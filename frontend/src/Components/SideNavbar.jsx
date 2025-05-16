@@ -4,7 +4,7 @@ import { DashboardOutlined } from "@ant-design/icons";
 import { Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 
-const SideNavbar = ({props}) => {
+const SideNavbar = ({ children }) => {
   return (
     <>
       <div className="sidebar active">
@@ -102,7 +102,7 @@ const SideNavbar = ({props}) => {
       </div>
 
       <div class="home_content">
-        <div class="text">Helllo</div>
+        {children}
       </div>
     </>
   );
