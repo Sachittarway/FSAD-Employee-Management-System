@@ -253,6 +253,7 @@ body {
   height: 100%;
   left: 280px;
   transition: all 0.5s ease;
+  top:70px;
 }
 
 .home_content .text {

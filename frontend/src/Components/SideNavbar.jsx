@@ -1,15 +1,10 @@
 import React from "react";
-import "./SideNavbar.css"; // Import the CSS file for styling
-import { DashboardOutlined } from "@ant-design/icons"; // Import the icon from Ant Design
-import { Avatar } from "antd"; // Import the Avatar component from Ant Design
-import { UserOutlined } from "@ant-design/icons"; // Import the UserOutlined icon from Ant Design
+import "./SideNavbar.css";
+import { DashboardOutlined } from "@ant-design/icons";
+import { Avatar } from "antd";
+import { UserOutlined } from "@ant-design/icons";
 
-const SideNavbar = () => {
-  //   const sidebarRef = useRef(null);
-
-  //   const toggleSidebar = () => {
-  //     sidebarRef.current.classList.toggle("active");
-  //   };
+const SideNavbar = ({props}) => {
   return (
     <>
       <div className="sidebar active">
@@ -95,19 +90,19 @@ const SideNavbar = () => {
       </div>
 
       <div className="top_navbar">
-        {/* Left div */}
+        
         <div className="left-div">
           <span className="brand_name">My App</span>
         </div>
 
-        {/* Right div */}
+        
         <div className="right-div">
           <Avatar size="large" icon={<UserOutlined />} />
         </div>
       </div>
 
       <div class="home_content">
-        <div class="text">Home Content</div>
+        <div class="text">Helllo</div>
       </div>
     </>
   );
