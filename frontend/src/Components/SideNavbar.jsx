@@ -1,13 +1,13 @@
 import React from "react";
 import "./SideNavbar.css";
 import { DashboardOutlined } from "@ant-design/icons";
-import { Avatar } from "antd";
+import { Avatar, Button } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 
 const SideNavbar = ({ children }) => {
   return (
     <>
-      <div className="sidebar active">
+      {/* <div className="sidebar active">
         <div class="logo_content">
           <div class="logo">
             <i class="bx bxl-c-plus-plus"></i>
@@ -90,20 +90,21 @@ const SideNavbar = ({ children }) => {
       </div>
 
       <div className="top_navbar">
-        
         <div className="left-div">
           <span className="brand_name">My App</span>
         </div>
 
-        
         <div className="right-div">
           <Avatar size="large" icon={<UserOutlined />} />
         </div>
       </div>
 
       <div class="home_content">
-        {children}
-      </div>
+        <div className="header">
+          <h1>Employee List</h1>
+          <Button type="primary">Primary Button</Button>
+        </div>
+      </div> */}
     </>
   );
 };

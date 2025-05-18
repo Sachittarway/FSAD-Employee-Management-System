@@ -1,4 +1,46 @@
-.header{
-    display: flex;
-    justify-content: center;
+/* Overall wrapper */
+.employee-list {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full height of viewport */
+}
+
+/* Top navigation bar */
+.top_navbar {
+  height: 80px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 99;
+}
+
+/* Body layout: sidebar + content */
+.employee-body {
+  display: flex;
+  flex: 1; /* Take the remaining height below the navbar */
+  flex-direction: row;
+}
+
+/* Sidebar wrapper - optional */
+.employee-body > div:first-child {
+  flex-shrink: 0;
+}
+
+/* Content area */
+.employee-content {
+  background-color: #f6f8fe;
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.hello {
+  margin: 0;
+  padding: 10px;
 }
