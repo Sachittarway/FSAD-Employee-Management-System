@@ -1,0 +1,19 @@
+meta {
+  name: Admin User Register
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://localhost:8081/registerAdmin
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email":"kanak@gmail.com",
+    "password":"Sachit",
+    "role":"ADMIN"
+  }
+}

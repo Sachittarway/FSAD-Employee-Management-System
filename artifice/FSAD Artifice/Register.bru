@@ -1,0 +1,23 @@
+meta {
+  name: Register
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:8081/register
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YXJ3YXlAZ21haWwuY29tIiwiaWF0IjoxNzQ3MzI2MzU1LCJleHAiOjE3NDczMjY0NjN9.48JEVqGvlT4MSUORvomiYl7Bq5vJxgHFXiMLlHd2ofA
+}
+
+body:json {
+  {
+    "email":"helloworld@gmail.com",
+    "password":"Sachit",
+    "role":"USER"
+  }
+}
