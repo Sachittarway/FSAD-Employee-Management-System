@@ -4,6 +4,7 @@ import Login from "./Pages/Login";
 import SideNavbar from "./Components/SideNavbar";
 import EmployeeList from "./Pages/EmployeeList";
 import Dashboard from "./Pages/Dashboard";
+import MyDetails from "./Pages/MyDetails";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/nav" element={<SideNavbar />} />
           <Route path="/EmployeeList" element={<EmployeeList />}/>
           <Route path="/Dashboard" element={<Dashboard />}/>
+          <Route path="/MyDetails" element={<MyDetails />} />
         </Routes>
       </BrowserRouter>
     </div>

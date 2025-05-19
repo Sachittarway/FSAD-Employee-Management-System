@@ -1,9 +1,10 @@
 import React from "react";
-import { Table, Tag, Space, Button, Avatar, Input, Dropdown } from "antd";
+import { Table, Tag, Space, Button, Avatar, Input, Dropdown,Modal } from "antd";
 import "./EmployeeList.css";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import {FilterOutlined,EditOutlined,DeleteOutlined,FolderViewOutlined} from "@ant-design/icons";
 import { Link } from 'react-router-dom';
+import { useState } from "react";
 
 const items = [
   {
@@ -99,6 +100,17 @@ const EmployeeList = () => {
     },
   ];
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="employee-list">
 
@@ -141,7 +153,7 @@ const EmployeeList = () => {
               <MenuItem component={<Link to="/Dashboard" />}>Dashboard</MenuItem>
               <MenuItem active>Employee List</MenuItem>
               <MenuItem>Requests</MenuItem>
-              <MenuItem>My Details </MenuItem>
+              <MenuItem component={<Link to="/MyDetails" />}>My Details </MenuItem>
             </Menu>
           </Sidebar>
         </div>
@@ -161,7 +173,7 @@ const EmployeeList = () => {
           >
             <div className="hello">Employee List</div>
             <div>
-              <Button type="primary" className="add-employee" size="large">
+              <Button type="primary" className="add-employee" size="large" onClick={showModal}>
                 Add Employee
               </Button>
             </div>
@@ -251,6 +263,19 @@ const EmployeeList = () => {
 
       </div>
       {/* Sidebar and Main Content Ends here !!! */}
+
+      {/* Modal - Add Employee Starts here !!! */}
+      <Modal
+        title="Add Employee"
+        closable={{ 'aria-label': 'Custom Close Button' }}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Modal>
 
     </div>
   );

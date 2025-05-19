@@ -1,22 +1,12 @@
+import "./MyDetails.css";
 import "./Dashboard.css"
 import React from "react";
 import { Avatar,Dropdown } from "antd";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
-import {UserOutlined,BarChartOutlined,CheckCircleOutlined,ClockCircleOutlined} from "@ant-design/icons";
 import { Link } from 'react-router-dom';
 
-const CardItem = ({ title, value, icon, trend, onClick }) => (
-    <div className="card" onClick={onClick}>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span className="title">{title}</span>
-        {icon}
-      </div>
-      <div className="value">{value}</div>
-    </div>
-);
+const MyDetails = () => {
 
-
-const Dashboard = () =>{
     const items = [
         {
           label: "Submit and continue",
@@ -24,36 +14,8 @@ const Dashboard = () =>{
         },
     ];
 
-    const cards = [
-        {
-          title: 'Team Size',
-          value: 15,
-          icon: <UserOutlined style={{ color: '#888' }} />,
-        },
-        {
-            title: 'Total Managers',
-            value: 15,
-            icon: <UserOutlined style={{ color: '#888' }} />,
-          },
-        {
-          title: 'All Requests',
-          value: 3,
-          icon: <BarChartOutlined style={{ color: '#888' }} />,
-        },
-        {
-          title: 'Approved Requests',
-          value: 10,
-          icon: <CheckCircleOutlined style={{ color: '#888' }} />,
-        },
-        {
-          title: 'Pending Requests',
-          value: 25,
-          icon: <ClockCircleOutlined style={{ color: '#888' }} />,
-        }
-    ];
-
     return(
-        <div className="dashboard">
+        <div className="mydetails">
 
             {/* Top Navbar Starts from here !!! */}
             <div className="top_navbar">
@@ -90,10 +52,10 @@ const Dashboard = () =>{
                                 },
                             }}
                         >
-                            <MenuItem active>Dashboard</MenuItem>
+                            <MenuItem component={<Link to="/Dashboard" />}>Dashboard</MenuItem>
                             <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
                             <MenuItem>Requests</MenuItem>
-                            <MenuItem component={<Link to="/MyDetails" />}>My Details </MenuItem>
+                            <MenuItem active>My Details </MenuItem>
                         </Menu>
                     </Sidebar>
                 </div>
@@ -101,26 +63,9 @@ const Dashboard = () =>{
         
                 {/* Main content Starts here !!! */}
                 <div className="employee-content">
-                    <div className="hello">Hi, Sachit Tarway 👋</div>
+                   
+                   {/* Start your from here !!!!!!! */}
 
-                    <div style={{
-                        width:"100%"
-                    }}>
-                        <div style={{ padding: '24px',minHeight: '100vh' }}>
-                            <div
-                                style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-                                    gap: '16px',
-                                }}
-                            >
-                                {cards.map((card, idx) => (
-                                <CardItem key={idx} {...card} onClick={() => alert(`Clicked on ${card.title}`)} />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-          
                 </div>
                 {/* Main content Ends here !!! */}
 
@@ -129,5 +74,4 @@ const Dashboard = () =>{
         </div>
     )
 }
-
-export default Dashboard;
+export default MyDetails;
