@@ -2,7 +2,8 @@ import "./Dashboard.css"
 import React from "react";
 import { Avatar,Dropdown } from "antd";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
-import {ArrowUpOutlined,UserOutlined,BarChartOutlined,CheckCircleOutlined,ClockCircleOutlined,PlusCircleOutlined,MinusCircleOutlined,FileTextOutlined,FileOutlined} from "@ant-design/icons";
+import {UserOutlined,BarChartOutlined,CheckCircleOutlined,ClockCircleOutlined} from "@ant-design/icons";
+import { Link } from 'react-router-dom';
 
 const CardItem = ({ title, value, icon, trend, onClick }) => (
     <div className="card" onClick={onClick}>
@@ -90,7 +91,7 @@ const Dashboard = () =>{
                             }}
                         >
                             <MenuItem active>Dashboard</MenuItem>
-                            <MenuItem>Employee List</MenuItem>
+                            <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
                             <MenuItem>Requests</MenuItem>
                             <MenuItem>My Details </MenuItem>
                         </Menu>

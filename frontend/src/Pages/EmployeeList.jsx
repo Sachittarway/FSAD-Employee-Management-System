@@ -3,7 +3,7 @@ import { Table, Tag, Space, Button, Avatar, Input, Dropdown } from "antd";
 import "./EmployeeList.css";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import {FilterOutlined,EditOutlined,DeleteOutlined,FolderViewOutlined} from "@ant-design/icons";
-
+import { Link } from 'react-router-dom';
 
 const items = [
   {
@@ -138,7 +138,7 @@ const EmployeeList = () => {
                 },
               }}
             >
-              <MenuItem>Dashboard</MenuItem>
+              <MenuItem component={<Link to="/Dashboard" />}>Dashboard</MenuItem>
               <MenuItem active>Employee List</MenuItem>
               <MenuItem>Requests</MenuItem>
               <MenuItem>My Details </MenuItem>
