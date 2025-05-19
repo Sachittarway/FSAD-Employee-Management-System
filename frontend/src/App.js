@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./Pages/Login";
 import SideNavbar from "./Components/SideNavbar";
 import EmployeeList from "./Pages/EmployeeList";
+import Dashboard from "./Pages/Dashboard";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/nav" element={<SideNavbar />} />
           <Route path="/EmployeeList" element={<EmployeeList />}/>
+          <Route path="/Dashboard" element={<Dashboard />}/>
         </Routes>
       </BrowserRouter>
     </div>

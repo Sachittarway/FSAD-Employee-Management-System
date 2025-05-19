@@ -1,80 +1,9 @@
 import React from "react";
 import { Table, Tag, Space, Button, Avatar, Input, Dropdown } from "antd";
 import "./EmployeeList.css";
-import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
-import { UserOutlined } from "@ant-design/icons";
-const columns = [
-  {
-    title: "Name",
-    dataIndex: "name",
-    key: "name",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "Age",
-    dataIndex: "age",
-    key: "age",
-  },
-  {
-    title: "Address",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Tags",
-    key: "tags",
-    dataIndex: "tags",
-    render: (_, { tags }) => (
-      <>
-        {tags.map((tag) => {
-          let color = tag.length > 5 ? "geekblue" : "green";
-          if (tag === "loser") {
-            color = "volcano";
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
-];
+import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
+import {FilterOutlined,EditOutlined,DeleteOutlined,FolderViewOutlined} from "@ant-design/icons";
 
-const data = [
-  {
-    key: "1",
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-    tags: ["nice", "developer"],
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    age: 42,
-    address: "London No. 1 Lake Park",
-    tags: ["loser"],
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    age: 32,
-    address: "Sydney No. 1 Lake Park",
-    tags: ["cool", "teacher"],
-  },
-];
 
 const items = [
   {
@@ -84,18 +13,113 @@ const items = [
 ];
 const EmployeeList = () => {
   const { Search } = Input;
+
+  /* Table Columns!!! */ 
+  const columns = [
+    {
+      title: "Employee ID",
+      dataIndex: "empid",
+      key: "empid",
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "Full Name",
+      dataIndex: "name",
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "Position",
+      dataIndex: "position",
+      key: "position",
+    },
+    {
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
+      render: (role) => {
+        let color;
+    
+        switch (role) {
+          case "Manager":
+            color = "blue";
+            break;
+          case "Admin":
+            color = "volcano";
+            break;
+          case "User":
+            color = "green";
+            break;
+          default:
+            color = "default";
+        }
+    
+        return <Tag color={color}>{role.toUpperCase()}</Tag>;
+      }
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <Button type="primary"><FolderViewOutlined /></Button>
+          <Button variant="outlined" color="danger"><EditOutlined /></Button>
+          <Button variant="filled" color="danger"><DeleteOutlined /></Button>
+        </Space>
+      ),
+    },
+  ];
+
+  /* Table Data!!!*/
+  const data = [
+    {
+      empid: "1",
+      name: "John Brown",
+      position: "Software Developer",
+      role: "Admin",
+      email:"sachit.tarway@gmail.com"
+    },
+    {
+      empid: "2",
+      name: "Jim Green",
+      position: "Software Developer",
+      role: "Manager",
+      email:"sachit.tarway@gmail.com"
+    },
+    {
+      empid: "3",
+      name: "Joe Black",
+      position: "Software Developer",
+      role: "User",
+      email:"sachit.tarway@gmail.com"
+    },
+  ];
+
   return (
     <div className="employee-list">
+
+      {/* Top Navbar Starts from here !!! */}
       <div className="top_navbar">
         <div className="left-div">
           <span className="brand_name">My App</span>
         </div>
 
         <div className="right-div">
-          <Avatar size="large" icon={<UserOutlined />} />
+        <Dropdown menu={{ items }} placement="bottomLeft">
+          <Avatar size="large" src={<img src={"https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg"}></img> }/>
+        </Dropdown>
         </div>
       </div>
+      {/* Top Navbar Ends here !!! */}
+
+      {/* Sidebar and Main Content Starts from here !!! */}
       <div className="employee-body">
+        
+        {/* Sidebar Starts from here !!! */}
         <div>
           <Sidebar
             rootStyles={{
@@ -114,16 +138,19 @@ const EmployeeList = () => {
                 },
               }}
             >
-              <SubMenu label="Charts">
-                <MenuItem> Pie charts </MenuItem>
-                <MenuItem> Line charts </MenuItem>
-              </SubMenu>
-              <MenuItem> Documentation </MenuItem>
-              <MenuItem active> Calendar </MenuItem>
+              <MenuItem>Dashboard</MenuItem>
+              <MenuItem active>Employee List</MenuItem>
+              <MenuItem>Requests</MenuItem>
+              <MenuItem>My Details </MenuItem>
             </Menu>
           </Sidebar>
         </div>
+        {/* Sidebar Ends here !!! */}
+        
+        {/* Main content Starts here !!! */}
         <div className="employee-content">
+
+
           <div
             style={{
               width: "100%",
@@ -134,13 +161,19 @@ const EmployeeList = () => {
           >
             <div className="hello">Employee List</div>
             <div>
-              <Button type="primary" className="add-employee">
+              <Button type="primary" className="add-employee" size="large">
                 Add Employee
               </Button>
             </div>
           </div>
 
-          <div>
+
+          <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop:"20px",
+                width: "100%",
+              }}>
             <div
               style={{
                 display: "flex",
@@ -166,16 +199,59 @@ const EmployeeList = () => {
               >
                 Filter
               </Dropdown.Button>
-              <Dropdown menu={{ items }} placement="bottomLeft" arrow>
-                <Button size="large">
-                  bottomLeft
-                  <Avatar icon={<UserOutlined />} />
-                </Button>
-              </Dropdown>
+            </div>
+
+            <div style={{
+              display:"flex",
+              justifyContent:"space-between",
+              gap: "20px"
+            }}>
+              <div>
+                <Dropdown menu={{ items }} placement="bottomLeft" arrow>
+                  <Button size="large">
+                  <FilterOutlined /> All Departments
+                  </Button>
+                </Dropdown>
+              </div>
+
+              <div>
+                <Dropdown menu={{ items }} placement="bottomLeft" arrow>
+                  <Button size="large">
+                  <FilterOutlined /> Roles
+                  </Button>
+                </Dropdown>
+              </div>
+
+              <div>
+                <Dropdown menu={{ items }} placement="bottomLeft" arrow>
+                  <Button size="large">
+                  <FilterOutlined /> Location
+                  </Button>
+                </Dropdown>
+              </div>
+
             </div>
           </div>
+
+          {/* Table Content Starts from here!!!!! */}
+          <div style={{
+            width:"100%",
+            marginTop:"20px",
+          }}>
+          <Table 
+            columns={columns} 
+            dataSource={data} 
+            className="custom-ant-table"
+          />
+          </div>
+          
         </div>
+        {/* Main content Ends here !!! */}
+
+
       </div>
+      {/* Sidebar and Main Content Ends here !!! */}
+
     </div>
   );
 };

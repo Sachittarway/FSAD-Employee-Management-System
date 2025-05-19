@@ -1,35 +1,36 @@
-/* Overall wrapper */
 .employee-list {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Full height of viewport */
+  height: 100vh;
 }
 
 /* Top navigation bar */
 .top_navbar {
-  height: 80px;
   background-color: #ffffff;
-  border-bottom: 1px solid #333;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
   z-index: 99;
 }
+.brand_name{
+  font-size: 24px;
+  font-weight: bold;
+}
 
-/* Body layout: sidebar + content */
 .employee-body {
   display: flex;
-  flex: 1; /* Take the remaining height below the navbar */
+  flex: 1; 
   flex-direction: row;
 }
 
-/* Sidebar wrapper - optional */
+
 .employee-body > div:first-child {
   flex-shrink: 0;
 }
 
-/* Content area */
 .employee-content {
   background-color: #f6f8fe;
   flex: 1;
@@ -43,4 +44,12 @@
 .hello {
   margin: 0;
   padding: 10px;
+  font-size: 38px;
+  font-weight: bold;
+}
+
+
+.custom-ant-table .ant-table-thead > tr > th {
+  background-color: #d5dff5; /* your custom color */
+  color: black;              /* optional: text color */
 }
