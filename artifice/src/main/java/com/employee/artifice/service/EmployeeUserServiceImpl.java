@@ -69,4 +69,10 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
         repository.save(user);
         return "Admin user created successfully";
     }
+
+    @Override
+    public String getRoleByEmail(String email) {
+        EmployeeUser user = repository.findByEmail(email);
+        return user != null ? user.getRole().toString() : "UNKNOWN";
+    }
 }

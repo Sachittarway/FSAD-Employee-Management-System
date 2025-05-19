@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 @RestController
 public class InitialController {
@@ -22,8 +25,13 @@ public class InitialController {
     }
 
     @PostMapping("/login")
-    public String loginUser(@RequestBody EmployeeUser user){
-        return service.verify(user);
+    public Map<String, String> loginUser(@RequestBody EmployeeUser user){
+        String token = service.verify(user);
+        String role = service.getRoleByEmail(user.getEmail());
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        response.put("role", role);
+        return response;
     }
 
     @PostMapping("/registerAdmin")
