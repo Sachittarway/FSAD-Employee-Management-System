@@ -2,7 +2,7 @@ import React from "react";
 import { Table, Tag, Space, Button, Avatar, Input, Dropdown,Modal } from "antd";
 import "./EmployeeList.css";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
-import {FilterOutlined,EditOutlined,DeleteOutlined,FolderViewOutlined} from "@ant-design/icons";
+import {FilterOutlined,EditOutlined,DeleteOutlined,FolderViewOutlined,UserOutlined} from "@ant-design/icons";
 import { Link } from 'react-router-dom';
 import { useState } from "react";
 
@@ -272,9 +272,11 @@ const EmployeeList = () => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        <div>
+        <label >Full Name</label>
+        <Input size="large" placeholder="large size" prefix={<UserOutlined />} />
+        </div>
+        
       </Modal>
 
     </div>

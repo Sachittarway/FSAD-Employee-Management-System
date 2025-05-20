@@ -1,10 +1,11 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./Pages/Login";
-import SideNavbar from "./Components/SideNavbar";
 import EmployeeList from "./Pages/EmployeeList";
-import Dashboard from "./Pages/Dashboard";
 import MyDetails from "./Pages/MyDetails";
+import AdminDashboard from "./Pages/Admin/AdminDashboard";
+import ManagerDashboard from "./Pages/Manager/ManagerDashboard";
+import ResourceRequests from "./Pages/ResourceRequests";
 import { AuthProvider } from "./Auth/AuthContext";
 
 function App() {
@@ -14,10 +15,13 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/nav" element={<SideNavbar />} />
           <Route path="/EmployeeList" element={<EmployeeList />}/>
-          <Route path="/Dashboard" element={<Dashboard />}/>
           <Route path="/MyDetails" element={<MyDetails />} />
+          <Route path="/Resources" element={<ResourceRequests />} />
+
+          <Route path="/AdminDashboard" element={<AdminDashboard />} />
+
+          <Route path="/ManagerDashboard" element={<ManagerDashboard />} />
         </Routes>
       </BrowserRouter>
       </AuthProvider>

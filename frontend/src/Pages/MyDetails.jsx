@@ -1,7 +1,6 @@
 import "./MyDetails.css";
-import "./Dashboard.css"
 import React from "react";
-import { Avatar,Dropdown } from "antd";
+import { Avatar,Dropdown,Descriptions } from "antd";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import { Link } from 'react-router-dom';
 
@@ -13,6 +12,34 @@ const MyDetails = () => {
           key: "1",
         },
     ];
+
+    const items1 = [
+        {
+          key: '1',
+          label: 'UserName',
+          children: 'Zhou Maomao',
+        },
+        {
+          key: '2',
+          label: 'Telephone',
+          children: '1810000000',
+        },
+        {
+          key: '3',
+          label: 'Live',
+          children: 'Hangzhou, Zhejiang',
+        },
+        {
+          key: '4',
+          label: 'Remark',
+          children: 'empty',
+        },
+        {
+          key: '5',
+          label: 'Address',
+          children: 'No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China',
+        },
+      ];
 
     return(
         <div className="mydetails">
