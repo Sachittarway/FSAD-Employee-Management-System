@@ -33,7 +33,7 @@ public class EmployeeUser {
         USER, MANAGER, ADMIN
     }
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JsonIgnore // Prevent infinite recursion
     private EmployeeDetails employeeDetails;
 }
