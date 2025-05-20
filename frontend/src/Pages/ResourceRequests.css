@@ -1,0 +1,42 @@
+.resourcerequests {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+  
+/* Top navigation bar */
+.top_navbar {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    z-index: 99;
+}
+.brand_name{
+    font-size: 24px;
+    font-weight: bold;
+}
+  
+.employee-body {
+    display: flex;
+    flex: 1; 
+    flex-direction: row;
+}
+  
+.employee-body > div:first-child {
+    flex-shrink: 0;
+}
+  
+.employee-content {
+    background-color: #f6f8fe;
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+}
