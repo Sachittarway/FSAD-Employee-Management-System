@@ -93,4 +93,9 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
         }
         return employees;
     }
+
+    @Override
+    public String getUserIdByEmail(String email) {
+        return repository.findByEmail(email).getId().toString();
+    }
 }

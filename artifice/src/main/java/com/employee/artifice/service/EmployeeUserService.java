@@ -19,4 +19,6 @@ public interface EmployeeUserService {
     String getRoleByEmail(String email);
 
     public List<Map<String, Object>> getAllEmployeesList();
+
+    public String getUserIdByEmail(String email);
 }
