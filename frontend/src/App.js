@@ -5,10 +5,12 @@ import SideNavbar from "./Components/SideNavbar";
 import EmployeeList from "./Pages/EmployeeList";
 import Dashboard from "./Pages/Dashboard";
 import MyDetails from "./Pages/MyDetails";
+import { AuthProvider } from "./Auth/AuthContext";
 
 function App() {
   return (
     <div className="App">
+      <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
@@ -18,6 +20,7 @@ function App() {
           <Route path="/MyDetails" element={<MyDetails />} />
         </Routes>
       </BrowserRouter>
+      </AuthProvider>
     </div>
   );
 }
