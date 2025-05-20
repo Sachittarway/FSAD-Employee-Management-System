@@ -4,6 +4,7 @@ import com.employee.artifice.model.EmployeeUser;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 @Service
 public interface EmployeeUserService {
@@ -16,4 +17,6 @@ public interface EmployeeUserService {
     String registerAdmin(EmployeeUser user);
 
     String getRoleByEmail(String email);
+
+    public List<Map<String, Object>> getAllEmployeesList();
 }

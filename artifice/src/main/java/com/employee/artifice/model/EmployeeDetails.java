@@ -17,8 +17,7 @@ public class EmployeeDetails {
     @Column(name = "id")
     Long id;
 
-    @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     EmployeeUser user;
 
     String employeeName;

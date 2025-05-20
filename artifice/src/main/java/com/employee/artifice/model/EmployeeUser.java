@@ -2,6 +2,7 @@ package com.employee.artifice.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Entity
@@ -32,5 +33,7 @@ public class EmployeeUser {
         USER, MANAGER, ADMIN
     }
 
-
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private EmployeeDetails employeeDetails;
 }

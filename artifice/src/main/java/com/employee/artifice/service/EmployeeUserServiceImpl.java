@@ -9,8 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class EmployeeUserServiceImpl implements EmployeeUserService{
@@ -74,5 +73,24 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
     public String getRoleByEmail(String email) {
         EmployeeUser user = repository.findByEmail(email);
         return user != null ? user.getRole().toString() : "UNKNOWN";
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllEmployeesList() {
+        List<EmployeeUser> users = repository.findAll();
+        List<Map<String, Object>> employees = new ArrayList<>();
+        for (EmployeeUser user : users) {
+            Map<String, Object> emp = new HashMap<>();
+            emp.put("id", user.getId());
+            if (user.getEmployeeDetails() != null) {
+                emp.put("name", user.getEmployeeDetails().getEmployeeName());
+            } else {
+                emp.put("name", null);
+            }
+            emp.put("email", user.getEmail());
+            emp.put("role", user.getRole().name());
+            employees.add(emp);
+        }
+        return employees;
     }
 }
