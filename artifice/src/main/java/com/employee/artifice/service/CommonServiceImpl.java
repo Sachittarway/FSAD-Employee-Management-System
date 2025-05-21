@@ -1,5 +1,6 @@
 package com.employee.artifice.service;
 
+import com.employee.artifice.dto.PasswordChangeRequest;
 import com.employee.artifice.model.EmployeeUser;
 import com.employee.artifice.repository.EmployeeUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,18 +17,18 @@ public class CommonServiceImpl implements CommonService{
     @Autowired
     EmployeeUserRepository repository;
 
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
     @Override
-    public String updatePassword(String newPassword) {
+    public String updatePassword(PasswordChangeRequest passwordChangeRequest) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("Email: " + email);
         EmployeeUser user = employeeUserService.getAllUsers()
                 .stream()
                 .filter(u -> u.getEmail().equals(email))
                 .findFirst()
                 .orElse(null);
         if (user != null) {
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-            user.setPassword(encoder.encode(newPassword));
+            user.setPassword(encoder.encode(passwordChangeRequest.getNewPassword()));
             repository.save(user);
             return "Password updated successfully";
         }
