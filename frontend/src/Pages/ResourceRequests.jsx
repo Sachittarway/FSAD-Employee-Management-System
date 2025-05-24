@@ -141,7 +141,7 @@ const ResourceRequests = () => {
                                     <>
                                         <MenuItem component={<Link to="/ManagerDashboard" />}>Dashboard</MenuItem>
                                         <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
-                                        <MenuItem>Team List</MenuItem>
+                                        <MenuItem component={<Link to ="/TeamList"/>}>Team List</MenuItem>
                                         <MenuItem active>Requests</MenuItem>
                                         <MenuItem component={<Link to="/MyDetails" />}>My Details </MenuItem>
                                     </>

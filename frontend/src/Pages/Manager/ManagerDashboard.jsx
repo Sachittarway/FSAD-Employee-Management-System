@@ -92,7 +92,7 @@ const ManagerDashboard = () =>{
                         >
                             <MenuItem active>Dashboard</MenuItem>
                             <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
-                            <MenuItem>Team List</MenuItem>
+                            <MenuItem component={<Link to="/TeamList" />}>Team List</MenuItem>
                             <MenuItem component={<Link to="/Resources" />}>Requests</MenuItem>
                             <MenuItem component={<Link to="/MyDetails" />}>My Details </MenuItem>
                         </Menu>

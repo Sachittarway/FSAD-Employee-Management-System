@@ -1,12 +1,11 @@
 import React from "react";
-import { Table, Tag, Space, Button, Avatar, Input, Dropdown,Modal,Select } from "antd";
-import "./EmployeeList.css";
+import { Table, Tag, Space, Button, Avatar, Input, Dropdown,Modal } from "antd";
+import "./TeamList.css";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
-import {FilterOutlined,DeleteOutlined,FolderViewOutlined,UserOutlined} from "@ant-design/icons";
+import {FilterOutlined,EditOutlined,DeleteOutlined,FolderViewOutlined,UserOutlined} from "@ant-design/icons";
 import { Link } from 'react-router-dom';
 import { useState } from "react";
 import { useAuth } from "../Auth/AuthContext";
-import { notification} from 'antd';
 
 const items = [
   {
@@ -14,25 +13,8 @@ const items = [
     key: "1",
   },
 ];
-const EmployeeList = () => {
+const TeamList = () => {
   const { Search } = Input;
-  const [searchText, setSearchText] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [fullname, setFullname] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("USER");
-  const [api, contextHolder] = notification.useNotification();
-    const openNotification = (pauseOnHover, type, message, description) => () => {
-      api.open({
-        message,
-        description,
-        showProgress: true,
-        pauseOnHover,
-        type,
-      });
-    };
 
   /* Table Columns!!! */ 
   const columns = [
@@ -87,7 +69,8 @@ const EmployeeList = () => {
       render: (_, record) => (
         <Space size="middle">
           <Button type="primary"><FolderViewOutlined /></Button>
-          <Button variant="filled" color="danger" onClick={showDeleteModal}><DeleteOutlined /></Button>
+          <Button variant="outlined" color="danger"><EditOutlined /></Button>
+          <Button variant="filled" color="danger"><DeleteOutlined /></Button>
         </Space>
       ),
     },
@@ -96,21 +79,21 @@ const EmployeeList = () => {
   /* Table Data!!!*/
   const data = [
     {
-      empid: "1",
+      empid: "4",
       name: "John Brown",
       position: "Software Developer",
       role: "Admin",
       email:"sachit.tarway@gmail.com"
     },
     {
-      empid: "2",
+      empid: "5",
       name: "Jim Green",
       position: "Software Developer",
       role: "Manager",
       email:"sachit.tarway@gmail.com"
     },
     {
-      empid: "3",
+      empid: "6",
       name: "Joe Black",
       position: "Software Developer",
       role: "User",
@@ -118,87 +101,21 @@ const EmployeeList = () => {
     },
   ];
 
-  
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
     setIsModalOpen(true);
   };
-
-  // Function to handle the Register button click
   const handleOk = () => {
-    if(!fullname || !email || !role){
-      openNotification(false, 'error', 'All fields are required', 'Please fill in all the fields before submitting.')();
-      return;
-    }
-    if(!email.includes("@") || !email.includes(".")){
-      openNotification(false, 'error', 'Invalid email', 'Please enter a valid email address.')();
-      return;
-    }
-    if(fullname.length < 3){
-      openNotification(false, 'error', 'Invalid full name', 'Full name should be at least 3 characters long.')();
-      return;
-    }
-    try{
-      const res = fetch('http://localhost:8081/admin/register', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(
-          { 
-            name: fullname, 
-            password: fullname,
-            email,
-            role 
-          }
-        )
-      });
-
-      if (!res.ok){
-        alert("Failed to add employee. Please try again.");
-        return;
-      }
-      const data = res.json();
-      console.log(data);
-      setIsModalOpen(false);
-    }catch(err){
-      console.error(err);
-    }
     setIsModalOpen(false);
-    setFullname("");
-    setEmail("");
-    setRole("USER");
   };
-
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  const showDeleteModal = () => {
-    setIsDeleteModalOpen(true);
-  };
-  const handleDeleteOk = () => {
-    setIsDeleteModalOpen(false);
-  };
-  const handleDeleteCancel = () => {
-    setIsDeleteModalOpen(false);
-  };
   const { user } = useAuth();
-
-  
-
-  const onSearch = (value) => {
-    setSearchText(value);
-    console.log(`searching for ${value}`);
-  };
-  
-  const handleMenuClick = (e) => {
-    setSelectedFilter(e.key);
-  };
-  console.log("Selected filter:", selectedFilter);
 
   return (
     <div className="employee-list">
-      {contextHolder}
+
       {/* Top Navbar Starts from here !!! */}
       <div className="top_navbar">
         <div className="left-div">
@@ -250,8 +167,8 @@ const EmployeeList = () => {
                 user.role === "MANAGER" && (
                   <>
                     <MenuItem component={<Link to="/ManagerDashboard" />}>Dashboard</MenuItem>
-                    <MenuItem active>Employee List</MenuItem>
-                    <MenuItem component={<Link to="/TeamList" />} >Team List</MenuItem>
+                    <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
+                    <MenuItem active>Team List</MenuItem>
                     <MenuItem component={<Link to="/Resources" />}>Requests</MenuItem>
                     <MenuItem component={<Link to="/MyDetails" />}>My Details </MenuItem>
                   </>
@@ -275,10 +192,10 @@ const EmployeeList = () => {
               alignItems: "center",
             }}
           >
-            <div className="hello">Employee List</div>
+            <div className="hello">Team List</div>
             <div>
               <Button type="primary" className="add-employee" size="large" onClick={showModal}>
-                Add Employee
+                Add Member
               </Button>
             </div>
           </div>
@@ -297,36 +214,18 @@ const EmployeeList = () => {
               }}
             >
               <Search
-                placeholder="Search ..."
+                placeholder="input search text"
                 // onSearch={onSearch}
                 size="large"
                 enterButton
                 style={{
                   width: 600,
                 }}
-                value={searchText}
-                onChange={(e) => onSearch(e.target.value)}
               />
               <Dropdown.Button
                 type="primary"
                 size="large"
-                menu={{
-                  items: [
-                    {
-                      label: "Filter by Department",
-                      key: "1",
-                    },
-                    {
-                      label: "Filter by Role",
-                      key: "2",
-                    },
-                    {
-                      label: "Filter by Location",
-                      key: "3",
-                    },
-                  ],
-                  onClick: handleMenuClick,
-                }}
+                menu={{ items }}
                 style={{
                   marginLeft: "10px",
                 }}
@@ -335,28 +234,13 @@ const EmployeeList = () => {
               </Dropdown.Button>
             </div>
 
-            <div style={{
+            {/* <div style={{
               display:"flex",
               justifyContent:"space-between",
               gap: "20px"
             }}>
               <div>
-                <Dropdown menu={{ 
-                  items: [
-                    {
-                      label: "HR",
-                      key: "2",
-                    },
-                    {
-                      label: "Engineering",
-                      key: "3",
-                    },
-                    {
-                      label: "Sales",
-                      key: "4",
-                    },
-                  ],
-                 }} placement="bottomLeft" arrow>
+                <Dropdown menu={{ items }} placement="bottomLeft" arrow>
                   <Button size="large">
                   <FilterOutlined /> All Departments
                   </Button>
@@ -364,18 +248,7 @@ const EmployeeList = () => {
               </div>
 
               <div>
-                <Dropdown menu={{ 
-                  items: [
-                    {
-                      label: "Manager",
-                      key: "1",
-                    },
-                    {
-                      label: "User",
-                      key: "2",
-                    }
-                  ],
-                 }} placement="bottomLeft" arrow>
+                <Dropdown menu={{ items }} placement="bottomLeft" arrow>
                   <Button size="large">
                   <FilterOutlined /> Roles
                   </Button>
@@ -383,29 +256,14 @@ const EmployeeList = () => {
               </div>
 
               <div>
-                <Dropdown menu={{ 
-                  items: [
-                    {
-                      label: "New York",
-                      key: "2",
-                    },
-                    {
-                      label: "San Francisco",
-                      key: "3",
-                    },
-                    {
-                      label: "Los Angeles",
-                      key: "4",
-                    },
-                  ],
-                 }} placement="bottomLeft" arrow>
+                <Dropdown menu={{ items }} placement="bottomLeft" arrow>
                   <Button size="large">
-                  <FilterOutlined /> Location 
+                  <FilterOutlined /> Location
                   </Button>
                 </Dropdown>
               </div>
 
-            </div>
+            </div> */}
           </div>
 
           {/* Table Content Starts from here!!!!! */}
@@ -435,66 +293,15 @@ const EmployeeList = () => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <div style={{
-          marginTop:"20px",
-        }}>
-        <label style={{
-          fontSize:"20px",
-          fontWeight:"bold",
-        }}>Full Name</label>
-        <Input size="large" placeholder="Employee Name" prefix={<UserOutlined />} 
-          value={fullname}
-          onChange={(e) => setFullname(e.target.value)}
-        />
-        </div>
-
-        <div style={{
-          marginTop:"20px",
-        }}>
-        <label style={{
-          fontSize:"20px",
-          fontWeight:"bold",
-        }}>Email</label>
-        <Input size="large" placeholder="Employee Email" prefix={<UserOutlined />} 
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        </div>
-
-        <div style={{
-          marginTop:"20px",
-        }}>
-        <label style={{
-          fontSize:"20px",
-          fontWeight:"bold",
-        }}>Role</label>
-        <br />
-        <Select
-          defaultValue="USER"
-          style={{ width: 220 }}
-          onChange={(value) => setRole(value)}
-          size="large"
-          options={[
-            { value: 'USER', label: 'User' },
-            { value: 'MANAGER', label: 'Manager' },
-          ]}
-        />
+        <div>
+        <label >Full Name</label>
+        <Input size="large" placeholder="large size" prefix={<UserOutlined />} />
         </div>
         
-      </Modal>
-
-      <Modal
-        title="Delete Employee"
-        closable={{ 'aria-label': 'Custom Close Button' }}
-        open={isDeleteModalOpen}
-        onOk={handleDeleteOk}
-        onCancel={handleDeleteCancel}
-      >
-        <p>Are you sure you want to delete this employee?</p>
       </Modal>
 
     </div>
   );
 };
 
-export default EmployeeList;
+export default TeamList;

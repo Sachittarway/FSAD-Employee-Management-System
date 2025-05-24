@@ -80,60 +80,33 @@ const MyDetails = () => {
                 ]
             }
         );
+        const[editMode, setEditMode] = useState(null);
+        const [editValues, setEditValues] = useState({
+                currentIbu: userDetails.currentIbu,
+                currentLocation: userDetails.currentLocation,
+                projectCode: userDetails.projectCode,
+            });
 
-          const [editFields, setEditFields] = useState({
-        currentIbu: false,
-        currentLocation: false,
-        projectCode: false
-    });
+            const handleEditProfileClick = () => {
+                if (editMode) {
+                setUserDetails(prev => ({ ...prev, ...editValues }));
+                setEditMode(false);
+                } else if (role === "manager" || role === "admin") {
+                setEditMode(true);
+                }
+            };
 
-    const [editedValues, setEditedValues] = useState({
-        currentIbu: userDetails.currentIbu,
-        currentLocation: userDetails.currentLocation,
-        projectCode: userDetails.projectCode
-    });
-
-    const handleFieldsEditClick = (field) => {
-        setEditFields(prev => ({ ...prev, [field]: true }));
-    };
-
-    const handlFieldseSaveClick = (field) => {
-        setUserDetails(prev => ({ ...prev, [field]: editedValues[field] }));
-        setEditFields(prev => ({ ...prev, [field]: false }));
-    };
+                const handleInputChange = (e) => {
+                const { name, value } = e.target;
+                setEditValues(prev => ({ ...prev, [name]: value }));
+            };
 
 
     
        
             
 
-    const items1 = [
-        {
-          key: '1',
-          label: 'UserName',
-          children: 'Zhou Maomao',
-        },
-        {
-          key: '2',
-          label: 'Telephone',
-          children: '1810000000',
-        },
-        {
-          key: '3',
-          label: 'Live',
-          children: 'Hangzhou, Zhejiang',
-        },
-        {
-          key: '4',
-          label: 'Remark',
-          children: 'empty',
-        },
-        {
-          key: '5',
-          label: 'Address',
-          children: 'No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China',
-        },
-      ];
+    
 
     return(
         <div className="mydetails">
@@ -226,8 +199,8 @@ const MyDetails = () => {
                                     <p>Team Manager</p>
                         </div>
                         <div>
-                        <Button type="primary" className="add-employee" size="large" >
-                            Edit Profile
+                        <Button type="primary" className="add-employee" size="large" onClick={handleEditProfileClick} >
+                             {editMode ? "Save" : "Edit Profile"}
                         </Button>
                         </div>
                     </div>
@@ -270,35 +243,11 @@ const MyDetails = () => {
                             <div className="user-section">
                              <p><span className="label">Years of Experience: </span>{userDetails?.yearsOfExperience}</p>
                             <p><span className="label">Current IBU: </span>
-                             {role === "manager" || role === "admin" ? (
-                                        editFields.currentIbu ? (
-                                            <>
-                                                <input
-                                                    type="text"
-                                                    value={editedValues.currentIbu}
-                                                    onChange={(e) =>
-                                                        setEditedValues(prev => ({ ...prev, currentIbu: e.target.value }))
-                                                    }
-                                                />
-                                                <FaSave
-                                                    onClick={() => handlFieldseSaveClick("currentIbu")}
-                                                    style={{ marginLeft: "8px", cursor: "pointer", color: "green" }}
-                                                    title="Save Current IBU"
-                                                />
-                                            </>
-                                        ) : (
-                                            <>
-                                                {userDetails.currentIbu}
-                                                <FaPen
-                                                    onClick={() => handleFieldsEditClick("currentIbu")}
-                                                    style={{ marginLeft: "8px", cursor: "pointer" }}
-                                                    title="Edit Current IBU"
-                                                />
-                                            </>
-                                        )
-                                    ) : (
-                                        userDetails.currentIbu
-                                    )}
+                            {
+                            (role === "manager" || role === "admin") && editMode
+                                ? <input name="currentIbu" value={editValues.currentIbu} onChange={handleInputChange} />
+                                : userDetails.currentIbu
+                            }
                             </p>
                             </div>
                              <div className="user-section right-align">
@@ -365,71 +314,22 @@ const MyDetails = () => {
                            <div className="user-section" >
                              <p><span className="label">Employee Number: </span>{userDetails?.employeeNumber}</p>
                             <p><span className="label">Project Code: </span>
-                            {role === "manager" || role === "admin" ? (
-                                        editFields.projectCode ? (
-                                            <>
-                                                <input
-                                                    type="text"
-                                                    value={editedValues.projectCode}
-                                                    onChange={(e) =>
-                                                        setEditedValues(prev => ({ ...prev, projectCode: e.target.value }))
-                                                    }
-                                                />
-                                                <FaSave
-                                                    onClick={() => handlFieldseSaveClick("projectCode")}
-                                                    style={{ marginLeft: "8px", cursor: "pointer", color: "green" }}
-                                                    title="Save Project Code"
-                                                />
-                                            </>
-                                        ) : (
-                                            <>
-                                                {userDetails.projectCode}
-                                                <FaPen
-                                                    onClick={() => handleFieldsEditClick("projectCode")}
-                                                    style={{ marginLeft: "8px", cursor: "pointer" }}
-                                                    title="Edit Project Code"
-                                                />
-                                            </>
-                                        )
-                                    ) : (
-                                        userDetails.projectCode
-                                    )}
-                            
+                           {
+                            (role === "manager" || role === "admin") && editMode
+                                ? <input name="projectCode" value={editValues.projectCode} onChange={handleInputChange} />
+                                : userDetails.projectCode
+                            }
                             
                             </p>
                             </div>
                             <div className="user-section">
                             <p><span className="label">Current Location: </span>
-                            {role === "manager" || role === "admin" ? (
-                                        editFields.currentLocation ? (
-                                            <>
-                                                <input
-                                                    type="text"
-                                                    value={editedValues.currentLocation}
-                                                    onChange={(e) =>
-                                                        setEditedValues(prev => ({ ...prev, currentLocation: e.target.value }))
-                                                    }
-                                                />
-                                                <FaSave
-                                                    onClick={() => handlFieldseSaveClick("currentLocation")}
-                                                    style={{ marginLeft: "8px", cursor: "pointer", color: "green" }}
-                                                    title="Save Current Location"
-                                                />
-                                            </>
-                                        ) : (
-                                            <>
-                                                {userDetails.currentLocation}
-                                                <FaPen
-                                                    onClick={() => handleFieldsEditClick("currentLocation")}
-                                                    style={{ marginLeft: "8px", cursor: "pointer" }}
-                                                    title="Edit Current Location"
-                                                />
-                                            </>
-                                        )
-                                    ) : (
-                                        userDetails.currentLocation
-                                    )}
-                            
+                            {
+                            (role === "manager" || role === "admin") && editMode
+                                ? <input name="currentLocation" value={editValues.currentLocation} onChange={handleInputChange} />
+                                : userDetails.currentLocation
+                            }
+                                            
                             
                             </p>
                             </div>
