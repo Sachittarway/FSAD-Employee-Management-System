@@ -1,8 +1,8 @@
 import React from "react";
-import { Table, Tag, Space, Button, Avatar, Input, Dropdown,Modal } from "antd";
+import { Table, Tag, Space, Button, Avatar, Input, Dropdown,Modal,Select } from "antd";
 import "./EmployeeList.css";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
-import {FilterOutlined,EditOutlined,DeleteOutlined,FolderViewOutlined,UserOutlined} from "@ant-design/icons";
+import {FilterOutlined,DeleteOutlined,FolderViewOutlined,UserOutlined} from "@ant-design/icons";
 import { Link } from 'react-router-dom';
 import { useState } from "react";
 import { useAuth } from "../Auth/AuthContext";
@@ -15,6 +15,10 @@ const items = [
 ];
 const EmployeeList = () => {
   const { Search } = Input;
+  const [searchText, setSearchText] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   /* Table Columns!!! */ 
   const columns = [
@@ -69,8 +73,7 @@ const EmployeeList = () => {
       render: (_, record) => (
         <Space size="middle">
           <Button type="primary"><FolderViewOutlined /></Button>
-          <Button variant="outlined" color="danger"><EditOutlined /></Button>
-          <Button variant="filled" color="danger"><DeleteOutlined /></Button>
+          <Button variant="filled" color="danger" onClick={showDeleteModal}><DeleteOutlined /></Button>
         </Space>
       ),
     },
@@ -101,7 +104,7 @@ const EmployeeList = () => {
     },
   ];
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -111,7 +114,32 @@ const EmployeeList = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+  const showDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+  const handleDeleteOk = () => {
+    setIsDeleteModalOpen(false);
+  };
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
+  };
   const { user } = useAuth();
+
+  const handleChange = value => {
+    console.log(`selected ${value}`);
+  };
+
+  
+
+  const onSearch = (value) => {
+    setSearchText(value);
+    console.log(`searching for ${value}`);
+  };
+  
+  const handleMenuClick = (e) => {
+    setSelectedFilter(e.key);
+  };
+  console.log("Selected filter:", selectedFilter);
 
   return (
     <div className="employee-list">
@@ -214,18 +242,36 @@ const EmployeeList = () => {
               }}
             >
               <Search
-                placeholder="input search text"
+                placeholder="Search ..."
                 // onSearch={onSearch}
                 size="large"
                 enterButton
                 style={{
                   width: 600,
                 }}
+                value={searchText}
+                onChange={(e) => onSearch(e.target.value)}
               />
               <Dropdown.Button
                 type="primary"
                 size="large"
-                menu={{ items }}
+                menu={{
+                  items: [
+                    {
+                      label: "Filter by Department",
+                      key: "1",
+                    },
+                    {
+                      label: "Filter by Role",
+                      key: "2",
+                    },
+                    {
+                      label: "Filter by Location",
+                      key: "3",
+                    },
+                  ],
+                  onClick: handleMenuClick,
+                }}
                 style={{
                   marginLeft: "10px",
                 }}
@@ -240,7 +286,22 @@ const EmployeeList = () => {
               gap: "20px"
             }}>
               <div>
-                <Dropdown menu={{ items }} placement="bottomLeft" arrow>
+                <Dropdown menu={{ 
+                  items: [
+                    {
+                      label: "HR",
+                      key: "2",
+                    },
+                    {
+                      label: "Engineering",
+                      key: "3",
+                    },
+                    {
+                      label: "Sales",
+                      key: "4",
+                    },
+                  ],
+                 }} placement="bottomLeft" arrow>
                   <Button size="large">
                   <FilterOutlined /> All Departments
                   </Button>
@@ -248,7 +309,18 @@ const EmployeeList = () => {
               </div>
 
               <div>
-                <Dropdown menu={{ items }} placement="bottomLeft" arrow>
+                <Dropdown menu={{ 
+                  items: [
+                    {
+                      label: "Manager",
+                      key: "1",
+                    },
+                    {
+                      label: "User",
+                      key: "2",
+                    }
+                  ],
+                 }} placement="bottomLeft" arrow>
                   <Button size="large">
                   <FilterOutlined /> Roles
                   </Button>
@@ -256,9 +328,24 @@ const EmployeeList = () => {
               </div>
 
               <div>
-                <Dropdown menu={{ items }} placement="bottomLeft" arrow>
+                <Dropdown menu={{ 
+                  items: [
+                    {
+                      label: "New York",
+                      key: "2",
+                    },
+                    {
+                      label: "San Francisco",
+                      key: "3",
+                    },
+                    {
+                      label: "Los Angeles",
+                      key: "4",
+                    },
+                  ],
+                 }} placement="bottomLeft" arrow>
                   <Button size="large">
-                  <FilterOutlined /> Location
+                  <FilterOutlined /> Location 
                   </Button>
                 </Dropdown>
               </div>
@@ -293,11 +380,56 @@ const EmployeeList = () => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <div>
-        <label >Full Name</label>
-        <Input size="large" placeholder="large size" prefix={<UserOutlined />} />
+        <div style={{
+          marginTop:"20px",
+        }}>
+        <label style={{
+          fontSize:"20px",
+          fontWeight:"bold",
+        }}>Full Name</label>
+        <Input size="large" placeholder="Employee Name" prefix={<UserOutlined />} />
+        </div>
+
+        <div style={{
+          marginTop:"20px",
+        }}>
+        <label style={{
+          fontSize:"20px",
+          fontWeight:"bold",
+        }}>Email</label>
+        <Input size="large" placeholder="Employee Email" prefix={<UserOutlined />} />
+        </div>
+
+        <div style={{
+          marginTop:"20px",
+        }}>
+        <label style={{
+          fontSize:"20px",
+          fontWeight:"bold",
+        }}>Role</label>
+        <br />
+        <Select
+          defaultValue="USER"
+          style={{ width: 220 }}
+          onChange={handleChange}
+          size="large"
+          options={[
+            { value: 'USER', label: 'User' },
+            { value: 'MANAGER', label: 'Manager' },
+          ]}
+        />
         </div>
         
+      </Modal>
+
+      <Modal
+        title="Delete Employee"
+        closable={{ 'aria-label': 'Custom Close Button' }}
+        open={isDeleteModalOpen}
+        onOk={handleDeleteOk}
+        onCancel={handleDeleteCancel}
+      >
+        <p>Are you sure you want to delete this employee?</p>
       </Modal>
 
     </div>
