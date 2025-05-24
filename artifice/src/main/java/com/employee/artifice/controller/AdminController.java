@@ -1,5 +1,6 @@
 package com.employee.artifice.controller;
 
+import com.employee.artifice.dto.CreateUser;
 import com.employee.artifice.model.EmployeeUser;
 import com.employee.artifice.service.EmployeeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ public class AdminController {
     EmployeeUserService service;
 
     @PostMapping("/register")
-    public ResponseEntity<EmployeeUser> createUser(@RequestBody EmployeeUser user){
+    public ResponseEntity<EmployeeUser> createUser(@RequestBody CreateUser user) {
         EmployeeUser newuser = service.createUser(user);
         return ResponseEntity.ok(newuser);
     }

@@ -1,7 +1,11 @@
 package com.employee.artifice.service;
 
+import com.employee.artifice.dto.CreateUser;
+import com.employee.artifice.model.EmployeeDetails;
 import com.employee.artifice.model.EmployeeUser;
+import com.employee.artifice.repository.EmployeeDetailsRepository;
 import com.employee.artifice.repository.EmployeeUserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,12 +27,26 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
     @Autowired
     JWTService jwtService;
 
+    @Autowired
+    EmployeeDetailsRepository employeeDetailsRepository;
+
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     @Override
-    public EmployeeUser createUser(EmployeeUser user) {
-        user.setPassword(encoder.encode(user.getPassword()));
-        return repository.save(user);
+    public EmployeeUser createUser(CreateUser user) {
+
+        EmployeeUser newUser = new EmployeeUser();
+        newUser.setEmail(user.getEmail());
+        newUser.setPassword(encoder.encode(user.getPassword()));
+        newUser.setRole(EmployeeUser.Role.valueOf(user.getRole().toUpperCase()));
+        EmployeeUser savedUser = repository.save(newUser);
+
+        EmployeeDetails details = new EmployeeDetails();
+        details.setEmployeeName(user.getName());
+        details.setUser(savedUser);
+        employeeDetailsRepository.save(details);
+
+        return savedUser;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.employee.artifice.service;
 
+import com.employee.artifice.dto.CreateUser;
 import com.employee.artifice.model.EmployeeUser;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Map;
 
 @Service
 public interface EmployeeUserService {
-    public EmployeeUser createUser(EmployeeUser user);
+    public EmployeeUser createUser(CreateUser user);
     public List<EmployeeUser> getAllUsers();
     public Optional<EmployeeUser> getUserById(Long id);
 
