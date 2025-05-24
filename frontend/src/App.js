@@ -7,6 +7,7 @@ import AdminDashboard from "./Pages/Admin/AdminDashboard";
 import ManagerDashboard from "./Pages/Manager/ManagerDashboard";
 import ResourceRequests from "./Pages/ResourceRequests";
 import { AuthProvider } from "./Auth/AuthContext";
+import ProtectedRoute from "./Auth/ProtectedRoute";
 
 function App() {
   return (
@@ -15,13 +16,22 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/EmployeeList" element={<EmployeeList />}/>
-          <Route path="/MyDetails" element={<MyDetails />} />
-          <Route path="/Resources" element={<ResourceRequests />} />
+          <Route 
+             path="/*"
+              element={
+                <ProtectedRoute>
+                  <Routes>
+                    <Route path="/EmployeeList" element={<EmployeeList />}/>
+                    <Route path="/MyDetails" element={<MyDetails />} />
+                    <Route path="/Resources" element={<ResourceRequests />} />
 
-          <Route path="/AdminDashboard" element={<AdminDashboard />} />
+                    <Route path="/AdminDashboard" element={<AdminDashboard />} />
 
-          <Route path="/ManagerDashboard" element={<ManagerDashboard />} />
+                    <Route path="/ManagerDashboard" element={<ManagerDashboard />} />
+                  </Routes>
+                </ProtectedRoute>
+              }
+              />
         </Routes>
       </BrowserRouter>
       </AuthProvider>

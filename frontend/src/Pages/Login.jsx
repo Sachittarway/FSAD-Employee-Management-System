@@ -1,21 +1,34 @@
-import React from "react";
 import "./Login.css";
 import { useState,useEffect } from "react";
 import { useAuth } from "../Auth/AuthContext";
 import { useNavigate } from 'react-router-dom';
+import { notification} from 'antd';
 
 const Login = () => {
   const [isActive, setIsActive] = useState(false);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
 
+    const [api, contextHolder] = notification.useNotification();
+    const openNotification = (pauseOnHover, type, message, description) => () => {
+      api.open({
+        message,
+        description,
+        showProgress: true,
+        pauseOnHover,
+        type,
+      });
+    };
+
   useEffect(() => {
     if (user.isAuthenticated) {
-      console.log('User is already authenticated:', user);
-      // Redirect if already logged in
+      
       switch (user.role) {
         case 'ADMIN':
           navigate('/AdminDashboard');
@@ -32,13 +45,13 @@ const Login = () => {
     }
   }, [user, navigate]);
 
-  // Toggle between login and signup
+
   const handleRegisterClick = () => {
-    setIsActive(true); // Show sign-up form
+    setIsActive(true); 
   };
 
   const handleLoginClick = () => {
-    setIsActive(false); // Show sign-in form
+    setIsActive(false); 
   };
 
   const loginUser = async (email, password) => {
@@ -79,27 +92,62 @@ const Login = () => {
       }
     } catch (err) {
       console.error(err);
-      alert('Invalid login');
+      openNotification(false, 'error', 'Login failed', 'Please check your email and password and try again.')();
     }
   };
 
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('http://localhost:8081/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email: newEmail, password: newPassword })
+      });
+
+      if (!res.ok) throw new Error('Registration failed');
+      const data = await res.json();
+      console.log(data);
+      openNotification(false, 'success')();
+    } catch (err) {
+      console.error(err);
+      openNotification(false, 'error')();
+    }
+  }
+
   return (
     <div className="test">
+      {contextHolder}
       <div className={`container ${isActive ? "active" : ""}`} id="container">
         <div class="form-container sign-up">
-          <form>
+          <form onSubmit={handleRegister}>
             <h1>Create Account</h1>
-            <span>or use your email for registration</span>
-            <input type="text" placeholder="Name" />
-            <input type="email" placeholder="Email" />
-            <input type="password" placeholder="Password" />
+            <span>use your email for registration</span>
+            <input 
+              type="text" 
+              placeholder="Name" 
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <input 
+              type="email" 
+              placeholder="Email" 
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+            />
+            <input 
+              type="password" 
+              placeholder="Password" 
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
             <button>Sign Up</button>
           </form>
         </div>
         <div class="form-container sign-in">
           <form onSubmit={handleLogin}>
             <h1>Sign In</h1>
-            <span>use your email and password</span>
+            <span>Use your Email and Password</span>
             <input 
               type="email" placeholder="Email" value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -107,7 +155,6 @@ const Login = () => {
             <input type="password" placeholder="Password"  value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <a href="">Forgot your email or password?</a>
             <button>Sign in</button>
           </form>
         </div>
@@ -115,7 +162,7 @@ const Login = () => {
           <div class="toggle">
             <div class="toggle-panel toggle-left">
               <h1>Welcome Back!</h1>
-              <p>Enter your personal details to use all of site features</p>
+              <p>Login to your account</p>
               <button onClick={handleLoginClick} class="hidden" id="login">
                 Sign In
               </button>
@@ -123,7 +170,7 @@ const Login = () => {
             <div class="toggle-panel toggle-right">
               <h1>Hello, User!</h1>
               <p>
-                Register with your personal details to use all of site features
+                Send a request to the admin for approval
               </p>
               <button
                 onClick={handleRegisterClick}
