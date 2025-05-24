@@ -16,6 +16,7 @@ const items = [
 ];
 const EmployeeList = () => {
   const { Search } = Input;
+  const { user } = useAuth();
   const [searchText, setSearchText] = useState("");
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,15 +25,16 @@ const EmployeeList = () => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("USER");
   const [api, contextHolder] = notification.useNotification();
-    const openNotification = (pauseOnHover, type, message, description) => () => {
-      api.open({
-        message,
-        description,
-        showProgress: true,
-        pauseOnHover,
-        type,
-      });
-    };
+    
+  const openNotification = (pauseOnHover, type, message, description) => () => {
+    api.open({
+      message,
+      description,
+      showProgress: true,
+      pauseOnHover,
+      type,
+    });
+  };
 
   /* Table Columns!!! */ 
   const columns = [
@@ -124,51 +126,53 @@ const EmployeeList = () => {
   };
 
   // Function to handle the Register button click
-  const handleOk = () => {
-    if(!fullname || !email || !role){
-      openNotification(false, 'error', 'All fields are required', 'Please fill in all the fields before submitting.')();
+  const handleOk = async () => {
+  if (!fullname || !email || !role) {
+    openNotification(false, 'error', 'All fields are required', 'Please fill in all the fields before submitting.')();
+    return;
+  }
+  if (!email.includes("@") || !email.includes(".")) {
+    openNotification(false, 'error', 'Invalid email', 'Please enter a valid email address.')();
+    return;
+  }
+  if (fullname.length < 3) {
+    openNotification(false, 'error', 'Invalid full name', 'Full name should be at least 3 characters long.')();
+    return;
+  }
+  try {
+    const res = await fetch('http://localhost:8081/admin/register', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ 
+        name: fullname, 
+        password: fullname,
+        email,
+        role 
+      })
+    });
+    console.log("Response:", res);
+    if (res.status === 401) {
+      openNotification(false, 'error', 'Unauthorized', 'You are not authorized to perform this action.')();
       return;
     }
-    if(!email.includes("@") || !email.includes(".")){
-      openNotification(false, 'error', 'Invalid email', 'Please enter a valid email address.')();
+    if (!res.ok) {
+      alert("Failed to add employee. Please try again.");
       return;
     }
-    if(fullname.length < 3){
-      openNotification(false, 'error', 'Invalid full name', 'Full name should be at least 3 characters long.')();
-      return;
-    }
-    try{
-      const res = fetch('http://localhost:8081/admin/register', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(
-          { 
-            name: fullname, 
-            password: fullname,
-            email,
-            role 
-          }
-        )
-      });
-
-      if (!res.ok){
-        alert("Failed to add employee. Please try again.");
-        return;
-      }
-      const data = res.json();
-      console.log(data);
-      setIsModalOpen(false);
-    }catch(err){
-      console.error(err);
-    }
+    const data = await res.json();
+    console.log(data);
     setIsModalOpen(false);
-    setFullname("");
-    setEmail("");
-    setRole("USER");
-  };
+  } catch (err) {
+    console.error(err);
+  }
+  setIsModalOpen(false);
+  setFullname("");
+  setEmail("");
+  setRole("USER");
+};
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -182,7 +186,7 @@ const EmployeeList = () => {
   const handleDeleteCancel = () => {
     setIsDeleteModalOpen(false);
   };
-  const { user } = useAuth();
+  
 
   
 
@@ -277,9 +281,13 @@ const EmployeeList = () => {
           >
             <div className="hello">Employee List</div>
             <div>
-              <Button type="primary" className="add-employee" size="large" onClick={showModal}>
-                Add Employee
-              </Button>
+              {
+                user.role === "ADMIN" && (
+                  <Button type="primary" className="add-employee" size="large" onClick={showModal}>
+                    Add Employee
+                  </Button>
+                )
+              }
             </div>
           </div>
 
