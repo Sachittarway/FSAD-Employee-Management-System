@@ -4,7 +4,9 @@ import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import { Link } from 'react-router-dom';
 import { Table,Space, Button, Avatar,Dropdown,Tag,Input,Select } from "antd";
 import {FolderViewOutlined} from "@ant-design/icons";
+import { useAuth } from "../Auth/AuthContext";
 const ResourceRequests = () => {
+    const { user } = useAuth();
     const { Search } = Input;
     const items = [
         {
@@ -123,11 +125,29 @@ const ResourceRequests = () => {
                                 },
                             }}
                         >
-                            <MenuItem component={<Link to="/AdminDashboard" />}>Dashboard</MenuItem>
-                            <MenuItem>Departments</MenuItem>
-                            <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
-                            <MenuItem active>Requests</MenuItem>
-                            <MenuItem component={<Link to="/MyDetails" />}>My Details </MenuItem>
+                            {
+                                user.role === "ADMIN" && (
+                                    <>
+                                        <MenuItem component={<Link to="/AdminDashboard" />}>Dashboard</MenuItem>
+                                        <MenuItem>Departments</MenuItem>
+                                        <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
+                                        <MenuItem active>Requests</MenuItem>
+                                        <MenuItem component={<Link to="/MyDetails" />}>My Details</MenuItem>
+                                    </>
+                                )
+                            }
+                            {
+                                user.role === "MANAGER" && (
+                                    <>
+                                        <MenuItem component={<Link to="/ManagerDashboard" />}>Dashboard</MenuItem>
+                                        <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
+                                        <MenuItem>Team List</MenuItem>
+                                        <MenuItem active>Requests</MenuItem>
+                                        <MenuItem component={<Link to="/MyDetails" />}>My Details </MenuItem>
+                                    </>
+                                              
+                                )
+                            }
                         </Menu>
                     </Sidebar>
                 </div>

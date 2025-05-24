@@ -3,8 +3,10 @@ import React from "react";
 import { Avatar,Dropdown,Descriptions } from "antd";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import { Link } from 'react-router-dom';
+import { useAuth } from "../Auth/AuthContext";
 
 const MyDetails = () => {
+    const { user } = useAuth();
 
     const items = [
         {
@@ -79,10 +81,28 @@ const MyDetails = () => {
                                 },
                             }}
                         >
-                            <MenuItem component={<Link to="/Dashboard" />}>Dashboard</MenuItem>
-                            <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
-                            <MenuItem>Requests</MenuItem>
-                            <MenuItem active>My Details </MenuItem>
+                            {
+                                user.role === "ADMIN" && (
+                                    <>
+                                        <MenuItem component={<Link to="/AdminDashboard" />}>Dashboard</MenuItem>
+                                        <MenuItem>Departments</MenuItem>
+                                        <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
+                                        <MenuItem component={<Link to="/Resources" />}>Requests</MenuItem>
+                                        <MenuItem active>My Details</MenuItem>
+                                    </>
+                                )
+                            }
+                            {
+                                user.role === "MANAGER" && (
+                                    <>
+                                        <MenuItem component={<Link to="/ManagerDashboard" />}>Dashboard</MenuItem>
+                                        <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
+                                        <MenuItem>Team List</MenuItem>
+                                        <MenuItem component={<Link to="/Resources" />}>Requests</MenuItem>
+                                        <MenuItem active>My Details </MenuItem>
+                                    </>
+                                )
+                            }
                         </Menu>
                     </Sidebar>
                 </div>

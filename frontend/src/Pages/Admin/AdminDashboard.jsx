@@ -3,8 +3,6 @@ import { Avatar,Dropdown } from "antd";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import {UserOutlined,BarChartOutlined,CheckCircleOutlined,ClockCircleOutlined} from "@ant-design/icons";
 import { Link } from 'react-router-dom' ;
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from "react";
 
 const CardItem = ({ title, value, icon, trend, onClick }) => (
     <div className="card" onClick={onClick}>
@@ -18,23 +16,7 @@ const CardItem = ({ title, value, icon, trend, onClick }) => (
 
 
 const AdminDashboard = () =>{
-
-    const navigate = useNavigate();
-
-    useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
-
-    // If no token or role, redirect to login
-    if (!token || !role) {
-      navigate('/', { replace: true });
-    }
-
-    // If not an admin, redirect to unauthorized page
-    else if (role !== 'ADMIN') {
-      navigate('/unauthorized', { replace: true });
-    }
-  }, [navigate]);
+    
 
     const items = [
         {

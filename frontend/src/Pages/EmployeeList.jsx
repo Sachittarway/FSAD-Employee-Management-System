@@ -5,6 +5,7 @@ import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import {FilterOutlined,EditOutlined,DeleteOutlined,FolderViewOutlined,UserOutlined} from "@ant-design/icons";
 import { Link } from 'react-router-dom';
 import { useState } from "react";
+import { useAuth } from "../Auth/AuthContext";
 
 const items = [
   {
@@ -110,6 +111,7 @@ const EmployeeList = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+  const { user } = useAuth();
 
   return (
     <div className="employee-list">
@@ -150,10 +152,29 @@ const EmployeeList = () => {
                 },
               }}
             >
-              <MenuItem component={<Link to="/Dashboard" />}>Dashboard</MenuItem>
-              <MenuItem active>Employee List</MenuItem>
-              <MenuItem>Requests</MenuItem>
-              <MenuItem component={<Link to="/MyDetails" />}>My Details </MenuItem>
+              {
+                user.role === "ADMIN" && (
+                  <>
+                    <MenuItem component={<Link to="/AdminDashboard" />}>Dashboard</MenuItem>
+                    <MenuItem>Departments</MenuItem>
+                    <MenuItem active>Employee List</MenuItem>
+                    <MenuItem component={<Link to="/Resources" />}>Requests</MenuItem>
+                    <MenuItem component={<Link to="/MyDetails" />}>My Details</MenuItem>
+                  </>
+                )
+              }
+              {
+                user.role === "MANAGER" && (
+                  <>
+                    <MenuItem component={<Link to="/ManagerDashboard" />}>Dashboard</MenuItem>
+                    <MenuItem active>Employee List</MenuItem>
+                    <MenuItem>Team List</MenuItem>
+                    <MenuItem component={<Link to="/Resources" />}>Requests</MenuItem>
+                    <MenuItem component={<Link to="/MyDetails" />}>My Details </MenuItem>
+                  </>
+                  
+                )
+              }
             </Menu>
           </Sidebar>
         </div>
