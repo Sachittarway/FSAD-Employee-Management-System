@@ -6,6 +6,7 @@ import {FilterOutlined,DeleteOutlined,FolderViewOutlined,UserOutlined} from "@an
 import { Link } from 'react-router-dom';
 import { useState } from "react";
 import { useAuth } from "../Auth/AuthContext";
+import { notification} from 'antd';
 
 const items = [
   {
@@ -19,6 +20,19 @@ const EmployeeList = () => {
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [fullname, setFullname] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("USER");
+  const [api, contextHolder] = notification.useNotification();
+    const openNotification = (pauseOnHover, type, message, description) => () => {
+      api.open({
+        message,
+        description,
+        showProgress: true,
+        pauseOnHover,
+        type,
+      });
+    };
 
   /* Table Columns!!! */ 
   const columns = [
@@ -108,9 +122,54 @@ const EmployeeList = () => {
   const showModal = () => {
     setIsModalOpen(true);
   };
+
+  // Function to handle the Register button click
   const handleOk = () => {
+    if(!fullname || !email || !role){
+      openNotification(false, 'error', 'All fields are required', 'Please fill in all the fields before submitting.')();
+      return;
+    }
+    if(!email.includes("@") || !email.includes(".")){
+      openNotification(false, 'error', 'Invalid email', 'Please enter a valid email address.')();
+      return;
+    }
+    if(fullname.length < 3){
+      openNotification(false, 'error', 'Invalid full name', 'Full name should be at least 3 characters long.')();
+      return;
+    }
+    try{
+      const res = fetch('http://localhost:8081/admin/register', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(
+          { 
+            name: fullname, 
+            password: fullname,
+            email,
+            role 
+          }
+        )
+      });
+
+      if (!res.ok){
+        alert("Failed to add employee. Please try again.");
+        return;
+      }
+      const data = res.json();
+      console.log(data);
+      setIsModalOpen(false);
+    }catch(err){
+      console.error(err);
+    }
     setIsModalOpen(false);
+    setFullname("");
+    setEmail("");
+    setRole("USER");
   };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -124,10 +183,6 @@ const EmployeeList = () => {
     setIsDeleteModalOpen(false);
   };
   const { user } = useAuth();
-
-  const handleChange = value => {
-    console.log(`selected ${value}`);
-  };
 
   
 
@@ -143,7 +198,7 @@ const EmployeeList = () => {
 
   return (
     <div className="employee-list">
-
+      {contextHolder}
       {/* Top Navbar Starts from here !!! */}
       <div className="top_navbar">
         <div className="left-div">
@@ -387,7 +442,10 @@ const EmployeeList = () => {
           fontSize:"20px",
           fontWeight:"bold",
         }}>Full Name</label>
-        <Input size="large" placeholder="Employee Name" prefix={<UserOutlined />} />
+        <Input size="large" placeholder="Employee Name" prefix={<UserOutlined />} 
+          value={fullname}
+          onChange={(e) => setFullname(e.target.value)}
+        />
         </div>
 
         <div style={{
@@ -397,7 +455,10 @@ const EmployeeList = () => {
           fontSize:"20px",
           fontWeight:"bold",
         }}>Email</label>
-        <Input size="large" placeholder="Employee Email" prefix={<UserOutlined />} />
+        <Input size="large" placeholder="Employee Email" prefix={<UserOutlined />} 
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
         </div>
 
         <div style={{
@@ -411,7 +472,7 @@ const EmployeeList = () => {
         <Select
           defaultValue="USER"
           style={{ width: 220 }}
-          onChange={handleChange}
+          onChange={(value) => setRole(value)}
           size="large"
           options={[
             { value: 'USER', label: 'User' },
