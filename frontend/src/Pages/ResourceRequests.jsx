@@ -97,7 +97,16 @@ const ResourceRequests = () => {
                 </div>
 
                 <div className="right-div">
-                    <Dropdown menu={{ items }} placement="bottomLeft">
+                    <Dropdown menu={{
+                        items,
+                        onClick: ({ key }) => {
+                            if (key === "1") {
+                                localStorage.removeItem("token");
+                                localStorage.removeItem("user");
+                                window.location.reload();
+                            }
+                        }
+                    }} placement="bottomLeft">
                         <Avatar size="large" src={<img src={"https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg"}></img> }/>
                     </Dropdown>
                 </div>
@@ -129,7 +138,7 @@ const ResourceRequests = () => {
                                 user.role === "ADMIN" && (
                                     <>
                                         <MenuItem component={<Link to="/AdminDashboard" />}>Dashboard</MenuItem>
-                                        <MenuItem>Departments</MenuItem>
+                                        <MenuItem component={<Link to="/Departments" />}>Departments</MenuItem>
                                         <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
                                         <MenuItem active>Requests</MenuItem>
                                         <MenuItem component={<Link to="/MyDetails" />}>My Details</MenuItem>

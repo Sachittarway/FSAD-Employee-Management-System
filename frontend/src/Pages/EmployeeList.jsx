@@ -8,12 +8,7 @@ import { useState } from "react";
 import { useAuth } from "../Auth/AuthContext";
 import { notification} from 'antd';
 
-const items = [
-  {
-    label: "Submit and continue",
-    key: "1",
-  },
-];
+
 const EmployeeList = () => {
   const { Search } = Input;
   const { user } = useAuth();
@@ -25,6 +20,14 @@ const EmployeeList = () => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("USER");
   const [api, contextHolder] = notification.useNotification();
+
+  const items = [
+    {
+      label: "Logout",
+      key: "1",
+      danger: true,
+    },
+  ];
     
   const openNotification = (pauseOnHover, type, message, description) => () => {
     api.open({
@@ -210,12 +213,21 @@ const EmployeeList = () => {
         </div>
 
         <div className="right-div">
-        <Dropdown menu={{ items }} placement="bottomLeft">
-          <Avatar size="large" src={<img src={"https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg"}></img> }/>
+        <Dropdown menu={{
+          items,
+          onClick: ({ key }) => {
+            if (key === "1") {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              window.location.reload();
+            }
+          }
+        }} placement="bottomLeft">
+          <Avatar size="large" src={<img src={"https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg"}></img>} />
         </Dropdown>
-        </div>
       </div>
-      {/* Top Navbar Ends here !!! */}
+    </div>
+    {/* Top Navbar Ends here !!! */}
 
       {/* Sidebar and Main Content Starts from here !!! */}
       <div className="employee-body">
@@ -243,7 +255,7 @@ const EmployeeList = () => {
                 user.role === "ADMIN" && (
                   <>
                     <MenuItem component={<Link to="/AdminDashboard" />}>Dashboard</MenuItem>
-                    <MenuItem>Departments</MenuItem>
+                    <MenuItem component={<Link to="/Departments" />}>Departments</MenuItem>
                     <MenuItem active>Employee List</MenuItem>
                     <MenuItem component={<Link to="/Resources" />}>Requests</MenuItem>
                     <MenuItem component={<Link to="/MyDetails" />}>My Details</MenuItem>

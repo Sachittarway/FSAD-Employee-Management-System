@@ -9,6 +9,7 @@ import ResourceRequests from "./Pages/ResourceRequests";
 import { AuthProvider } from "./Auth/AuthContext";
 import ProtectedRoute from "./Auth/ProtectedRoute";
 import TeamList from "./Pages/TeamList";
+import Departments from "./Pages/Admin/Departments";
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
                     <Route path="/TeamList" element={<TeamList />} />
                     <Route path="/MyDetails" element={<MyDetails />} />
                     <Route path="/Resources" element={<ResourceRequests />} />
+                    <Route path="/Departments" element={<Departments />} />
 
                     <Route path="/AdminDashboard" element={<AdminDashboard />} />
 

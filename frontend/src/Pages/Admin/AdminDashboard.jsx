@@ -20,8 +20,9 @@ const AdminDashboard = () =>{
 
     const items = [
         {
-          label: "Submit and continue",
+          label: "Logout",
           key: "1",
+          danger: true,
         },
     ];
 
@@ -68,7 +69,17 @@ const AdminDashboard = () =>{
                 </div>
 
                 <div className="right-div">
-                    <Dropdown menu={{ items }} placement="bottomLeft">
+                    {/* logout functionality */}
+                    <Dropdown menu={{
+                        items,
+                        onClick: ({ key }) => {
+                            if (key === "1") {
+                                localStorage.removeItem("token");
+                                localStorage.removeItem("user");
+                                window.location.reload();
+                            }
+                        }
+                    }} placement="bottomLeft">
                         <Avatar size="large" src={<img src={"https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg"}></img> }/>
                     </Dropdown>
                 </div>
@@ -97,7 +108,7 @@ const AdminDashboard = () =>{
                             }}
                         >
                             <MenuItem active>Dashboard</MenuItem>
-                            <MenuItem>Departments</MenuItem>
+                            <MenuItem component={<Link to="/Departments" />}>Departments</MenuItem>
                             <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
                             <MenuItem component={<Link to="/Resources" />}>Requests</MenuItem>
                             <MenuItem component={<Link to="/MyDetails" />}>My Details </MenuItem>
