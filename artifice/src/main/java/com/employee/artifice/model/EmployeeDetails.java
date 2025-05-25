@@ -25,11 +25,19 @@ public class EmployeeDetails {
 
     String employeeNumber;
 
-    String projectCode;
+    // @Column(name = "projectCode")
+    @ManyToOne
+    @JoinColumn(name = "project_code_id", referencedColumnName = "id")
+    private Project project;
+    // String projectCode;
 
     String currentLocation;
 
-    String currentIbu;
+    // @Column(name = "currentIbu")
+    @ManyToOne
+    @JoinColumn(name = "department_id", referencedColumnName = "id")
+    private Department department;
+    // String currentIbu;
 
     String permanentAddress;
 
