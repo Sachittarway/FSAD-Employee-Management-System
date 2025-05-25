@@ -59,4 +59,14 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
         existingDetails.setPassportOffice(details.getPassportOffice());
         return Optional.of(detailsRepository.save(existingDetails));
     }
+
+    @Override
+    public Optional<EmployeeDetails> getDetailsByEmail() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return Optional.ofNullable(detailsRepository.findByUserEmail(email)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.BAD_REQUEST,
+                        "Employee details not found for email"
+                )));
+    }
 }

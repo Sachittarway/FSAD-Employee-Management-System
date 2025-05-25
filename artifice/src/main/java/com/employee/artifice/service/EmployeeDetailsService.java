@@ -13,4 +13,5 @@ public interface EmployeeDetailsService {
     public List<EmployeeDetails> getAllDetails();
     public Optional<EmployeeDetails> getDetailsById(Long id);
     public Optional<EmployeeDetails> updateEmployeeDetails(CustomEmployeeDetails details);
+    public Optional<EmployeeDetails> getDetailsByEmail();
 }

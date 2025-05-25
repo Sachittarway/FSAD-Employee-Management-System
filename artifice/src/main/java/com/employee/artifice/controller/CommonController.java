@@ -29,4 +29,10 @@ public class CommonController {
         return employeeDetailsService.updateEmployeeDetails(details)
                 .orElseThrow(() -> new RuntimeException("Failed to update employee details"));
     }
+
+    @GetMapping("/getEmployeeDetailsByEmail")
+    public EmployeeDetails getEmployeeDetailsByEmail() {
+        return employeeDetailsService.getDetailsByEmail()
+                .orElseThrow(() -> new RuntimeException("Employee details not found for email"));
+    }
 }
