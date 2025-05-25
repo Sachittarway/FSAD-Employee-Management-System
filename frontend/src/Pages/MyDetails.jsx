@@ -1,17 +1,19 @@
-import "./MyDetails.css";
+import "./UserDetails.css";
 import React from "react";
-import { Avatar,Dropdown,Descriptions } from "antd";
+import { Avatar,Dropdown } from "antd";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import { Link } from 'react-router-dom';
 import { useAuth } from "../Auth/AuthContext";
 import {  Button } from 'antd';
-import axios from "axios";
+
 import  { useEffect, useState } from "react";
 import { FaPen, FaSave } from "react-icons/fa";
 
 
 const MyDetails = () => {
     const { user } = useAuth();
+    const role = user.role;
+    console.log(role);
 
     const items = [
         {
@@ -33,7 +35,7 @@ const MyDetails = () => {
             setIsEditing(false);
         };
 
-        const role = "manager"; 
+        // const role = "MANAGER"; 
 
        
 
@@ -85,20 +87,44 @@ const MyDetails = () => {
                 currentIbu: userDetails.currentIbu,
                 currentLocation: userDetails.currentLocation,
                 projectCode: userDetails.projectCode,
-            });
+        });
 
             const handleEditProfileClick = () => {
                 if (editMode) {
-                setUserDetails(prev => ({ ...prev, ...editValues }));
-                setEditMode(false);
-                } else if (role === "manager" || role === "admin") {
+                // Save mode - Send PUT request
+                fetch("http://localhost:8081/common/updateDetails", {
+                method: "PUT",
+                headers: {
+                    headers: { 
+                   'Content-Type': 'application/json',
+                   'Authorization': `Bearer ${localStorage.getItem('token')}`
+                 },
+                },
+                body: JSON.stringify(editValues),
+                })
+                .then((res) => {
+                    if (!res.ok) throw new Error("Failed to update");
+                    return res.json();
+                })
+                .then((updatedData) => {
+                    setUserDetails((prev) => ({ ...prev, ...editValues }));
+                    setEditMode(false);
+                    console.log("Update successful:", updatedData);
+                })
+                .catch((error) => {
+                    console.error("Update error:", error);
+                    alert("Failed to update details.");
+                });
+            } else if (role === "MANAGER" || role === "ADMIN") {
                 setEditMode(true);
-                }
+            }
+                        
+           
             };
 
                 const handleInputChange = (e) => {
                 const { name, value } = e.target;
-                setEditValues(prev => ({ ...prev, [name]: value }));
+                setEditValues((prev) => ({ ...prev, [name]: value }));
             };
 
 
@@ -162,7 +188,7 @@ const MyDetails = () => {
                                     <>
                                         <MenuItem component={<Link to="/ManagerDashboard" />}>Dashboard</MenuItem>
                                         <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
-                                        <MenuItem>Team List</MenuItem>
+                                        <MenuItem component={<Link to="/TeamList" />}>Team List</MenuItem>
                                         <MenuItem component={<Link to="/Resources" />}>Requests</MenuItem>
                                         <MenuItem active>My Details </MenuItem>
                                     </>
@@ -244,7 +270,7 @@ const MyDetails = () => {
                              <p><span className="label">Years of Experience: </span>{userDetails?.yearsOfExperience}</p>
                             <p><span className="label">Current IBU: </span>
                             {
-                            (role === "manager" || role === "admin") && editMode
+                            editMode
                                 ? <input name="currentIbu" value={editValues.currentIbu} onChange={handleInputChange} />
                                 : userDetails.currentIbu
                             }
@@ -253,7 +279,7 @@ const MyDetails = () => {
                              <div className="user-section right-align">
                             <p>
                                 <span className="label">Password: </span>
-                                {role === "user" && isEditing ? (
+                                {role === "USER" && isEditing ? (
                                     <>
                                         <input
                                         type="text"
@@ -315,7 +341,7 @@ const MyDetails = () => {
                              <p><span className="label">Employee Number: </span>{userDetails?.employeeNumber}</p>
                             <p><span className="label">Project Code: </span>
                            {
-                            (role === "manager" || role === "admin") && editMode
+                            (role === "MANAGER" || role === "ADMIN") && editMode
                                 ? <input name="projectCode" value={editValues.projectCode} onChange={handleInputChange} />
                                 : userDetails.projectCode
                             }
@@ -324,11 +350,15 @@ const MyDetails = () => {
                             </div>
                             <div className="user-section">
                             <p><span className="label">Current Location: </span>
-                            {
-                            (role === "manager" || role === "admin") && editMode
-                                ? <input name="currentLocation" value={editValues.currentLocation} onChange={handleInputChange} />
-                                : userDetails.currentLocation
-                            }
+                            {editMode ? (
+                                <input
+                                name="cuurentLocation"
+                                value={editValues.currentLocation}
+                                onChange={handleInputChange}
+                                />
+                            ) : (
+                                userDetails.currentLocation
+                            )}
                                             
                             
                             </p>
@@ -368,7 +398,16 @@ const MyDetails = () => {
                                 
                          
                            <div className="user-section" >
-                            <p><span className="label">Permanent Address: </span>{userDetails?.permanentAddress}</p>
+                            <p><span className="label">Permanent Address: </span>
+                            {editMode ? (
+                                <input
+                                name="permanentAddress"
+                                value={editValues.permanentAddress}
+                                onChange={handleInputChange}
+                                />
+                            ) : (
+                                userDetails.permanentAddress
+                            )}</p>
                             <p><span className="label">Local Address: </span>{userDetails?.localAddress}</p>
                             </div>
                             <div className="user-section">
