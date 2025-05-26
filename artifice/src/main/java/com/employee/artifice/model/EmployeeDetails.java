@@ -1,5 +1,7 @@
 package com.employee.artifice.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,11 +27,16 @@ public class EmployeeDetails {
 
     String employeeNumber;
 
-    String projectCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Department department;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    @JsonIgnore
+    private Project project;
 
     String currentLocation;
-
-    String currentIbu;
 
     String permanentAddress;
 

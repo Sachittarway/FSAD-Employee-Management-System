@@ -43,7 +43,7 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
     }
 
     @Override
-    public Optional<EmployeeDetails> updateEmployeeDetails(CustomEmployeeDetails details) {
+    public Optional<EmployeeDetails> updateEmployeeDetails(EmployeeDetails details) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         EmployeeDetails existingDetails = detailsRepository.findByUserEmail(email)
                 .orElseThrow(() -> new RuntimeException("Employee details not found for user: " + email));
@@ -57,16 +57,30 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
         existingDetails.setPassportIssueDate(details.getPassportIssueDate());
         existingDetails.setPassportExpiryDate(details.getPassportExpiryDate());
         existingDetails.setPassportOffice(details.getPassportOffice());
+        existingDetails.setDepartment(details.getDepartment());
+        existingDetails.setProject(details.getProject());
         return Optional.of(detailsRepository.save(existingDetails));
     }
 
     @Override
-    public Optional<EmployeeDetails> getDetailsByEmail() {
+    public Optional<CustomEmployeeDetails> getDetailsByEmail() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return Optional.ofNullable(detailsRepository.findByUserEmail(email)
-                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
-                        org.springframework.http.HttpStatus.BAD_REQUEST,
-                        "Employee details not found for email"
-                )));
+        return detailsRepository.findByUserEmail(email)
+                .map(details -> new CustomEmployeeDetails(
+                        details.getCurrentLocation(),
+                        details.getPermanentAddress(),
+                        details.getLocalAddress(),
+                        details.getPassportNo(),
+                        details.getPhoneNumber(),
+                        details.getYearsOfExperience(),
+                        details.getPassportIssueDate(),
+                        details.getPassportExpiryDate(),
+                        details.getPassportOffice(),
+                        details.getDepartment().getId(),
+                        details.getProject().getId(),
+                        details.getDepartment().getDepartment_name(),
+                        details.getProject().getProject_code(),
+                        details.getUser().getEmail()
+                        ));
     }
 }

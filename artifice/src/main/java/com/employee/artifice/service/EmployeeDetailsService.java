@@ -13,6 +13,6 @@ public interface EmployeeDetailsService {
     public EmployeeDetails createDetails(EmployeeDetails details);
     public List<EmployeeDetails> getAllDetails();
     public Optional<EmployeeDetails> getDetailsById(Long id);
-    public Optional<EmployeeDetails> updateEmployeeDetails(CustomEmployeeDetails details);
-    public Optional<EmployeeDetails> getDetailsByEmail();
+    public Optional<EmployeeDetails> updateEmployeeDetails(EmployeeDetails details);
+    public Optional<CustomEmployeeDetails> getDetailsByEmail();
 }
