@@ -25,13 +25,13 @@ public class CommonController {
     }
 
     @PutMapping("/updateDetails")
-    public EmployeeDetails updateDetails(@RequestBody CustomEmployeeDetails details) {
+    public EmployeeDetails updateDetails(@RequestBody EmployeeDetails details) {
         return employeeDetailsService.updateEmployeeDetails(details)
                 .orElseThrow(() -> new RuntimeException("Failed to update employee details"));
     }
 
     @GetMapping("/getEmployeeDetailsByEmail")
-    public EmployeeDetails getEmployeeDetailsByEmail() {
+    public CustomEmployeeDetails getEmployeeDetailsByEmail() {
         return employeeDetailsService.getDetailsByEmail()
                 .orElseThrow(() -> new RuntimeException("Employee details not found for email"));
     }
