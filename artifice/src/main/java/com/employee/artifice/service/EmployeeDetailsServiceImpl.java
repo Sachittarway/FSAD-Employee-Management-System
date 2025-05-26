@@ -76,11 +76,11 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
                         details.getPassportIssueDate(),
                         details.getPassportExpiryDate(),
                         details.getPassportOffice(),
-                        details.getDepartment().getId(),
-                        details.getProject().getId(),
-                        details.getDepartment().getDepartment_name(),
-                        details.getProject().getProject_code(),
+                        details.getDepartment() != null ? details.getDepartment().getId() : null,
+                        details.getProject() != null ? details.getProject().getId() : null,
+                        details.getDepartment() != null ? details.getDepartment().getDepartment_name() : "",
+                        details.getProject() != null ? details.getProject().getProject_code() : "",
                         details.getUser().getEmail()
-                        ));
+                ));
     }
 }
