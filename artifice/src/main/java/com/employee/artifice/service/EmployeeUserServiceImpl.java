@@ -116,27 +116,36 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
     }
     
     @Override
-    public List<EmployeeUser> searchUsers(Long id, String email, String roleStr) {
-        if (id != null) {
-            Optional<EmployeeUser> user = repository.findById(id);
-            return user.map(List::of).orElse(List.of());
-        }
+public List<EmployeeUser> searchUsers(Long id, String email, String roleStr, String employeeName) {
+    List<EmployeeUser> users;
 
-        if (email != null) {
-            return repository.findByEmailContainingIgnoreCase(email);
+    // Filter by ID first if present
+    if (id != null) {
+        Optional<EmployeeUser> user = repository.findById(id);
+        users = user.map(List::of).orElse(List.of());
+    } else if (email != null) {
+        users = repository.findByEmailContainingIgnoreCase(email);
+    } else if (roleStr != null) {
+        try {
+            EmployeeUser.Role role = EmployeeUser.Role.valueOf(roleStr.toUpperCase());
+            users = repository.findByRole(role);
+        } catch (IllegalArgumentException e) {
+            users = List.of(); // Invalid role
         }
+    } else {
+        users = repository.findAll(); // No filters
+    }
 
-        if (roleStr != null) {
-            try {
-                EmployeeUser.Role role = EmployeeUser.Role.valueOf(roleStr.toUpperCase());
-                return repository.findByRole(role);
-            } catch (IllegalArgumentException e) {
-                return List.of(); // Invalid role string
-            }
-        }
+    // Now filter by employeeName if provided
+    if (employeeName != null && !employeeName.isEmpty()) {
+        users = users.stream()
+                .filter(user -> user.getEmployeeDetails() != null &&
+                        user.getEmployeeDetails().getEmployeeName() != null &&
+                        user.getEmployeeDetails().getEmployeeName().toLowerCase().contains(employeeName.toLowerCase()))
+                .toList();
+    }
 
-    // Return all users if no filters applied
-    return repository.findAll();
+    return users;
 }
 
     @Override

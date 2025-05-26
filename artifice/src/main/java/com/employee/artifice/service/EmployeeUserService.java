@@ -25,6 +25,6 @@ public interface EmployeeUserService {
 
     public String getUserIdByEmail(String email);
 
-    List<EmployeeUser> searchUsers(Long id, String email, String role);
+    List<EmployeeUser> searchUsers(Long id, String email, String role, String employeeName);
 
 }
