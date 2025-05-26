@@ -1,11 +1,12 @@
 package com.employee.artifice.service;
 
-import com.employee.artifice.dto.CustomEmployeeDetails;
-import com.employee.artifice.model.EmployeeDetails;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import com.employee.artifice.dto.CustomEmployeeDetails;
+import com.employee.artifice.model.EmployeeDetails;
 
 @Service
 public interface EmployeeDetailsService {

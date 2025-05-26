@@ -1,19 +1,22 @@
 package com.employee.artifice.service;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import com.employee.artifice.dto.CreateUser;
 import com.employee.artifice.model.EmployeeDetails;
 import com.employee.artifice.model.EmployeeUser;
 import com.employee.artifice.repository.EmployeeDetailsRepository;
 import com.employee.artifice.repository.EmployeeUserRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.security.core.Authentication;
-
-import java.util.*;
 
 @Service
 public class EmployeeUserServiceImpl implements EmployeeUserService{
@@ -76,7 +79,7 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
         if(existingUser != null){
             return "User already exists";
         }
-        EmployeeUser adminUser = repository.findByRole(EmployeeUser.Role.ADMIN);
+        EmployeeUser adminUser = (EmployeeUser) repository.findByRole(EmployeeUser.Role.ADMIN);
         if (adminUser != null) {
             return "Admin user already exists";
         }
@@ -111,6 +114,39 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
         }
         return employees;
     }
+    
+    @Override
+public List<EmployeeUser> searchUsers(Long id, String email, String roleStr, String employeeName) {
+    List<EmployeeUser> users;
+
+    // Filter by ID first if present
+    if (id != null) {
+        Optional<EmployeeUser> user = repository.findById(id);
+        users = user.map(List::of).orElse(List.of());
+    } else if (email != null) {
+        users = repository.findByEmailContainingIgnoreCase(email);
+    } else if (roleStr != null) {
+        try {
+            EmployeeUser.Role role = EmployeeUser.Role.valueOf(roleStr.toUpperCase());
+            users = repository.findByRole(role);
+        } catch (IllegalArgumentException e) {
+            users = List.of(); // Invalid role
+        }
+    } else {
+        users = repository.findAll(); // No filters
+    }
+
+    // Now filter by employeeName if provided
+    if (employeeName != null && !employeeName.isEmpty()) {
+        users = users.stream()
+                .filter(user -> user.getEmployeeDetails() != null &&
+                        user.getEmployeeDetails().getEmployeeName() != null &&
+                        user.getEmployeeDetails().getEmployeeName().toLowerCase().contains(employeeName.toLowerCase()))
+                .toList();
+    }
+
+    return users;
+}
 
     @Override
     public String getUserIdByEmail(String email) {

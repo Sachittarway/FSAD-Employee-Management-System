@@ -1,11 +1,13 @@
 package com.employee.artifice.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import com.employee.artifice.dto.CreateUser;
 import com.employee.artifice.model.EmployeeUser;
-import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Optional;
-import java.util.Map;
 
 @Service
 public interface EmployeeUserService {
@@ -22,4 +24,7 @@ public interface EmployeeUserService {
     public List<Map<String, Object>> getAllEmployeesList();
 
     public String getUserIdByEmail(String email);
+
+    List<EmployeeUser> searchUsers(Long id, String email, String role, String employeeName);
+
 }
