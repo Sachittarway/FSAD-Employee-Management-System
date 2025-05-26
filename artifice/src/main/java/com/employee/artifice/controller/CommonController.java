@@ -41,9 +41,7 @@ public class CommonController {
 
     @Autowired
     EmployeeDetailsService employeeDetailsService;
-
-    @Autowired
-    EmployeeUserService employeeUserService; 
+ 
     @Autowired
     EmployeeUserService employeeUserService;
 
