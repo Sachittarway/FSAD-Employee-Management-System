@@ -29,4 +29,8 @@ public class DepartmentServiceImpl implements DepartmentService{
     public Optional<Department> getDepartmentById(Long id) {
         return departmentRepository.findById(id);
     }
+
+    public List<Department> searchDepartmentsByName(String name) {
+        return departmentRepository.findByDepartmentNameContainingIgnoreCase(name);
+    }
 }

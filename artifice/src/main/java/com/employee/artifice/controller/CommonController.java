@@ -2,6 +2,7 @@ package com.employee.artifice.controller;
 
 import java.util.List;
 
+import com.employee.artifice.dto.GetEmployeeList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -84,7 +85,7 @@ public class CommonController {
     }
 
     @GetMapping("/employeeList")
-    public List<Map<String, Object>> getEmployeeList() {
+    public List<GetEmployeeList> getEmployeeList() {
         return employeeUserService.getAllEmployeesList();
     }
 
@@ -114,5 +115,12 @@ public class CommonController {
     public List<Project> getProjectByDepartment(@PathVariable Long departmentId) {
         List<Project> project = projectService.getAllProjectsInOneDepartment(departmentId);
         return project;
+    }
+
+    @GetMapping("/searchDepartments")
+    public ResponseEntity<List<Department>> searchDepartments(@RequestParam String name) {
+        System.out.println("Searching for departments with name: " + name);
+        List<Department> result = departmentService.searchDepartmentsByName(name);
+        return ResponseEntity.ok(result);
     }
 }

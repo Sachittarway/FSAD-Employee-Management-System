@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.employee.artifice.dto.GetEmployeeList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -97,22 +98,23 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
     }
 
     @Override
-    public List<Map<String, Object>> getAllEmployeesList() {
+    public List<GetEmployeeList> getAllEmployeesList() {
         List<EmployeeUser> users = repository.findAll();
-        List<Map<String, Object>> employees = new ArrayList<>();
+        List<GetEmployeeList> employeeList = new ArrayList<>();
         for (EmployeeUser user : users) {
-            Map<String, Object> emp = new HashMap<>();
-            emp.put("id", user.getId());
+            GetEmployeeList employee = new GetEmployeeList();
+            employee.setEmployeeId(user.getId());
+            employee.setEmployeeEmail(user.getEmail());
+            employee.setEmployeeRole(user.getRole().toString());
+            employee.setEmployeePosition(user.getEmployeeDetails() != null ? user.getEmployeeDetails().getPosition() : "N/A");
             if (user.getEmployeeDetails() != null) {
-                emp.put("name", user.getEmployeeDetails().getEmployeeName());
+                employee.setEmployeeName(user.getEmployeeDetails().getEmployeeName());
             } else {
-                emp.put("name", null);
+                employee.setEmployeeName(" ");
             }
-            emp.put("email", user.getEmail());
-            emp.put("role", user.getRole().name());
-            employees.add(emp);
+            employeeList.add(employee);
         }
-        return employees;
+        return employeeList;
     }
     
     @Override

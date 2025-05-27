@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.employee.artifice.dto.GetEmployeeList;
 import org.springframework.stereotype.Service;
 
 import com.employee.artifice.dto.CreateUser;
@@ -21,7 +22,7 @@ public interface EmployeeUserService {
 
     String getRoleByEmail(String email);
 
-    public List<Map<String, Object>> getAllEmployeesList();
+    public List<GetEmployeeList> getAllEmployeesList();
 
     public String getUserIdByEmail(String email);
 

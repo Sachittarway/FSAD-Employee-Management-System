@@ -52,6 +52,8 @@ public class EmployeeDetails {
 
     String phoneNumber;
 
+    String position;
+
     int yearsOfExperience;
 
 }

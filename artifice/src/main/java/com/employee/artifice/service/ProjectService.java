@@ -7,7 +7,7 @@ import com.employee.artifice.model.Project;
 
 public interface ProjectService {
 
-    public Project createProject(Project project);
+    public Project createProject(String projectName,Long departmentId);
 
     public List<Project> getAllProjects();
     

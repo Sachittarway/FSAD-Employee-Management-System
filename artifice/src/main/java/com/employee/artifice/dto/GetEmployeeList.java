@@ -7,8 +7,7 @@ import lombok.Setter;
 @Getter
 public class GetEmployeeList {
 
-    @Getter
-    String employeeId;
+    Long employeeId;
     String employeeName;
     String employeeEmail;
     String employeeRole;
@@ -16,7 +15,7 @@ public class GetEmployeeList {
 
     public GetEmployeeList() {
     }
-    public GetEmployeeList(String employeeId, String employeeName, String employeeEmail, String employeeRole, String employeePosition) {
+    public GetEmployeeList(Long employeeId, String employeeName, String employeeEmail, String employeeRole, String employeePosition) {
         this.employeeId = employeeId;
         this.employeeName = employeeName;
         this.employeeEmail = employeeEmail;

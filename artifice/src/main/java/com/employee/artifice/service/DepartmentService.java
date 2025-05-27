@@ -10,4 +10,5 @@ public interface DepartmentService {
     public Department createDepartment(Department department);
     public List<Department> getAllDepartments();
     public Optional<Department> getDepartmentById(Long id);
+    List<Department> searchDepartmentsByName(String name);
 }

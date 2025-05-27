@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -43,8 +45,10 @@ public class AdminController {
     }
 
     @PostMapping("/createProject")
-    public ResponseEntity<Project> createProject(@RequestBody Project project) {
-        Project newProject = projectService.createProject(project);
+    public ResponseEntity<Project> createProject(@RequestBody Map<String, Object> payload) {
+        String projectCode = (String) payload.get("project_code");
+        Long departmentId = ((Number) payload.get("department_id")).longValue();
+        Project newProject = projectService.createProject(projectCode, departmentId);
         return ResponseEntity.ok(newProject);
     }
 }
