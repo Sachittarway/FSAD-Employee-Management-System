@@ -13,7 +13,6 @@ const EmployeeList = () => {
   const { Search } = Input;
   const { user } = useAuth();
   const [searchText, setSearchText] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [fullname, setFullname] = useState("");
@@ -21,9 +20,11 @@ const EmployeeList = () => {
   const [role, setRole] = useState("USER");
   const [api, contextHolder] = notification.useNotification();
   const[employeeList, setEmployeeList] = useState([]);
+  const [departmentList, setDepartmentList] = useState([]);
 
   useEffect(() => {
     fetchEmployeeList();
+    fetchDepartmentList();
   }, []);
 
   const fetchEmployeeList = async () => {
@@ -52,6 +53,31 @@ const EmployeeList = () => {
       console.error("Error fetching employee list:", err);
     }
   }
+
+  const fetchDepartmentList = async () => {
+    try {
+      const res = await fetch('http://localhost:8081/common/departments', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (res.status === 401) {
+        console.error("Unauthorized access. Redirecting to login.");
+        return;
+      }
+      if (!res.ok) {
+        console.error("Failed to fetch department list. Status:", res.status);
+        return;
+      }
+      const data = await res.json();
+      setDepartmentList(data);
+      console.log("Department List Data:", data);
+    } catch (err) {
+      console.error("Error fetching department list:", err);
+    }
+  };
   console.log("Employee List:", employeeList);
 
   const items = [
@@ -232,9 +258,74 @@ const EmployeeList = () => {
   };
   
   const handleMenuClick = (e) => {
-    setSelectedFilter(e.key);
+    if(e.key=="all") {
+      fetchEmployeeList();
+    }
+    else{
+      fetchEmployeeListByDepartment(e.key);
+    }
   };
-  console.log("Selected filter:", selectedFilter);
+
+  const handleRoleFilter = (e) => {
+    if(e.key === "MANAGER" || e.key === "USER") {
+      fetchEmployeeListByRole(e.key);
+    }
+    else {
+      fetchEmployeeList();
+    }
+  }
+
+  const fetchEmployeeListByDepartment = async (departmentId) => {
+    try{
+      const response = await fetch(`http://localhost:8081/common/searchEmployeesByDepartmentId?departmentId=${departmentId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`    
+        }
+      });
+      if (response.status === 401) {
+        console.error("Unauthorized access. Redirecting to login.");
+        return;
+      }
+      if (!response.ok) {
+        console.error("Failed to fetch employee list by department. Status:", response.status);
+        return;
+      }
+      const data = await response.json();
+      setEmployeeList(data);
+      console.log("Filtered Employee List Data:", data);  
+    }
+    catch (err) {
+      console.error("Error fetching employee list by department:", err);
+    }
+  }
+
+  const fetchEmployeeListByRole = async (role) => {
+    try{
+      const response = await fetch(`http://localhost:8081/common/getEmployeeByRole?role=${role}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`    
+        }
+      });
+      if (response.status === 401) {
+        console.error("Unauthorized access. Redirecting to login.");
+        return;
+      }
+      if (!response.ok) {
+        console.error("Failed to fetch employee list by role. Status:", response.status);
+        return;
+      }
+      const data = await response.json();
+      setEmployeeList(data);
+      console.log("Filtered Employee List Data:", data);  
+    }
+    catch (err) {
+      console.error("Error fetching employee list by role:", err);
+    }
+  }
 
   return (
     <div className="employee-list">
@@ -394,40 +485,43 @@ const EmployeeList = () => {
               gap: "20px"
             }}>
               <div>
-                <Dropdown menu={{ 
-                  items: [
-                    {
-                      label: "HR",
-                      key: "2",
-                    },
-                    {
-                      label: "Engineering",
-                      key: "3",
-                    },
-                    {
-                      label: "Sales",
-                      key: "4",
-                    },
-                  ],
-                 }} placement="bottomLeft" arrow>
-                  <Button size="large">
+                <Dropdown
+                  menu={{
+                    items: [
+                      { label: "All Employees", key: "all" }, // Static option
+                      ...departmentList.map(department => ({
+                        label: department.department_name,
+                        key: department.id,
+                      })),
+                    ],
+                    onClick: handleMenuClick,
+                  }}
+                  placement="bottomLeft"
+                  arrow
+                >
+                <Button size="large">
                   <FilterOutlined /> All Departments
-                  </Button>
-                </Dropdown>
+                </Button>
+              </Dropdown>
               </div>
 
               <div>
                 <Dropdown menu={{ 
                   items: [
                     {
+                      label: "All Roles",
+                      key: "all",
+                    },
+                    {
                       label: "Manager",
-                      key: "1",
+                      key: "MANAGER",
                     },
                     {
                       label: "User",
-                      key: "2",
+                      key: "USER",
                     }
                   ],
+                  onClick: handleRoleFilter,
                  }} placement="bottomLeft" arrow>
                   <Button size="large">
                   <FilterOutlined /> Roles
