@@ -154,4 +154,20 @@ public List<EmployeeUser> searchUsers(Long id, String email, String roleStr, Str
     public String getUserIdByEmail(String email) {
         return repository.findByEmail(email).getId().toString();
     }
+
+    @Override
+    public List<GetEmployeeList> getEmployeeListByRole (String role){
+        List<EmployeeUser> users = repository.findByRole(EmployeeUser.Role.valueOf(role.toUpperCase()));
+        List<GetEmployeeList> employeeList = new ArrayList<>();
+        for (EmployeeUser user : users) {
+            GetEmployeeList employee = new GetEmployeeList();
+            employee.setEmployeeId(user.getId());
+            employee.setEmployeeName(user.getEmployeeDetails() != null ? user.getEmployeeDetails().getEmployeeName() : "N/A");
+            employee.setEmployeeEmail(user.getEmail());
+            employee.setEmployeeRole(user.getRole().toString());
+            employee.setEmployeePosition(user.getEmployeeDetails() != null ? user.getEmployeeDetails().getPosition() : "N/A");
+            employeeList.add(employee);
+        }
+        return employeeList;
+    }
 }

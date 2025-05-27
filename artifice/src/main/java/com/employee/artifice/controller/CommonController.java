@@ -123,4 +123,15 @@ public class CommonController {
         List<Department> result = departmentService.searchDepartmentsByName(name);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/searchEmployeesByDepartmentId")
+    public ResponseEntity<List<GetEmployeeList>> searchEmployeesByDepartmentId(@RequestParam Long departmentId) {
+        List<GetEmployeeList> employees = departmentService.searchEmployeesByDepartmentId(departmentId);
+        return ResponseEntity.ok(employees);
+    }
+
+    @GetMapping("/getEmployeeByRole")
+    public List<GetEmployeeList> getEmployeeByRole(@RequestParam String role) {
+        return employeeUserService.getEmployeeListByRole(role);
+    }
 }

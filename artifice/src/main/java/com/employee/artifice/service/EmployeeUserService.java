@@ -28,4 +28,6 @@ public interface EmployeeUserService {
 
     List<EmployeeUser> searchUsers(Long id, String email, String role, String employeeName);
 
+    public List<GetEmployeeList> getEmployeeListByRole (String role);
+
 }

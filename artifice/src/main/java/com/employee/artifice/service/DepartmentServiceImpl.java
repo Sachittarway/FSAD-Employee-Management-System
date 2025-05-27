@@ -3,6 +3,7 @@ package com.employee.artifice.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.employee.artifice.dto.GetEmployeeList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,22 @@ public class DepartmentServiceImpl implements DepartmentService{
         return departmentRepository.findById(id);
     }
 
+    @Override
     public List<Department> searchDepartmentsByName(String name) {
         return departmentRepository.findByDepartmentNameContainingIgnoreCase(name);
+    }
+
+    @Override
+    public List<GetEmployeeList> searchEmployeesByDepartmentId(Long departmentId) {
+        return departmentRepository.findById(departmentId)
+                .map(department -> department.getUsers().stream()
+                        .map(user-> new GetEmployeeList(
+                                user.getId(),
+                                user.getEmployeeName(),
+                                user.getUser().getEmail(),
+                                user.getUser().getRole().toString(),
+                                user.getPosition()))
+                        .toList())
+                .orElseThrow(() -> new RuntimeException("Department not found with id: " + departmentId));
     }
 }
