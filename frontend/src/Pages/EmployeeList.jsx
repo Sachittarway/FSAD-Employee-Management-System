@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Table, Tag, Space, Button, Avatar, Input, Dropdown,Modal,Select } from "antd";
 import "./EmployeeList.css";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
@@ -20,6 +20,39 @@ const EmployeeList = () => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("USER");
   const [api, contextHolder] = notification.useNotification();
+  const[employeeList, setEmployeeList] = useState([]);
+
+  useEffect(() => {
+    fetchEmployeeList();
+  }, []);
+
+  const fetchEmployeeList = async () => {
+    try {
+      const res = await fetch('http://localhost:8081/common/employeeList', {
+        method: 'GET',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (res.status === 401) {
+        console.error("Unauthorized access. Redirecting to login.");
+        return;
+      }
+      if (!res.ok) {
+        console.error("Failed to fetch employee list. Status:", res.status);
+        return;
+      }
+      const data = await res.json();
+      setEmployeeList(data);
+      console.log("Employee List Data:", data);
+      // You can set the data to state if needed
+    }
+    catch (err) {
+      console.error("Error fetching employee list:", err);
+    }
+  }
+  console.log("Employee List:", employeeList);
 
   const items = [
     {
@@ -43,35 +76,35 @@ const EmployeeList = () => {
   const columns = [
     {
       title: "Employee ID",
-      dataIndex: "empid",
-      key: "empid",
+      dataIndex: "employeeId",
+      key: "employeeId",
       render: (text) => <a>{text}</a>,
     },
     {
       title: "Full Name",
-      dataIndex: "name",
+      dataIndex: "employeeName",
       render: (text) => <a>{text}</a>,
     },
     {
       title: "Position",
-      dataIndex: "position",
-      key: "position",
+      dataIndex: "employeePosition",
+      key: "employeePosition",
     },
     {
       title: "Role",
-      dataIndex: "role",
-      key: "role",
+      dataIndex: "employeeRole",
+      key: "employeeRole",
       render: (role) => {
         let color;
     
         switch (role) {
-          case "Manager":
+          case "MANAGER":
             color = "blue";
             break;
-          case "Admin":
+          case "ADMIN":
             color = "volcano";
             break;
-          case "User":
+          case "USER":
             color = "green";
             break;
           default:
@@ -83,8 +116,8 @@ const EmployeeList = () => {
     },
     {
       title: "Email",
-      dataIndex: "email",
-      key: "email",
+      dataIndex: "employeeEmail",
+      key: "employeeEmail",
     },
     {
       title: "Action",
@@ -435,7 +468,7 @@ const EmployeeList = () => {
           }}>
           <Table 
             columns={columns} 
-            dataSource={data} 
+            dataSource={employeeList} 
             className="custom-ant-table"
           />
           </div>
