@@ -21,10 +21,12 @@ const EmployeeList = () => {
   const [api, contextHolder] = notification.useNotification();
   const[employeeList, setEmployeeList] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
+  const [countryList, setCountryList] = useState([]);
 
   useEffect(() => {
     fetchEmployeeList();
     fetchDepartmentList();
+    fetchCountryList();
   }, []);
 
   const fetchEmployeeList = async () => {
@@ -79,6 +81,31 @@ const EmployeeList = () => {
     }
   };
   console.log("Employee List:", employeeList);
+
+  const fetchCountryList = async () => {
+    try {
+      const res = await fetch('http://localhost:8081/common/getCountryList', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (res.status === 401) {
+        console.error("Unauthorized access. Redirecting to login.");
+        return;
+      }
+      if (!res.ok) {
+        console.error("Failed to fetch country list. Status:", res.status);
+        return;
+      }
+      const data = await res.json();
+      setCountryList(data);
+      console.log("Country List Data:", data);
+    } catch (err) {
+      console.error("Error fetching country list:", err);
+    }
+  };
 
   const items = [
     {
@@ -275,6 +302,16 @@ const EmployeeList = () => {
     }
   }
 
+  const handleLocationFilter = (e) => {
+    if(e.key === "all") {
+      fetchEmployeeList();
+    }
+    else {
+      console.log("Selected Location:", e);
+      fetchEmployeeListByLocation(e.key);
+    }
+  }
+
   const fetchEmployeeListByDepartment = async (departmentId) => {
     try{
       const response = await fetch(`http://localhost:8081/common/searchEmployeesByDepartmentId?departmentId=${departmentId}`, {
@@ -326,6 +363,33 @@ const EmployeeList = () => {
       console.error("Error fetching employee list by role:", err);
     }
   }
+
+  const fetchEmployeeListByLocation = async (countryName) => {
+    try{
+      const response = await fetch(`http://localhost:8081/common/getEmployeeDetailsByCurrentLocation?currentLocation=${countryName}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`    
+        }
+      });
+      if (response.status === 401) {
+        console.error("Unauthorized access. Redirecting to login.");
+        return;
+      }
+      if (!response.ok) {
+        console.error("Failed to fetch employee list by location. Status:", response.status);
+        return;
+      }
+      const data = await response.json();
+      setEmployeeList(data);
+      console.log("Filtered Employee List Data:", data);  
+    }
+    catch (err) {
+      console.error("Error fetching employee list by location:", err);
+    }
+  }
+
 
   return (
     <div className="employee-list">
@@ -533,18 +597,15 @@ const EmployeeList = () => {
                 <Dropdown menu={{ 
                   items: [
                     {
-                      label: "New York",
-                      key: "2",
+                      label: "All Locations",
+                      key: "all",
                     },
-                    {
-                      label: "San Francisco",
-                      key: "3",
-                    },
-                    {
-                      label: "Los Angeles",
-                      key: "4",
-                    },
+                    ...countryList.map(country => ({
+                      label: country.name,
+                      key: country.name,
+                    })),
                   ],
+                  onClick: handleLocationFilter,
                  }} placement="bottomLeft" arrow>
                   <Button size="large">
                   <FilterOutlined /> Location 
