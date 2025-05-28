@@ -3,6 +3,7 @@ package com.employee.artifice.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.employee.artifice.dto.GetEmployeeList;
 import org.springframework.stereotype.Service;
 
 import com.employee.artifice.dto.CustomEmployeeDetails;
@@ -15,4 +16,5 @@ public interface EmployeeDetailsService {
     public Optional<EmployeeDetails> getDetailsById(Long id);
     public Optional<EmployeeDetails> updateEmployeeDetails(EmployeeDetails details);
     public Optional<CustomEmployeeDetails> getDetailsByEmail();
+    public Optional<List<GetEmployeeList>> getDetailsByCurrentLocation(String currentLocation);
 }

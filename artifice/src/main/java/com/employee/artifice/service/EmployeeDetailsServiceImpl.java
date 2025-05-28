@@ -1,6 +1,7 @@
 package com.employee.artifice.service;
 
 import com.employee.artifice.dto.CustomEmployeeDetails;
+import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.model.EmployeeDetails;
 import com.employee.artifice.model.EmployeeUser;
 import com.employee.artifice.repository.EmployeeDetailsRepository;
@@ -82,5 +83,18 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
                         details.getProject() != null ? details.getProject().getProject_code() : "",
                         details.getUser().getEmail()
                 ));
+    }
+
+    @Override
+    public Optional<List<GetEmployeeList>> getDetailsByCurrentLocation(String currentLocation) {
+        return detailsRepository.findByCurrentLocation(currentLocation)
+                .map(detailsList -> detailsList.stream()
+                        .map(details -> new GetEmployeeList(
+                                details.getUser().getId(),
+                                details.getEmployeeName(),
+                                details.getUser().getEmail(),
+                                details.getUser().getRole().toString(),
+                                details.getPosition()
+                        )).toList());
     }
 }

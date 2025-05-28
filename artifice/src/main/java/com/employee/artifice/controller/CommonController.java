@@ -3,6 +3,8 @@ package com.employee.artifice.controller;
 import java.util.List;
 
 import com.employee.artifice.dto.GetEmployeeList;
+import com.employee.artifice.model.*;
+import com.employee.artifice.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,16 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.employee.artifice.dto.CustomEmployeeDetails;
 import com.employee.artifice.dto.PasswordChangeRequest;
-import com.employee.artifice.model.Department;
-import com.employee.artifice.model.EmployeeDetails;
-import com.employee.artifice.model.EmployeeUser;
-import com.employee.artifice.model.Project;
-import com.employee.artifice.service.CommonService;
-import com.employee.artifice.service.DepartmentService;
-import com.employee.artifice.service.EmployeeDetailsService;
 import com.employee.artifice.service.EmployeeUserService;
-import com.employee.artifice.service.EmployeeUserService;
-import com.employee.artifice.service.ProjectService;
 
 import java.util.List;
 import java.util.Map;
@@ -51,6 +44,9 @@ public class CommonController {
 
     @Autowired
     ProjectService projectService;
+
+    @Autowired
+    CountryService countryService;
 
 
     @PostMapping("/updatePassword")
@@ -133,5 +129,15 @@ public class CommonController {
     @GetMapping("/getEmployeeByRole")
     public List<GetEmployeeList> getEmployeeByRole(@RequestParam String role) {
         return employeeUserService.getEmployeeListByRole(role);
+    }
+
+    @GetMapping("/getEmployeeDetailsByCurrentLocation")
+    public Optional<List<GetEmployeeList>> getEmployeeDetailsByCurrentLocation(@RequestParam String currentLocation) {
+        return employeeDetailsService.getDetailsByCurrentLocation(currentLocation);
+    }
+
+    @GetMapping("/getCountryList")
+    public List<Country> getCountryList() {
+        return countryService.getAllCountries();
     }
 }
