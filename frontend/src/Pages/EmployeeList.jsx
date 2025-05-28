@@ -177,7 +177,9 @@ const EmployeeList = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
+          <Link to = "/UserDetails">
           <Button type="primary"><FolderViewOutlined /></Button>
+          </Link>
           <Button variant="filled" color="danger" onClick={showDeleteModal}><DeleteOutlined /></Button>
         </Space>
       ),

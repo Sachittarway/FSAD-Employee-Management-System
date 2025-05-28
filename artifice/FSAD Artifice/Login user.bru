@@ -1,18 +1,18 @@
 meta {
-  name: Login
+  name: Login user
   type: http
-  seq: 4
+  seq: 13
 }
 
 post {
   url: http://localhost:8081/login
   body: json
-  auth: inherit
+  auth: none
 }
 
 body:json {
   {
-    "email":"kanak@gmail.com",
+    "email":"temper@gmail.com",
     "password":"Sachit"
   }
 }

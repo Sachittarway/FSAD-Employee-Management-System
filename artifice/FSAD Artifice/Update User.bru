@@ -1,0 +1,29 @@
+meta {
+  name: Update User
+  type: http
+  seq: 10
+}
+
+put {
+  url: http://localhost:8081/common/updateDetails
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZW1wZXJAZ21haWwuY29tIiwiaWF0IjoxNzQ4MTkyMjE5LCJleHAiOjE3NDgxOTIzMjd9.xtu2OKkFk7sRSoqUtng2Al7ucuZs-M4xXUOZm2Q6kwk
+}
+
+body:json {
+  {
+    "currentLocation": "Mysur",
+    "permanentAddress": "123 Main Stree, Hometown, India",
+    "localAddress": "456 Tech Park, Bangalore, India",
+    "passportNo": "M1234567",
+    "phoneNumber": "+91-9876543210",
+    "yearsOfExperience": 5,
+    "passportIssueDate": "2019-06-15",
+    "passportExpiryDate": "2029-06-14",
+    "passportOffice": "Bangalore"
+  }
+}

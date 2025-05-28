@@ -1,0 +1,23 @@
+meta {
+  name: Create Manager
+  type: http
+  seq: 11
+}
+
+get {
+  url: http://localhost:8081/admin/register
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJrYW5ha0BnbWFpbC5jb20iLCJpYXQiOjE3NDgwNjY4ODksImV4cCI6MTc0ODA2Njk5N30.8YUnk2Yd9JtgUevAByx9YL6vY2q-fwkU5KJHe8F7q_g
+}
+
+body:json {
+  {
+    "email":"ritika@gmail.com",
+    "password":"Sachit",
+    "role":"MANAGER"
+  }
+}

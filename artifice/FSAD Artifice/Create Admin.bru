@@ -1,0 +1,24 @@
+meta {
+  name: Create Admin
+  type: http
+  seq: 9
+}
+
+post {
+  url: http://localhost:8081/admin/register
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZW1wZXJAZ21haWwuY29tIiwiaWF0IjoxNzQ4MTkxOTgwLCJleHAiOjE3NDgxOTIwODh9.LIyvCQlL7RzLjYev0G8T0QGzT3dqcH8CCZfkKx85HeY
+}
+
+body:json {
+  {
+    "email":"temper@gmail.com",
+    "password":"Sachit",
+    "role":"USER",
+    "name":"Temper"
+  }
+}

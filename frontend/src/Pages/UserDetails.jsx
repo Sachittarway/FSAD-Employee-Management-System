@@ -4,128 +4,149 @@ import { Avatar,Dropdown } from "antd";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import { Link } from 'react-router-dom';
 import { useAuth } from "../Auth/AuthContext";
-import {  Button, Space } from 'antd';
+import {  Button , Input, Space} from 'antd';
 
 import  { useEffect, useState } from "react";
-import { Input } from "antd";
 import { FaPen, FaSave } from "react-icons/fa";
 
 
-const MyDetails = () => {
-    const { user } = useAuth();
-    const role = user.role;
+const UserDetails = () => {
+     const { user } = useAuth();
+        const role = user.role;
+            const items = [
+                {
+                label: "Logout",
+                key: "1",
+                danger: true,
+                },
+            ];
+            
+            
+      const [userDetails, setUserDetails] = useState(null);
+      const [editMode, setEditMode] = useState(false);
+      const [editValues, setEditValues] = useState({});
+      const [isEditing, setIsEditing] = useState(false); // For password editing
+      const [password, setPassword] = useState("India");
+      const [editedPassword, setEditedPassword] = useState(password);
     
-
-        const items = [
-            {
-            label: "Logout",
-            key: "1",
-            danger: true,
-            },
-        ];
-        
-        
-  const [userDetails, setUserDetails] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  const [editValues, setEditValues] = useState({});
-  const [isEditing, setIsEditing] = useState(false); // For password editing
-  const [password, setPassword] = useState("India");
-  const [editedPassword, setEditedPassword] = useState(password);
-
-  // Fetch user details once on mount
-  useEffect(() => {
-   const fetchUserDetails = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:8081/common/getEmployeeDetailsByEmail",
-          {
+      // Fetch user details once on mount
+      useEffect(() => {
+       const fetchUserDetails = async () => {
+          try {
+            const response = await fetch(
+              "http://localhost:8081/common/getEmployeeDetailsByEmail",
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }
+            );
+    
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+    
+            const data = await response.json();
+            setUserDetails(data);
+          } catch (error) {
+            console.error("Error fetching user details:", error);
+          }
+        };
+    
+        fetchUserDetails();
+      }, []);
+    
+    
+      // Initialize editValues when userDetails changes
+      useEffect(() => {
+        if (userDetails) {
+          setEditValues({
+            phoneNumber: userDetails.phoneNumber || "",
+            yearsOfExperience: userDetails.yearsOfExperience || 0,
+            permanentAddress: userDetails.permanentAddress || "",
+            localAddress: userDetails.localAddress || "",
+            passportNo: userDetails.passportNo || "",
+            passportOffice: userDetails.passportOffice || "",
+            passportIssueDate: userDetails.passportIssueDate || "",
+            passportExpiryDate: userDetails.passportExpiryDate || "",
+            employeeNumber: userDetails.employeeNumber || "",
+            currentLocation: userDetails.currentLocation || "",
+            // add other fields as needed
+          });
+        }
+      }, [userDetails]);
+    
+      // Handlers
+    
+      const handleEditClick = () => {
+        setIsEditing(true);
+      };
+    
+      const handleSaveClick = () => {
+        setPassword(editedPassword);
+        setIsEditing(false);
+      };
+    
+      const handleEditProfileClick = async () => {
+        if (editMode) {
+          // Save mode - PUT updated details to backend
+          fetch("http://localhost:8081/common/updateDetails", {
+            method: "PUT",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+            body: JSON.stringify(editValues),
+          })
+            .then((res) => {
+              if (!res.ok) throw new Error("Failed to update");
+              return res.json();
+            })
+            .then((updatedData) => {
+              setUserDetails((prev) => ({ ...prev, ...editValues }));
+              setEditMode(false);
+              console.log("Update successful:", updatedData);
+            })
+            .catch((error) => {
+              console.error("Update error:", error);
+              alert("Failed to update details.");
+            });
+        } else {
+          // Enter edit mode
+          setEditMode(true);
         }
+      };
+    
+      const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditValues((prev) => ({ ...prev, [name]: value }));
+      };
+      
+        // const[editMode, setEditMode] = useState(null);
+        // const [editValues, setEditValues] = useState({
+        //         currentIbu: userDetails.currentIbu,
+        //         currentLocation: userDetails.currentLocation,
+        //         projectCode: userDetails.projectCode,
+        //     });
 
-        const data = await response.json();
-        setUserDetails(data);
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-      }
-    };
+        //     const handleEditProfileClick = () => {
+        //         if (editMode) {
+        //         setUserDetails(prev => ({ ...prev, ...editValues }));
+        //         setEditMode(false);
+        //         } else if (role === "MANAGER" || role === "ADMIN") {
+        //         setEditMode(true);
+        //         }
+        //     };
 
-    fetchUserDetails();
-  }, []);
+        //         const handleInputChange = (e) => {
+        //         const { name, value } = e.target;
+        //         setEditValues(prev => ({ ...prev, [name]: value }));
+        //     };
 
 
-  // Initialize editValues when userDetails changes
-  useEffect(() => {
-    if (userDetails) {
-      setEditValues({
-        phoneNumber: userDetails.phoneNumber || "",
-        yearsOfExperience: userDetails.yearsOfExperience || 0,
-        permanentAddress: userDetails.permanentAddress || "",
-        localAddress: userDetails.localAddress || "",
-        passportNo: userDetails.passportNo || "",
-        passportOffice: userDetails.passportOffice || "",
-        passportIssueDate: userDetails.passportIssueDate || "",
-        passportExpiryDate: userDetails.passportExpiryDate || "",
-        employeeNumber: userDetails.employeeNumber || "",
-        currentLocation: userDetails.currentLocation || "",
-        // add other fields as needed
-      });
-    }
-  }, [userDetails]);
-
-  // Handlers
-
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
-  const handleSaveClick = () => {
-    setPassword(editedPassword);
-    setIsEditing(false);
-  };
-
-  const handleEditProfileClick = () => {
-    if (editMode) {
-      // Save mode - PUT updated details to backend
-      fetch("http://localhost:8081/common/updateDetails", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(editValues),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to update");
-          return res.json();
-        })
-        .then((updatedData) => {
-          setUserDetails((prev) => ({ ...prev, ...editValues }));
-          setEditMode(false);
-          console.log("Update successful:", updatedData);
-        })
-        .catch((error) => {
-          console.error("Update error:", error);
-          alert("Failed to update details.");
-        });
-    } else {
-      // Enter edit mode
-      setEditMode(true);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditValues((prev) => ({ ...prev, [name]: value }));
-  };
-  
+    
+       
             
 
     
@@ -140,18 +161,9 @@ const MyDetails = () => {
                 </div>
 
                 <div className="right-div">
-                  <Dropdown menu={{
-                            items,
-                            onClick: ({ key }) => {
-                              if (key === "1") {
-                                localStorage.removeItem("token");
-                                localStorage.removeItem("user");
-                                window.location.reload();
-                              }
-                            }
-                          }} placement="bottomLeft">
-                            <Avatar size="large" src={<img src={"https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg"}></img>} />
-                          </Dropdown>
+                    <Dropdown menu={{ items }} placement="bottomLeft">
+                        <Avatar size="large" src={<img src={"https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg"}></img> }/>
+                    </Dropdown>
                 </div>
             </div>
             {/* Top Navbar Ends here !!! */}
@@ -181,11 +193,11 @@ const MyDetails = () => {
                                 user.role === "ADMIN" && (
                                     <>
                                         <MenuItem component={<Link to="/AdminDashboard" />}>Dashboard</MenuItem>
-                                        <MenuItem component={<Link to="/Departments" />} >Departments</MenuItem>
-                                        <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
+                                         <MenuItem component={<Link to="/Departments" />} >Departments</MenuItem>
+                                        <MenuItem active > Employee List</MenuItem>
                                         <MenuItem component={<Link to="/Resources" />}>Requests</MenuItem>
-                                       
-                                        <MenuItem active>My Details</MenuItem>
+                                         <MenuItem component={<Link to="/MyDetails" />}>My Details</MenuItem>
+
                                     </>
                                 )
                             }
@@ -194,10 +206,12 @@ const MyDetails = () => {
                                     <>
                                         <MenuItem component={<Link to="/ManagerDashboard" />}>Dashboard</MenuItem>
                                         <MenuItem component={<Link to="/Departments" />} >Departments</MenuItem>
-                                        <MenuItem component={<Link to="/EmployeeList" />}>Employee List</MenuItem>
-                                      
+                                        <MenuItem active > Employee List</MenuItem>
+                                        <MenuItem component={<Link to="/TeamList" />}>Team List</MenuItem>
                                         <MenuItem component={<Link to="/Resources" />}>Requests</MenuItem>
-                                        <MenuItem active>My Details </MenuItem>
+                                        <MenuItem component={<Link to="/MyDetails" />}>My Details</MenuItem>
+
+                                        
                                     </>
                                 )
                             }
@@ -271,42 +285,26 @@ const MyDetails = () => {
                            
                            <div className="user-section" >
                             <p><span className="label">Name: </span>{userDetails?.employeeName}</p>
-                            <p><span className="label">Phone: </span>
-                            {editMode ? (
-                                 <Space.Compact>
-                                <Input
-                                name="phoneNumber"
-                                value={editValues.phoneNumber}
-                                onChange={handleInputChange}
-                                />
-                                </Space.Compact>
-                            ) : (
-                                userDetails?.phoneNumber
-                            )}
-                            
-                            </p>
+                            <p><span className="label">Phone: </span>{userDetails?.phoneNumber}</p>
                             </div>
                             <div className="user-section">
-                             <p><span className="label">Years of Experience: </span>
-                             {editMode ? (
+                             <p><span className="label">Years of Experience: </span>{userDetails?.yearsOfExperience}</p>
+                            <p><span className="label">Current IBU: </span>
+                            {
+                            (role === "MANAGER" || role === "ADMIN") && editMode
+                                ? (
                                 <Space.Compact>
                                 <Input
-                                name="yearsOfExperience"
-                                value={editValues.yearsOfExperience}
+                                name="projectCode"
+                                value={editValues.currentIbu}
                                 onChange={handleInputChange}
                                 />
                                 </Space.Compact>
                             ) : (
-                                userDetails?.yearsOfExperience ?? "N/A"
-                            )}
-                            </p>
-                            {/* <p><span className="label">Current IBU: </span>
-                            {
-                            editMode
-                                ? <input name="currentIbu" value={editValues.currentIbu} onChange={handleInputChange} />
-                                : userDetails.currentIbu
+                                 userDetails?.currenIbu ?? "N/A"
+                            )
                             }
-                            </p> */}
+                            </p>
                             </div>
                              <div className="user-section right-align">
                             <p>
@@ -328,7 +326,7 @@ const MyDetails = () => {
                                     ) : (
                                     <>
                                         {"•".repeat(password.length)}
-                                        {role === "USER" && (
+                                        {role === "user" && (
                                         <FaPen
                                             onClick={handleEditClick}
                                             style={{ marginLeft: "10px", cursor: "pointer" }}
@@ -370,19 +368,11 @@ const MyDetails = () => {
                                 
                             
                            <div className="user-section" >
-                             <p><span className="label">Employee Number: </span>
-                             {/* {editMode ? (
-                                <Input
-                                name="Employee Number"
-                                value={editValues.employeeNumber}
-                                onChange={handleInputChange}
-                                />
-                            ) : (
-                                userDetails?.employeeNumber ?? "N/A"
-                            )} */}
-                            </p>
+                             <p><span className="label">Employee Number: </span>{userDetails?.employeeNumber}</p>
                             <p><span className="label">Project Code: </span>
-                            {editMode ? (
+                           {
+                            (role === "MANAGER" || role === "ADMIN") && editMode
+                                ? (
                                 <Space.Compact>
                                 <Input
                                 name="projectCode"
@@ -392,23 +382,27 @@ const MyDetails = () => {
                                 </Space.Compact>
                             ) : (
                                  userDetails?.projectCode ?? "N/A"
-                            )}
+                            )
+                            }
                             
                             </p>
                             </div>
                             <div className="user-section">
                             <p><span className="label">Current Location: </span>
-                            {editMode ? (
+                            {
+                            (role === "MANAGER" || role === "ADMIN") && editMode
+                                ? (
                                 <Space.Compact>
                                 <Input
-                                name="currentLocation"
+                                name="projectCode"
                                 value={editValues.currentLocation}
                                 onChange={handleInputChange}
                                 />
                                 </Space.Compact>
                             ) : (
                                  userDetails?.currentLocation ?? "N/A"
-                            )}
+                            )
+                            }
                                             
                             
                             </p>
@@ -448,100 +442,16 @@ const MyDetails = () => {
                                 
                          
                            <div className="user-section" >
-                            <p><span className="label">Permanent Address: </span>
-                            {editMode ? (
-                                <Space.Compact>
-    
-  
-                                <Input
-                                name="permanentAddress"
-                                value={editValues.permanentAddress}
-                                onChange={handleInputChange}
-                                
-                                />
-
-                                </Space.Compact>
-                            ) : (
-                                 userDetails?.permanentAddress ?? "N/A"
-                            )}
-                              
-                            </p>
-
-                            <p><span className="label">Local Address: </span>
-                            {editMode ? (
-                                 <Space.Compact>
-                                <Input
-                                name="localAddress"
-                                value={editValues.localAddress}
-                                onChange={handleInputChange}
-                                />
-                                </Space.Compact>
-                            ) : (
-                                 userDetails?.localAddress?? "N/A"
-                            )}
-                            
-                            </p>
+                            <p><span className="label">Permanent Address: </span>{userDetails?.permanentAddress}</p>
+                            <p><span className="label">Local Address: </span>{userDetails?.localAddress}</p>
                             </div>
                             <div className="user-section">
-                            <p><span className="label">Passport No: </span>
-                            {editMode ? (
-                                <Space.Compact>
-                                <Input
-                                name="passportNo"
-                                value={editValues.passportNo}
-                                onChange={handleInputChange}
-                                />
-                                </Space.Compact>
-                            ) : (
-                                 userDetails?.passportNo ?? "N/A"
-                            )}
-                            
-                            </p>
-                            <p><span className="label">Passport Office: </span>
-                            {editMode ? (
-                                <Space.Compact>
-                                <Input
-                                name="passportOffice"
-                                value={editValues.passportOffice}
-                                onChange={handleInputChange}
-                                />
-                                </Space.Compact>
-                            ) : (
-                                 userDetails?.passportOffice ?? "N/A"
-                            )}
-                            
-                            
-                            </p>
+                            <p><span className="label">Passport No: </span>{userDetails?.passportNo}</p>
+                            <p><span className="label">Passport Office: </span>{userDetails?.passportOffice}</p>
                             </div>
                             <div className="user-section right-align">
-                            <p><span className="label">Issue Date: </span>
-                            {editMode ? (
-                                <Space.Compact>
-                                <Input
-                                name="passportIssueDate"
-                                value={editValues.passportIssueDate}
-                                onChange={handleInputChange}
-                                />
-                                </Space.Compact>
-                            ) : (
-                                 userDetails?.passportIssueDate ?? "N/A"
-                            )}
-                            
-                            </p>
-                            <p><span className="label">Expiry Date: </span>
-                             {editMode ? (
-                                <Space.Compact>
-                                <Input
-                                name="passportExpiryDate"
-                                value={editValues.passportExpiryDate}
-                                onChange={handleInputChange}
-                                />
-                                </Space.Compact>
-                            ) : (
-                                 userDetails?.passportExpiryDate?? "N/A"
-                            )}
-                            
-                            </p>
+                            <p><span className="label">Issue Date: </span>{userDetails?.passportIssueDate}</p>
+                            <p><span className="label">Expiry Date: </span>{userDetails?.passportExpiryDate}</p>
                             </div>
                      
                         </div>
@@ -578,15 +488,21 @@ const MyDetails = () => {
                                     padding: "15px",
                                     backgroundColor: "#fafafa"
                                 }}>
-                                    <p><strong>Organization:</strong> </p>
-                                    <p><strong>Duration:</strong> </p>
-                                    <p><strong>Designation:</strong> </p>
-                                    <p><strong>Description:</strong> </p>
+                                    <p><strong>Organization:</strong> {job.organizationName}</p>
+                                    <p><strong>Duration:</strong> {job.duration}</p>
+                                    <p><strong>Designation:</strong> {job.designation}</p>
+                                    <p><strong>Description:</strong> {job.description}</p>
                                 </div>
                                 ))}
                                                 
                      </div>
-                   </div>                           
+                   </div>
+
+
+
+                 
+                  
+                           
                    
                    {/* Start your from here !!!!!!! */}
                    
@@ -600,4 +516,4 @@ const MyDetails = () => {
         </div>
     )
 }
-export default MyDetails;
+export default UserDetails;
