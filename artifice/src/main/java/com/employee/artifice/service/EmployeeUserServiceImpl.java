@@ -1,9 +1,5 @@
 package com.employee.artifice.service;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import com.employee.artifice.dto.GetEmployeeList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +35,18 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
 
     @Override
     public EmployeeUser createUser(CreateUser user) {
-
+        // Check if user already exists
+        EmployeeUser existingUser = repository.findByEmail(user.getEmail());
+        if (existingUser != null) {
+            throw new RuntimeException("User already exists with email: " + user.getEmail());
+        }
+        // Check if role as admin already exists
+        if(Objects.equals(user.getRole(), "ADMIN")) {
+            EmployeeUser adminUser = (EmployeeUser) repository.findByRole(EmployeeUser.Role.ADMIN);
+            if (adminUser != null && user.getRole().equalsIgnoreCase("ADMIN")) {
+                throw new RuntimeException("Admin user already exists");
+            }
+        }
         EmployeeUser newUser = new EmployeeUser();
         newUser.setEmail(user.getEmail());
         newUser.setPassword(encoder.encode(user.getPassword()));

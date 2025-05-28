@@ -9,8 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.employee.artifice.dto.CustomEmployeeDetails;
 import com.employee.artifice.dto.GetEmployeeList;
+import com.employee.artifice.dto.UpdateTeam;
+import com.employee.artifice.model.Department;
 import com.employee.artifice.model.EmployeeDetails;
 import com.employee.artifice.model.EmployeeUser;
+import com.employee.artifice.model.Project;
 import com.employee.artifice.repository.EmployeeDetailsRepository;
 import com.employee.artifice.repository.EmployeeUserRepository;
 
@@ -22,6 +25,12 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
 
     @Autowired
     EmployeeUserRepository userRepository;
+
+    @Autowired
+    DepartmentService departmentService;
+
+    @Autowired
+    ProjectService projectService;
 
     @Override
     public EmployeeDetails createDetails(EmployeeDetails details) {
@@ -61,6 +70,7 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
         existingDetails.setPassportOffice(details.getPassportOffice());
         existingDetails.setDepartment(details.getDepartment());
         existingDetails.setProject(details.getProject());
+        existingDetails.setPosition(details.getPosition());
         return Optional.of(detailsRepository.save(existingDetails));
     }
 
@@ -97,5 +107,37 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
                                 details.getUser().getRole().toString(),
                                 details.getPosition()
                         )).toList());
+    }
+
+    @Override
+    public List<GetEmployeeList> getMyTeamMembers() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long departmentId = detailsRepository.findByUserEmail(email)
+                .orElseThrow(() -> new RuntimeException("Employee details not found for user: " + email))
+                .getDepartment().getId();
+        System.out.println("Department ID: " + departmentId);
+        return departmentService.searchEmployeesByDepartmentId(departmentId);
+    }
+
+    /* Update Employee Department and Project by the Manager */
+    @Override
+    public UpdateTeam updateEmployeeTeam(UpdateTeam updateTeam) {
+        EmployeeDetails details = detailsRepository.findByUserEmail(updateTeam.getEmail())
+                .orElseThrow(() -> new RuntimeException("Employee details not found for email: " + updateTeam.getEmail()));
+
+        if (updateTeam.getDepartmentId() != null) {
+            Department department = departmentService.getDepartmentById(updateTeam.getDepartmentId())
+                    .orElseThrow(() -> new RuntimeException("Department not found with id: " + updateTeam.getDepartmentId()));
+            details.setDepartment(department);
+        }
+
+        if (updateTeam.getProjectId() != null) {
+            Project project = projectService.getProjectById(updateTeam.getProjectId())
+                    .orElseThrow(() -> new RuntimeException("Project not found with id: " + updateTeam.getProjectId()));
+            details.setProject(project);
+        }
+
+        detailsRepository.save(details);
+        return updateTeam;
     }
 }

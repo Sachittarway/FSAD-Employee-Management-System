@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.employee.artifice.dto.CustomEmployeeDetails;
 import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.dto.PasswordChangeRequest;
@@ -27,6 +26,9 @@ import com.employee.artifice.service.CountryService;
 import com.employee.artifice.service.DepartmentService;
 import com.employee.artifice.service.EmployeeDetailsService;
 import com.employee.artifice.service.EmployeeUserService;
+import java.util.Optional;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import com.employee.artifice.service.ProjectService;
 
 @RestController

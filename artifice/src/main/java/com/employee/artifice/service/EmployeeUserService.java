@@ -19,8 +19,6 @@ public interface EmployeeUserService {
 
     public String verify(EmployeeUser user);
 
-    String registerAdmin(EmployeeUser user);
-
     String getRoleByEmail(String email);
 
     public List<GetEmployeeList> getAllEmployeesList();

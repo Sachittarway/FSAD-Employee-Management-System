@@ -1,5 +1,6 @@
 package com.employee.artifice.controller;
 
+import com.employee.artifice.dto.CreateUser;
 import com.employee.artifice.model.EmployeeUser;
 import com.employee.artifice.service.EmployeeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import java.util.Map;
 
 
 @RestController
-//@CrossOrigin(origins = "*")
 public class InitialController {
 
     @Autowired
@@ -33,7 +33,7 @@ public class InitialController {
     }
 
     @PostMapping("/registerAdmin")
-    public String registerAdmin(@RequestBody EmployeeUser user){
-        return service.registerAdmin(user);
+    public EmployeeUser registerAdmin(@RequestBody CreateUser user){
+        return service.createUser(user);
     }
 }
