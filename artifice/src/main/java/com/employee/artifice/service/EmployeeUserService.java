@@ -8,6 +8,7 @@ import com.employee.artifice.dto.GetEmployeeList;
 import org.springframework.stereotype.Service;
 
 import com.employee.artifice.dto.CreateUser;
+import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.model.EmployeeUser;
 
 @Service
@@ -26,7 +27,11 @@ public interface EmployeeUserService {
 
     public String getUserIdByEmail(String email);
 
-    List<EmployeeUser> searchUsers(Long id, String email, String role, String employeeName);
+    Long countAllEmployees();
+    Long countManagers();
+    
+    List<GetEmployeeList> searchUsers(Long id, String email, String roleStr, String employeeName);
+
 
     public List<GetEmployeeList> getEmployeeListByRole (String role);
 

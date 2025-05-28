@@ -3,9 +3,18 @@ package com.employee.artifice.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
-import lombok.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -30,4 +39,7 @@ public class Department {
     @JsonIgnore
     private List<Project> projects;
 
-}
+    public boolean equalsIgnoreCase(String department) {
+        throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }

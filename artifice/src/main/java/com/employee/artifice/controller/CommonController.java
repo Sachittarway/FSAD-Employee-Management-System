@@ -1,12 +1,12 @@
 package com.employee.artifice.controller;
 
 import java.util.List;
+import java.util.Optional;
 
-import com.employee.artifice.dto.GetEmployeeList;
-import com.employee.artifice.model.*;
-import com.employee.artifice.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,16 +15,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.employee.artifice.dto.CustomEmployeeDetails;
+import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.dto.PasswordChangeRequest;
+import com.employee.artifice.model.Country;
+import com.employee.artifice.model.Department;
+import com.employee.artifice.model.EmployeeDetails;
+import com.employee.artifice.model.EmployeeUser;
+import com.employee.artifice.model.Project;
+import com.employee.artifice.service.CommonService;
+import com.employee.artifice.service.CountryService;
+import com.employee.artifice.service.DepartmentService;
+import com.employee.artifice.service.EmployeeDetailsService;
 import com.employee.artifice.service.EmployeeUserService;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.employee.artifice.service.ProjectService;
 
 @RestController
 @RequestMapping("/common")
@@ -70,15 +73,26 @@ public class CommonController {
         return employeeUserService.getAllUsers();
     }
 
+    @GetMapping("/count/employees")
+    public Long getEmployeeCount() {
+        return employeeUserService.countAllEmployees();
+    }
+
+    @GetMapping("/count/managers")
+    public Long getManagerCount() {
+        return employeeUserService.countManagers();
+    }
+
+
     @GetMapping("/searchUsers")
-    public List<EmployeeUser> searchUsers(
+    public List<GetEmployeeList> searchUsers(
             @RequestParam(required = false) Long id,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String role,
-            @RequestParam(required = false) String name
+            @RequestParam(required = false) String employeeName
     ) {
-        return employeeUserService.searchUsers(id, email, role, name);
-    }
+        return employeeUserService.searchUsers(id, email, role, employeeName);
+}
 
     @GetMapping("/employeeList")
     public List<GetEmployeeList> getEmployeeList() {

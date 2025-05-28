@@ -1,9 +1,9 @@
 package com.employee.artifice.dto;
 
+import java.time.LocalDate;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -23,7 +23,7 @@ public class CustomEmployeeDetails {
     private String projectCode;
     private String userEmail;
 
-    public CustomEmployeeDetails() {
+    public CustomEmployeeDetails(String currentLocation1, String permanentAddress1, String localAddress1, String passportNo1, String phoneNumber1, int yearsOfExperience1, LocalDate passportIssueDate1, LocalDate passportExpiryDate1, String passportOffice1, Long id, Long id1, String departmentName1) {
     }
     public CustomEmployeeDetails(String currentLocation, String permanentAddress, String localAddress, String passportNo, String phoneNumber, int yearsOfExperience, LocalDate passportIssueDate, LocalDate passportExpiryDate, String passportOffice, Long departmentId, Long projectId, String departmentName, String projectCode, String userEmail) {
         this.currentLocation = currentLocation;

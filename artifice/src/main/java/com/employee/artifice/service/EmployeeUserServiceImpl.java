@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.employee.artifice.dto.CreateUser;
+import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.model.EmployeeDetails;
 import com.employee.artifice.model.EmployeeUser;
 import com.employee.artifice.repository.EmployeeDetailsRepository;
@@ -92,6 +93,17 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
     }
 
     @Override
+    public Long countAllEmployees() {
+        return repository.count();
+    }
+
+    @Override
+    public Long countManagers() {
+        return repository.countByRole(EmployeeUser.Role.MANAGER);
+    }
+
+
+    @Override
     public String getRoleByEmail(String email) {
         EmployeeUser user = repository.findByEmail(email);
         return user != null ? user.getRole().toString() : "UNKNOWN";
@@ -116,38 +128,49 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
         }
         return employeeList;
     }
+
+    private GetEmployeeList toGetEmployeeList(EmployeeUser user) {
+        String id = user.getId() != null ? user.getId().toString() : null;
+        String name = (user.getEmployeeDetails() != null) ? user.getEmployeeDetails().getEmployeeName() : null;
+        String email = user.getEmail();
+        String role = (user.getRole() != null) ? user.getRole().name() : null;
+        String position = null; // Add logic if needed
+        
+        return new GetEmployeeList(id, name, email, role, position);
+    }
     
     @Override
-public List<EmployeeUser> searchUsers(Long id, String email, String roleStr, String employeeName) {
-    List<EmployeeUser> users;
+    public List<GetEmployeeList> searchUsers(Long id, String email, String roleStr, String employeeName) {
+        List<EmployeeUser> users;
 
-    // Filter by ID first if present
-    if (id != null) {
-        Optional<EmployeeUser> user = repository.findById(id);
-        users = user.map(List::of).orElse(List.of());
-    } else if (email != null) {
-        users = repository.findByEmailContainingIgnoreCase(email);
-    } else if (roleStr != null) {
-        try {
-            EmployeeUser.Role role = EmployeeUser.Role.valueOf(roleStr.toUpperCase());
-            users = repository.findByRole(role);
-        } catch (IllegalArgumentException e) {
-            users = List.of(); // Invalid role
+        if (id != null) {
+            Optional<EmployeeUser> user = repository.findById(id);
+            users = user.map(List::of).orElse(List.of());
+        } else if (email != null) {
+            users = repository.findByEmailContainingIgnoreCase(email);
+        } else if (roleStr != null) {
+            try {
+                EmployeeUser.Role role = EmployeeUser.Role.valueOf(roleStr.toUpperCase());
+                users = repository.findByRole(role);
+            } catch (IllegalArgumentException e) {
+                users = List.of();
+            }
+        } else {
+            users = repository.findAll();
         }
-    } else {
-        users = repository.findAll(); // No filters
-    }
 
-    // Now filter by employeeName if provided
-    if (employeeName != null && !employeeName.isEmpty()) {
-        users = users.stream()
-                .filter(user -> user.getEmployeeDetails() != null &&
-                        user.getEmployeeDetails().getEmployeeName() != null &&
-                        user.getEmployeeDetails().getEmployeeName().toLowerCase().contains(employeeName.toLowerCase()))
+        // Filter by employeeName if present
+        if (employeeName != null && !employeeName.isEmpty()) {
+            users = users.stream()
+                    .filter(user -> user.getEmployeeDetails() != null &&
+                            user.getEmployeeDetails().getEmployeeName() != null &&
+                            user.getEmployeeDetails().getEmployeeName().toLowerCase().contains(employeeName.toLowerCase()))
+                    .toList();
+        }
+
+    return users.stream()
+                .map(this::toGetEmployeeList)
                 .toList();
-    }
-
-    return users;
 }
 
     @Override

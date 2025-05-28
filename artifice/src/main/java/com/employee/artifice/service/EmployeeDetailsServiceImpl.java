@@ -1,17 +1,18 @@
 package com.employee.artifice.service;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.employee.artifice.dto.CustomEmployeeDetails;
 import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.model.EmployeeDetails;
 import com.employee.artifice.model.EmployeeUser;
 import com.employee.artifice.repository.EmployeeDetailsRepository;
 import com.employee.artifice.repository.EmployeeUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
