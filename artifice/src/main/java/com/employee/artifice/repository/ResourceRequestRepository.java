@@ -12,4 +12,6 @@ public interface ResourceRequestRepository extends JpaRepository<ResourceRequest
 
     List<ResourceRequest> findByEmployeeEmail(String managerEmail);
 
+    Long countByAccept(Boolean accept);
+
 }

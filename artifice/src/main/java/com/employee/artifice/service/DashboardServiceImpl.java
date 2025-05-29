@@ -7,6 +7,7 @@ import com.employee.artifice.dto.DashboardCountsDTO;
 import com.employee.artifice.model.EmployeeUser;
 import com.employee.artifice.repository.DepartmentRepository;
 import com.employee.artifice.repository.EmployeeUserRepository;
+import com.employee.artifice.repository.ResourceRequestRepository;
 
 @Service
 public class DashboardServiceImpl implements DashboardService {
@@ -17,17 +18,17 @@ public class DashboardServiceImpl implements DashboardService {
     @Autowired
     private DepartmentRepository departmentRepository;
 
-    // @Autowired
-    // private RequestRepository requestRepository;
+    @Autowired
+    private ResourceRequestRepository requestRepository;
 
     @Override
     public DashboardCountsDTO getDashboardCounts() {
         Long employeeCount = employeeUserRepository.countByRole(EmployeeUser.Role.USER);
         Long managerCount = employeeUserRepository.countByRole(EmployeeUser.Role.MANAGER);
         Long departmentCount = departmentRepository.count();
-        Long totalRequestCount = null;
-        Long approvedRequestCount = null;
-        Long pendingRequestCount = null;
+        Long totalRequestCount = requestRepository.count();
+        Long approvedRequestCount = requestRepository.countByAccept(true);
+        Long pendingRequestCount = requestRepository.countByAccept(false);;
 
         return new DashboardCountsDTO(
                 employeeCount,

@@ -53,6 +53,5 @@ public class ManagerController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         List<ResourceRequest> requests = resourceRequestService.getRequestsByManagerEmail(email);
         return ResponseEntity.ok(requests);
-        
     }
 }
