@@ -23,6 +23,7 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
     @Autowired
     EmployeeDetailsRepository detailsRepository;
 
+
     @Autowired
     EmployeeUserRepository userRepository;
 
@@ -92,7 +93,12 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
                         details.getProject() != null ? details.getProject().getId() : null,
                         details.getDepartment() != null ? details.getDepartment().getDepartment_name() : "",
                         details.getProject() != null ? details.getProject().getProject_code() : "",
-                        details.getUser().getEmail()
+                        details.getUser().getEmail(),
+                        details.getManager() != null ? details.getManager().getId() : null,
+                        details.getManager() != null ? details.getManager().getEmployeeDetails().getEmployeeName() : "",
+                        details.getEmployeeName(),
+                        details.getUser().getId(),
+                        details.getManager() != null ? details.getManager().getEmail() : ""
                 ));
     }
 
@@ -139,5 +145,48 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
 
         detailsRepository.save(details);
         return updateTeam;
+    }
+
+    /*
+        * Update Employee Manager by that Manager only.
+        * Will take employee details from the token and update the manager of that employee.
+     */
+    @Override
+    public Optional<CustomEmployeeDetails> updateEmployeeManager(Long employeeId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        EmployeeUser employeeManager = userRepository.findByEmail(email);
+
+        EmployeeUser employeeUser = userRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee user not found for id: " + employeeId));
+
+        Long employeeUserDetailId = employeeUser.getEmployeeDetails().getId();
+
+        EmployeeDetails employeeToUpdate = detailsRepository.findById(employeeUserDetailId)
+                .orElseThrow(() -> new RuntimeException("Employee details not found for id: " + employeeId));
+
+        employeeToUpdate.setManager(employeeManager);
+        detailsRepository.save(employeeToUpdate);
+        return Optional.of(new CustomEmployeeDetails(
+                employeeToUpdate.getCurrentLocation(),
+                employeeToUpdate.getPermanentAddress(),
+                employeeToUpdate.getLocalAddress(),
+                employeeToUpdate.getPassportNo(),
+                employeeToUpdate.getPhoneNumber(),
+                employeeToUpdate.getYearsOfExperience(),
+                employeeToUpdate.getPassportIssueDate(),
+                employeeToUpdate.getPassportExpiryDate(),
+                employeeToUpdate.getPassportOffice(),
+                employeeToUpdate.getDepartment() != null ? employeeToUpdate.getDepartment().getId() : null,
+                employeeToUpdate.getProject() != null ? employeeToUpdate.getProject().getId() : null,
+                employeeToUpdate.getDepartment() != null ? employeeToUpdate.getDepartment().getDepartment_name() : "",
+                employeeToUpdate.getProject() != null ? employeeToUpdate.getProject().getProject_code() : "",
+                employeeToUpdate.getUser().getEmail(),
+                employeeToUpdate.getManager() != null ? employeeToUpdate.getManager().getId() : null,
+                employeeToUpdate.getManager() != null ? employeeToUpdate.getManager().getEmployeeDetails().getEmployeeName() : "",
+                employeeToUpdate.getEmployeeName(),
+                employeeToUpdate.getUser().getId(),
+                employeeToUpdate.getManager() != null ? employeeToUpdate.getManager().getEmail() : ""
+        ));
     }
 }

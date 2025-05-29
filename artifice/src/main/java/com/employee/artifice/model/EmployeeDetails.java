@@ -36,6 +36,10 @@ public class EmployeeDetails {
     @JsonIgnore
     private Project project;
 
+    @OneToOne
+    @JoinColumn(name = "manager_id", referencedColumnName = "id")
+    private EmployeeUser manager;
+
     String currentLocation;
 
     String permanentAddress;

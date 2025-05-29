@@ -20,4 +20,5 @@ public interface EmployeeDetailsService {
     public Optional<List<GetEmployeeList>> getDetailsByCurrentLocation(String currentLocation);
     public List<GetEmployeeList> getMyTeamMembers();
     public UpdateTeam updateEmployeeTeam(UpdateTeam updateTeam);
+    public Optional<CustomEmployeeDetails> updateEmployeeManager(Long employeeId);
 }

@@ -33,6 +33,13 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
 
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
+    /*
+        1. Method to create an Employee
+        2. It checks if the user already exists by email.
+        3. It checks if an admin user already exists when trying to create a new admin user.
+        4. It saves the new user and creates an EmployeeDetails entry for them.
+        5. Initially name is set in Employee Details as it is passed from payload.
+    */
     @Override
     public EmployeeUser createUser(CreateUser user) {
         // Check if user already exists
@@ -82,24 +89,6 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
     }
 
     @Override
-    public String registerAdmin(EmployeeUser user) {
-        //first check if user is already present or already a admin user is their
-        EmployeeUser existingUser = repository.findByEmail(user.getEmail());
-        if(existingUser != null){
-            return "User already exists";
-        }
-        EmployeeUser adminUser = (EmployeeUser) repository.findByRole(EmployeeUser.Role.ADMIN);
-        if (adminUser != null) {
-            return "Admin user already exists";
-        }
-        //if not then create a new user
-        user.setPassword(encoder.encode(user.getPassword()));
-        user.setRole(EmployeeUser.Role.ADMIN);
-        repository.save(user);
-        return "Admin user created successfully";
-    }
-
-    @Override
     public Long countAllEmployees() {
         return repository.count();
     }
@@ -137,12 +126,12 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
     }
 
     private GetEmployeeList toGetEmployeeList(EmployeeUser user) {
-        String id = user.getId() != null ? user.getId().toString() : null;
+        Long id = user.getId();
         String name = (user.getEmployeeDetails() != null) ? user.getEmployeeDetails().getEmployeeName() : null;
         String email = user.getEmail();
         String role = (user.getRole() != null) ? user.getRole().name() : null;
         String position = null; // Add logic if needed
-        
+
         return new GetEmployeeList(id, name, email, role, position);
     }
     

@@ -1,5 +1,6 @@
 package com.employee.artifice.controller;
 
+import com.employee.artifice.dto.CustomEmployeeDetails;
 import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.dto.UpdateTeam;
 import com.employee.artifice.model.Department;
@@ -33,6 +34,16 @@ public class ManagerController {
     @PatchMapping("/updateTeam")
     public ResponseEntity<UpdateTeam> updateTeam(@RequestBody UpdateTeam updateTeam){
         return ResponseEntity.ok(employeeDetailsService.updateEmployeeTeam(updateTeam));
+    }
+
+    /*
+        * Endpoint to update the manager of an employee!!
+     */
+    @PatchMapping("/updateManager/{employeeId}")
+    public ResponseEntity<CustomEmployeeDetails> updateManager(@PathVariable Long employeeId){
+        return employeeDetailsService.updateEmployeeManager(employeeId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
 }
