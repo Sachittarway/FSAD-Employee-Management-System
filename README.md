@@ -4,18 +4,18 @@ The **Artifice Management System** is an Intranet-based employee management tool
 
 ---
 
-##Features:
-###Login Module:
+#->Features:
+#=>Login Module:
 - User Authentication
 - Role based access (Employee / Manager / Admin)
 
-###User Module:
+#=>User Module:
 - **Employee** can:
   - Login to the system
   - Change the password
   - View profile with detailed personal info
 
-###Manager Module:
+#=>Manager Module:
 - View all employee records
 - Search employees using any field
 - Edit the following:
