@@ -1,4 +1,4 @@
-import "./UserDetails.css";
+// import "./UserDetails.css";
 import React from "react";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Link } from "react-router-dom";

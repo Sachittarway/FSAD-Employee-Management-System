@@ -80,7 +80,6 @@ const EmployeeList = () => {
       console.error("Error fetching department list:", err);
     }
   };
-  console.log("Employee List:", employeeList);
 
   const fetchCountryList = async () => {
     try {
@@ -178,7 +177,11 @@ const EmployeeList = () => {
       render: (_, record) => (
         <Space size="middle">
           <Button type="primary"><FolderViewOutlined /></Button>
-          <Button variant="filled" color="danger" onClick={showDeleteModal}><DeleteOutlined /></Button>
+          {
+            user.role === "ADMIN" && (
+              <Button variant="filled" color="danger" onClick={showDeleteModal}><DeleteOutlined /></Button>
+            )
+          }
         </Space>
       ),
     },

@@ -29,8 +29,8 @@ public class ManagerController {
     ResourceRequestService resourceRequestService;
 
     @GetMapping("/myTeam")
-    public List<GetEmployeeList> getMyTeamMembers() {
-        return employeeDetailsService.getMyTeamMembers();
+    public List<GetEmployeeList> getMyTeamMembers(@RequestParam String name) {
+        return employeeDetailsService.getMyTeamMembers(name);
     }
 
     @PatchMapping("/updateTeam")

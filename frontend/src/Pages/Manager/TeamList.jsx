@@ -1,107 +1,107 @@
-import React from "react";
-import { Table, Tag, Space, Button, Avatar, Input, Dropdown,Modal } from "antd";
+import { Table, Tag,Avatar, Input, Dropdown,Modal } from "antd";
 import "./TeamList.css";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
-import {FilterOutlined,EditOutlined,DeleteOutlined,FolderViewOutlined,UserOutlined} from "@ant-design/icons";
+import {UserOutlined} from "@ant-design/icons";
 import { Link } from 'react-router-dom';
-import { useState } from "react";
-import { useAuth } from "../Auth/AuthContext";
+import { useState,useEffect} from "react";
+import { useAuth } from "../../Auth/AuthContext";
 
-const items = [
-  {
-    label: "Submit and continue",
-    key: "1",
-  },
-];
 const TeamList = () => {
   const { Search } = Input;
+  const { user } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const[employeeList, setEmployeeList] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+
+  const items = [
+    {
+      label: "Logout",
+      key: "1",
+      danger: true,
+    },
+  ];
+
+
+  useEffect(() => {
+      fetchTeamEmployeeList();
+  }, []);
+
+  const fetchTeamEmployeeList = async () => {
+    try {
+      const res = await fetch(`http://localhost:8081/manager/myTeam?name=${searchInput}`, {
+        method: 'GET',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (res.status === 401) {
+        console.error("Unauthorized access. Redirecting to login.");
+        return;
+      }
+      if (!res.ok) {
+        console.error("Failed to fetch employee list. Status:", res.status);
+        return;
+      }
+      const data = await res.json();
+      setEmployeeList(data);
+      console.log("Employee List Data:", data);
+    }
+    catch (err) {
+      console.error("Error fetching employee list:", err);
+    }
+  }
 
   /* Table Columns!!! */ 
   const columns = [
-    {
-      title: "Employee ID",
-      dataIndex: "empid",
-      key: "empid",
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: "Full Name",
-      dataIndex: "name",
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: "Position",
-      dataIndex: "position",
-      key: "position",
-    },
-    {
-      title: "Role",
-      dataIndex: "role",
-      key: "role",
-      render: (role) => {
-        let color;
-    
-        switch (role) {
-          case "Manager":
-            color = "blue";
-            break;
-          case "Admin":
-            color = "volcano";
-            break;
-          case "User":
-            color = "green";
-            break;
-          default:
-            color = "default";
+      {
+        title: "Employee ID",
+        dataIndex: "employeeId",
+        key: "employeeId",
+        render: (text) => <a>{text}</a>,
+      },
+      {
+        title: "Full Name",
+        dataIndex: "employeeName",
+        render: (text) => <a>{text}</a>,
+      },
+      {
+        title: "Position",
+        dataIndex: "employeePosition",
+        key: "employeePosition",
+      },
+      {
+        title: "Role",
+        dataIndex: "employeeRole",
+        key: "employeeRole",
+        render: (role) => {
+          let color;
+      
+          switch (role) {
+            case "MANAGER":
+              color = "blue";
+              break;
+            case "ADMIN":
+              color = "volcano";
+              break;
+            case "USER":
+              color = "green";
+              break;
+            default:
+              color = "default";
+          }
+      
+          return <Tag color={color}>{role?.toUpperCase()}</Tag>;
         }
-    
-        return <Tag color={color}>{role.toUpperCase()}</Tag>;
-      }
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Space size="middle">
-          <Button type="primary"><FolderViewOutlined /></Button>
-          <Button variant="outlined" color="danger"><EditOutlined /></Button>
-          <Button variant="filled" color="danger"><DeleteOutlined /></Button>
-        </Space>
-      ),
-    },
-  ];
+      },
+      {
+        title: "Email",
+        dataIndex: "employeeEmail",
+        key: "employeeEmail",
+      },
+    ];
 
-  /* Table Data!!!*/
-  const data = [
-    {
-      empid: "4",
-      name: "John Brown",
-      position: "Software Developer",
-      role: "Admin",
-      email:"sachit.tarway@gmail.com"
-    },
-    {
-      empid: "5",
-      name: "Jim Green",
-      position: "Software Developer",
-      role: "Manager",
-      email:"sachit.tarway@gmail.com"
-    },
-    {
-      empid: "6",
-      name: "Joe Black",
-      position: "Software Developer",
-      role: "User",
-      email:"sachit.tarway@gmail.com"
-    },
-  ];
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -111,7 +111,7 @@ const TeamList = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  const { user } = useAuth();
+  
 
   return (
     <div className="employee-list">
@@ -123,8 +123,17 @@ const TeamList = () => {
         </div>
 
         <div className="right-div">
-        <Dropdown menu={{ items }} placement="bottomLeft">
-          <Avatar size="large" src={<img src={"https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg"}></img> }/>
+        <Dropdown menu={{
+            items,
+            onClick: ({ key }) => {
+              if (key === "1") {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                window.location.reload();
+              }
+            }
+          }} placement="bottomLeft">
+          <Avatar size="large" src={<img src={"https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg"}></img>} />
         </Dropdown>
         </div>
       </div>
@@ -193,11 +202,6 @@ const TeamList = () => {
             }}
           >
             <div className="hello">Team List</div>
-            <div>
-              <Button type="primary" className="add-employee" size="large" onClick={showModal}>
-                Add Member
-              </Button>
-            </div>
           </div>
 
 
@@ -214,24 +218,16 @@ const TeamList = () => {
               }}
             >
               <Search
-                placeholder="input search text"
-                // onSearch={onSearch}
+                placeholder="Search Employee by Name"
+                onSearch={fetchTeamEmployeeList}
                 size="large"
                 enterButton
                 style={{
                   width: 600,
                 }}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
               />
-              <Dropdown.Button
-                type="primary"
-                size="large"
-                menu={{ items }}
-                style={{
-                  marginLeft: "10px",
-                }}
-              >
-                Filter
-              </Dropdown.Button>
             </div>
 
             {/* <div style={{
@@ -273,7 +269,7 @@ const TeamList = () => {
           }}>
           <Table 
             columns={columns} 
-            dataSource={data} 
+            dataSource={employeeList} 
             className="custom-ant-table"
           />
           </div>

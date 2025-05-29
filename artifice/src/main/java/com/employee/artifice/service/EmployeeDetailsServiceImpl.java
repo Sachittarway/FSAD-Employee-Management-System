@@ -115,14 +115,26 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
                         )).toList());
     }
 
+    /*
+        * Get the team members of the manager by searching the employee name.
+        * Will take the department of the manager from the token and return the list of employees in that department.
+        * If searchName is provided, it will filter the employees by their name.
+    */
     @Override
-    public List<GetEmployeeList> getMyTeamMembers() {
+    public List<GetEmployeeList> getMyTeamMembers(String searchName) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Long departmentId = detailsRepository.findByUserEmail(email)
                 .orElseThrow(() -> new RuntimeException("Employee details not found for user: " + email))
                 .getDepartment().getId();
-        System.out.println("Department ID: " + departmentId);
-        return departmentService.searchEmployeesByDepartmentId(departmentId);
+        List<GetEmployeeList> teamMembers = departmentService.searchEmployeesByDepartmentId(departmentId);
+        System.out.println("Search Name: " + searchName);
+        if (searchName == null || searchName.isBlank()) {
+            return teamMembers;
+        }
+        return teamMembers.stream()
+                .filter(emp -> emp.getEmployeeName() != null &&
+                        emp.getEmployeeName().toLowerCase().contains(searchName.toLowerCase()))
+                .toList();
     }
 
     /* Update Employee Department and Project by the Manager */
