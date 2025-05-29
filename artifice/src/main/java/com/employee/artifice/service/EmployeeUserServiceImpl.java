@@ -48,7 +48,7 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
         }
         // Check if role as admin already exists
         if(Objects.equals(user.getRole(), "ADMIN")) {
-            EmployeeUser adminUser = (EmployeeUser) repository.findByRole(EmployeeUser.Role.ADMIN);
+            EmployeeUser adminUser = repository.findFirstByRole(EmployeeUser.Role.ADMIN);
             if (adminUser != null && user.getRole().equalsIgnoreCase("ADMIN")) {
                 throw new RuntimeException("Admin user already exists");
             }
@@ -58,12 +58,10 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
         newUser.setPassword(encoder.encode(user.getPassword()));
         newUser.setRole(EmployeeUser.Role.valueOf(user.getRole().toUpperCase()));
         EmployeeUser savedUser = repository.save(newUser);
-
         EmployeeDetails details = new EmployeeDetails();
         details.setEmployeeName(user.getName());
         details.setUser(savedUser);
         employeeDetailsRepository.save(details);
-
         return savedUser;
     }
 
@@ -109,6 +107,9 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
         List<EmployeeUser> users = repository.findAll();
         List<GetEmployeeList> employeeList = new ArrayList<>();
         for (EmployeeUser user : users) {
+            if(user.getRole() == EmployeeUser.Role.ADMIN) {
+                continue;
+            }
             GetEmployeeList employee = new GetEmployeeList();
             employee.setEmployeeId(user.getId());
             employee.setEmployeeEmail(user.getEmail());
