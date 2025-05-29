@@ -5,10 +5,12 @@ import com.employee.artifice.model.Country;
 import com.employee.artifice.model.Department;
 import com.employee.artifice.model.EmployeeUser;
 import com.employee.artifice.model.Project;
+import com.employee.artifice.model.ResourceRequest;
 import com.employee.artifice.service.CountryService;
 import com.employee.artifice.service.DepartmentService;
 import com.employee.artifice.service.EmployeeUserService;
 import com.employee.artifice.service.ProjectService;
+import com.employee.artifice.service.ResourceRequestService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,9 @@ public class AdminController {
 
     @Autowired
     ProjectService projectService;
+
+    @Autowired
+    ResourceRequestService resourceRequestService;
 
     @Autowired
     CountryService countryService;
@@ -56,6 +61,18 @@ public class AdminController {
         Long departmentId = ((Number) payload.get("department_id")).longValue();
         Project newProject = projectService.createProject(projectCode, departmentId);
         return ResponseEntity.ok(newProject);
+    }
+
+    @GetMapping("/resourceRequests")
+    public ResponseEntity<List<ResourceRequest>> getResourceRequests() {
+        List<ResourceRequest> requests = resourceRequestService.getAllResourceRequests();
+        return ResponseEntity.ok(requests);
+    }
+
+    @GetMapping("/resourceRequests/{managerEmail}")
+    public ResponseEntity<List<ResourceRequest>> getRequestsUnderOneManager(@PathVariable String managerEmail) {
+        List<ResourceRequest> requests = resourceRequestService.getRequestsByManagerEmail(managerEmail);
+        return ResponseEntity.ok(requests);
     }
 
     @PostMapping("/createCountries")

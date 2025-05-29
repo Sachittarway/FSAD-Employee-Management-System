@@ -3,21 +3,20 @@ package com.employee.artifice.controller;
 import com.employee.artifice.dto.CustomEmployeeDetails;
 import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.dto.UpdateTeam;
-import com.employee.artifice.model.Department;
-import com.employee.artifice.model.EmployeeDetails;
-import com.employee.artifice.model.Project;
-import com.employee.artifice.service.DepartmentService;
 import com.employee.artifice.service.EmployeeDetailsService;
-import com.employee.artifice.service.EmployeeUserService;
-import com.employee.artifice.service.ProjectService;
+import com.employee.artifice.model.ResourceRequest;
+import com.employee.artifice.service.ResourceRequestService;
+
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/manager")
@@ -25,6 +24,9 @@ public class ManagerController {
 
     @Autowired
     EmployeeDetailsService employeeDetailsService;
+
+    @Autowired
+    ResourceRequestService resourceRequestService;
 
     @GetMapping("/myTeam")
     public List<GetEmployeeList> getMyTeamMembers() {
@@ -46,4 +48,11 @@ public class ManagerController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/resourceRequests")
+    public ResponseEntity<List<ResourceRequest>> getRequests() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<ResourceRequest> requests = resourceRequestService.getRequestsByManagerEmail(email);
+        return ResponseEntity.ok(requests);
+        
+    }
 }

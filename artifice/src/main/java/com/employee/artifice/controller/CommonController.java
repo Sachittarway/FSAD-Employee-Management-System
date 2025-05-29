@@ -26,9 +26,6 @@ import com.employee.artifice.service.CountryService;
 import com.employee.artifice.service.DepartmentService;
 import com.employee.artifice.service.EmployeeDetailsService;
 import com.employee.artifice.service.EmployeeUserService;
-import java.util.Optional;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import com.employee.artifice.service.ProjectService;
 
 @RestController

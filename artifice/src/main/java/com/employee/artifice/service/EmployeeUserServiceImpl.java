@@ -10,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.employee.artifice.dto.CreateUser;
-import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.model.EmployeeDetails;
 import com.employee.artifice.model.EmployeeUser;
 import com.employee.artifice.repository.EmployeeDetailsRepository;
