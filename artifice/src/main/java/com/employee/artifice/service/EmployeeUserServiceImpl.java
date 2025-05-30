@@ -1,7 +1,9 @@
 package com.employee.artifice.service;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
-import com.employee.artifice.dto.GetEmployeeList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.employee.artifice.dto.CreateUser;
+import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.model.EmployeeDetails;
 import com.employee.artifice.model.EmployeeUser;
 import com.employee.artifice.repository.EmployeeDetailsRepository;
@@ -29,6 +32,9 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
 
     @Autowired
     EmployeeDetailsRepository employeeDetailsRepository;
+
+    @Autowired
+    EmployeeUserRepository employeeUserRepository;
 
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
@@ -188,5 +194,10 @@ public class EmployeeUserServiceImpl implements EmployeeUserService{
             employeeList.add(employee);
         }
         return employeeList;
+    }
+    @Override
+    public Optional<String> getRoleByEmployeeId(Long employeeId) {
+        return employeeUserRepository.findById(employeeId)
+                .map(role -> role.getRole().toString());
     }
 }
