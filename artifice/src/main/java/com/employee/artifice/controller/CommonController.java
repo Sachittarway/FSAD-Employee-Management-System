@@ -161,4 +161,11 @@ public class CommonController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/getEmployeeRoleById/{employeeId}")
+    public ResponseEntity<String> getEmployeeRoleById(@PathVariable Long employeeId) {
+        return employeeUserService.getRoleByEmployeeId(employeeId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
