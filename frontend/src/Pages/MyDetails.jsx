@@ -302,6 +302,16 @@ const MyDetails = () => {
                   <MenuItem active>My Details </MenuItem>
                 </>
               )}
+              {
+                user.role === "USER" && (
+                  <>
+                    <MenuItem active>My Details</MenuItem>
+                    <MenuItem component={<Link to="/Resources" />}>
+                      My Requests
+                    </MenuItem>
+                  </>
+                )
+              }
             </Menu>
           </Sidebar>
         </div>

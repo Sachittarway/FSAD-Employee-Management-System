@@ -1,13 +1,17 @@
 import "./ResourceRequests.css";
-import React from "react";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import { Link } from 'react-router-dom';
-import { Table,Space, Button, Avatar,Dropdown,Tag,Input,Select } from "antd";
-import {FolderViewOutlined} from "@ant-design/icons";
+import { Table,Space, Button, Avatar,Dropdown,Tag,Input,Modal} from "antd";
+import {FolderViewOutlined,} from "@ant-design/icons";
 import { useAuth } from "../Auth/AuthContext";
+import { useState } from "react";
 const ResourceRequests = () => {
     const { user } = useAuth();
     const { Search } = Input;
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [resourceRequests, setResourceRequests] = useState([]);
+    const [resourceName, setResourceName] = useState("");
+    const [message, setMessage] = useState("");
     const items = [
         {
           label: "Submit and continue",
@@ -56,37 +60,17 @@ const ResourceRequests = () => {
       ),
     },
   ];
+  
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
-  /* Table Data!!!*/
-  const data = [
-    {
-      empid: "1",
-      name: "John Brown",
-      approver: "Ishan Sharma",
-      email:"sachit.tarway@gmail.com",
-      resource:"Laptop"
-    },
-    {
-      empid: "2",
-      name: "Jim Green",
-      approver: "Ishan Sharma",
-      email:"sachit.tarway@gmail.com",
-      resource:"Laptop"
-    },
-    {
-      empid: "3",
-      name: "Joe Black",
-      approver: "Ishan Sharma",
-      email:"sachit.tarway@gmail.com",
-      resource:"Laptop"
-    },
-  ];
-  const onChange = value => {
-    console.log(`selected ${value}`);
-  };
-  const onSearch = value => {
-    console.log('search:', value);
-  };
     return(
         <div className="resourcerequests">
 
@@ -157,6 +141,16 @@ const ResourceRequests = () => {
                                               
                                 )
                             }
+                            {
+                                user.role === "USER" && (
+                                    <>
+                                        <MenuItem component={<Link to="/MyDetails" />}>My Details</MenuItem>
+                                        <MenuItem active>
+                                            My Requests
+                                        </MenuItem>
+                                    </>
+                                )
+                            }
                         </Menu>
                     </Sidebar>
                 </div>
@@ -166,9 +160,26 @@ const ResourceRequests = () => {
                 <div className="employee-content">
                    
                    {/* Start your from here !!!!!!! */}
-                    <div className="hello">Resource Requested 💡</div>
+                   <div
+                    style={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                    }}
+                    >
+                        <div className="hello">Resource Requested 💡</div>
+                    <div>
+                        <Button type="primary" className="add-employee" size="large" onClick={showModal}>
+                            Add Resource Request
+                        </Button>
+                    </div>
+                    </div>
+                    
 
-                    <div className="resourcefilter">
+                    <div className="resourcefilter" style={{
+                        marginTop:"20px",
+                    }}>
                         <Search
                             placeholder="input search text"
                             // onSearch={onSearch}
@@ -178,34 +189,6 @@ const ResourceRequests = () => {
                                 width: 600,
                             }}
                         />
-
-                        <Select
-                            showSearch
-                            placeholder="Select a resource"
-                            optionFilterProp="label"
-                            onChange={onChange}
-                            onSearch={onSearch}
-                            size="large"
-                            style={{
-                                marginLeft:"10px"
-                            }}
-                            status="warning"
-                            options={[
-                                {
-                                    value: 'laptop',
-                                    label: 'Laptop',
-                                },
-                                {
-                                    value: 'headphone',
-                                    label: 'Headphone',
-                                },
-                                {
-                                    value: 'keyboard',
-                                    label: 'Keyboard',
-                                },
-                                
-                            ]}
-                        />
                     </div>
 
                     <div style={{
@@ -214,7 +197,7 @@ const ResourceRequests = () => {
                     }}>
                         <Table 
                             columns={columns} 
-                            dataSource={data} 
+                            dataSource={resourceRequests} 
                             className="custom-ant-table"
                         />
                     </div>
@@ -224,6 +207,47 @@ const ResourceRequests = () => {
 
             </div>
             {/* Sidebar and Main Content Ends here !!! */}
+            <Modal
+                title="Resource Request"
+                closable={{ 'aria-label': 'Custom Close Button' }}
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+            >
+               <div 
+                style={{
+                    marginTop:"20px",
+                }}>
+                    <label 
+                        style={{
+                            fontSize:"20px",
+                            fontWeight:"bold",
+                        }
+                    }>
+                        Resource Name
+                    </label>
+                    <Input size="large" placeholder="Resource Name"  
+                        value={resourceName}
+                        onChange={(e) => setResourceName(e.target.value)}
+                    />
+                </div>
+
+                <div style={{
+                    marginTop:"20px",
+            }}>
+                <label style={{
+                    fontSize:"20px",
+                    fontWeight:"bold",
+                    }}
+                >
+                    Message
+                </label>
+                    <Input size="large" placeholder="Message" 
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                    />
+                </div>
+            </Modal>
         </div>
     )
 }
