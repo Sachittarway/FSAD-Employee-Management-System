@@ -1,21 +1,16 @@
-// import "./UserDetails.css";
+import "./UserDetails.css";
 import React from "react";
+import { Avatar, Dropdown } from "antd";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
 import { useAuth } from "../Auth/AuthContext";
-import { Button, Space, Modal, Avatar, Dropdown } from "antd";
-import {
-  UserOutlined,
-} from "@ant-design/icons";
+import { Button, Input, Space } from "antd";
+
 import { useEffect, useState } from "react";
-import { Input } from "antd";
 import { FaPen, FaSave } from "react-icons/fa";
-import { notification } from "antd";
+import { useLocation } from "react-router-dom";
 
-const MyDetails = () => {
-  const { user } = useAuth();
-  const role = user.role;
-
+const UserDetails = () => {
   const items = [
     {
       label: "Logout",
@@ -23,41 +18,61 @@ const MyDetails = () => {
       danger: true,
     },
   ];
-
+  const { user } = useAuth();
   const [userDetails, setUserDetails] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [editValues, setEditValues] = useState({});
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedPassword, setEditedPassword] = useState("");
-  const [currentPassword, setCurrentPassword] = useState(editedPassword);
+  const location = useLocation();
+  const { employeeId } = location.state || {};
   const [countryList, setCountryList] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [departmentList, setDepartmentList] = useState([]);
+  const [projectCodeList, setProjectCodeList] = useState([]);
   const [previousJobs, setPreviousJobs] = useState([]);
-  const [orgName, setOrgName] = useState("");
-  const [duration, setJobDuration] = useState("");
-  const [designation, setDesignation] = useState("");
-  const [description, setDescription] = useState("");
-  const [newJob, setNewJob] = useState({
-    orgName: "",
-    designation: "",
-    duration: "",
-    description: "",
-  });
+  const [role, setRole] = useState("");
 
-  const [api, contextHolder] = notification.useNotification();
+  console.log("User Role:", role);
+  console.log("User Details:", userDetails);
+  // console.log("User Email:", email);
 
   useEffect(() => {
-    fetchUserDetails();
+    fetchUserDetailsById(employeeId);
+    fetchDepartmentList();
     fetchCountryList();
-    fetchPreviousJobDetails();
-  }, []);
+    fetchPreviousJobDetailsbyId(employeeId);
+    fetchRoleById(employeeId);
+  }, [employeeId]);
 
   // Fetch user details once on mount
 
-  const fetchUserDetails = async () => {
+  const fetchRoleById = async (employeeId) => {
     try {
       const response = await fetch(
-        "http://localhost:8081/common/getEmployeeDetailsByEmail",
+        `http://localhost:8081/common/getEmployeeRoleById/${employeeId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch role");
+      }
+
+      const role = await response.text(); // because response is plain text like "USER", not JSON
+      console.log("Role fetched:", role);
+      setRole(role);
+    } catch (error) {
+      console.error("Error fetching role:", error);
+      return null;
+    }
+  };
+
+  const fetchUserDetailsById = async (employeeiId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8081/common/getEmployeeDetailsById/${employeeId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -69,7 +84,6 @@ const MyDetails = () => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
       const data = await response.json();
       setUserDetails(data);
     } catch (error) {
@@ -109,10 +123,84 @@ const MyDetails = () => {
     }
   };
 
-  const fetchPreviousJobDetails = async () => {
+  const fetchDepartmentList = async () => {
+    try {
+      const res = await fetch("http://localhost:8081/common/departments", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (res.status === 401) {
+        console.error("Unauthorized access. Redirecting to login.");
+        return;
+      }
+      if (!res.ok) {
+        console.error("Failed to fetch department list. Status:", res.status);
+        return;
+      }
+      const data = await res.json();
+      setDepartmentList(data);
+      console.log("Department List Data:", data);
+    } catch (err) {
+      console.error("Error fetching department list:", err);
+    }
+  };
+
+  const handleDepartmentFilter = async (e) => {
+    const key = e.key;
+    const selectedDeptName = departmentList
+      .filter((item) => key.includes(item.id))
+      .map((item) => item.department_name)[0];
+
+    console.log("Selected Department Key:", e.key);
+    console.log("Department list is :", departmentList);
+
+    console.log("Selected Department Name :", selectedDeptName);
+    // if (selectedDept) {
+
+    handleInputChange({
+      target: { name: "departmentName", value: selectedDeptName },
+    });
+    //   setEditValues(prev => ({
+    //       ...prev,
+    //       departmentName: selectedDept?.department_name ,
+
+    //     }));
+    //   }
+
     try {
       const response = await fetch(
-        "http://localhost:8081/employees/pre-employment-details",
+        `http://localhost:8081/common/project/department/${e.key}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      console.log("Response:", response);
+      const data = await response.json();
+      console.log(data);
+      setProjectCodeList(data);
+    } catch (error) {
+      console.error("Error fetching project codes:", error);
+      setProjectCodeList([]);
+    }
+  };
+
+  const fetchPreviousJobDetailsbyId = async (employeeId) => {
+    console.log("Fetching previous job details for employeeId:", employeeId);
+    if (!employeeId) {
+      console.error("No employeeId provided for fetching job details.");
+      return;
+    }
+    try {
+      const response = await fetch(
+        `http://localhost:8081/employees/pre-employment-details/${employeeId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -150,8 +238,6 @@ const MyDetails = () => {
         projectCode: userDetails.projectCode || "",
         departmentId: userDetails.departmentId || "",
         projectId: userDetails.projectId || "",
-        previousJobs: userDetails.previousJobs || [],
-
         // add other fields as needed
       });
     }
@@ -159,61 +245,7 @@ const MyDetails = () => {
 
   // Handlers
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
-  
-  const handleSaveClick = async () => {
-    try {
-      await updatePassword(editedPassword);
-      setCurrentPassword(editedPassword);
-      setIsEditing(false);
-    } catch (error) {
-      alert("Failed to update password. Please try again.");
-    }
-  };
-
-
-  const updatePassword = async (newPassword) => {
-    try {
-      const response = await fetch(
-        "http://localhost:8081/common/updatePassword",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ newPassword }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to update password");
-      }
-
-      const data = await response.text();
-      console.log("Password updated:", data);
-      localStorage.removeItem("token");
-      window.location.href = "/login"; 
-      return data;
-    } catch (error) {
-      console.error("Error updating password:", error);
-      throw error;
-    }
-  };
-
-  // const handleEditClick = () => {
-  //   setIsEditing(true);
-  // };
-
-  // const handleSaveClick = () => {
-  //   setPassword(editedPassword);
-  //   setIsEditing(false);
-  // };
-
-  const handleEditProfileClick = () => {
+  const handleEditProfileClick = async () => {
     if (editMode) {
       // Save mode - PUT updated details to backend
       fetch("http://localhost:8081/common/updateDetails", {
@@ -248,84 +280,6 @@ const MyDetails = () => {
     setEditValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  //Model Handlers
-  const openNotification = (pauseOnHover, type, message, description) => () => {
-    api.open({
-      message,
-      description,
-      showProgress: true,
-      pauseOnHover,
-      type,
-    });
-  };
-  const handleOk = async () => {
-    const { orgName, duration, designation } = newJob;
-    if (!orgName || !duration || !designation) {
-      openNotification(
-        false,
-        "error",
-        "All fields are required",
-        "Please fill in all the fields before submitting."
-      )();
-      return;
-    }
-
-    if (orgName.length < 3) {
-      openNotification(
-        false,
-        "error",
-        "Invalid Organization name",
-        "Organization Name should be at least 3 characters long."
-      )();
-      return;
-    }
-    try {
-      // Make API call to add new job
-      const res = await fetch(
-        "http://localhost:8081/employees/pre-employment-details",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify([newJob]),
-        }
-      );
-  
-
-      if (res.status === 401) {
-        openNotification(
-          false,
-          "error",
-          "Unauthorized",
-          "You are not authorized to perform this action."
-        )();
-        return;
-      }
-      if (!res.ok) {
-        alert("Failed to add employee. Please try again.");
-        return;
-      }
-      const data = await res.json();
-      console.log(data);
-      setPreviousJobs((prevJobs) => [...prevJobs, ...data]); // update UI
-      setNewJob({
-        orgName: "",
-        designation: "",
-        duration: "",
-        description: "",
-      });
-    } catch (err) {
-      console.error(err);
-    }
-
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
   return (
     <div className="mydetails">
       {/* Top Navbar Starts from here !!! */}
@@ -335,19 +289,7 @@ const MyDetails = () => {
         </div>
 
         <div className="right-div">
-          <Dropdown
-            menu={{
-              items,
-              onClick: ({ key }) => {
-                if (key === "1") {
-                  localStorage.removeItem("token");
-                  localStorage.removeItem("user");
-                  window.location.reload();
-                }
-              },
-            }}
-            placement="bottomLeft"
-          >
+          <Dropdown menu={{ items }} placement="bottomLeft">
             <Avatar
               size="large"
               src={
@@ -391,14 +333,13 @@ const MyDetails = () => {
                   <MenuItem component={<Link to="/Departments" />}>
                     Departments
                   </MenuItem>
-                  <MenuItem component={<Link to="/EmployeeList" />}>
-                    Employee List
-                  </MenuItem>
+                  <MenuItem active> Employee List</MenuItem>
                   <MenuItem component={<Link to="/Resources" />}>
                     Requests
                   </MenuItem>
-
-                  <MenuItem active>My Details</MenuItem>
+                  <MenuItem component={<Link to="/MyDetails" />}>
+                    My Details
+                  </MenuItem>
                 </>
               )}
               {user.role === "MANAGER" && (
@@ -409,14 +350,16 @@ const MyDetails = () => {
                   <MenuItem component={<Link to="/Departments" />}>
                     Departments
                   </MenuItem>
-                  <MenuItem component={<Link to="/EmployeeList" />}>
-                    Employee List
+                  <MenuItem active> Employee List</MenuItem>
+                  <MenuItem component={<Link to="/TeamList" />}>
+                    Team List
                   </MenuItem>
-
                   <MenuItem component={<Link to="/Resources" />}>
                     Requests
                   </MenuItem>
-                  <MenuItem active>My Details </MenuItem>
+                  <MenuItem component={<Link to="/MyDetails" />}>
+                    My Details
+                  </MenuItem>
                 </>
               )}
             </Menu>
@@ -510,40 +453,46 @@ const MyDetails = () => {
                 </p>
                 <p>
                   <span className="label">Phone: </span>
-                  {editMode ? (
-                    <Space.Compact>
-                      <Input
-                        name="phoneNumber"
-                        value={editValues.phoneNumber}
-                        onChange={handleInputChange}
-                      />
-                    </Space.Compact>
-                  ) : (
-                    userDetails?.phoneNumber
-                  )}
+                  {userDetails?.phoneNumber}
                 </p>
               </div>
               <div className="user-section">
                 <p>
                   <span className="label">Years of Experience: </span>
-                  {editMode ? (
-                    <Space.Compact>
-                      <Input
-                        name="yearsOfExperience"
-                        value={editValues.yearsOfExperience}
-                        onChange={handleInputChange}
-                      />
-                    </Space.Compact>
-                  ) : (
-                    userDetails?.yearsOfExperience ?? "N/A"
-                  )}
+                  {userDetails?.yearsOfExperience}
                 </p>
                 <p>
                   <span className="label">Current IBU: </span>
-                  {userDetails?.departmentName ?? "N/A"}
+                  {(role === "MANAGER" || role === "ADMIN") && editMode ? (
+                    <Dropdown
+                      menu={{
+                        items: [
+                          ...departmentList.map((department) => ({
+                            label: department.department_name,
+                            key: department.id,
+                          })),
+                        ],
+                        onClick: handleDepartmentFilter,
+                      }}
+                      placement="bottomLeft"
+                      arrow
+                    >
+                      <Space.Compact>
+                        <Input
+                          name="country"
+                          value={editValues.departmentName}
+                          onChange={handleInputChange}
+                          // placeholder="Select or type country"
+                          style={{ width: 220 }}
+                        />
+                      </Space.Compact>
+                    </Dropdown>
+                  ) : (
+                    userDetails?.departmentName ?? "N/A"
+                  )}
                 </p>
               </div>
-              <div className="user-section right-align">
+              {/* <div className="user-section right-align">
                 <p>
                   <span className="label">Password: </span>
                   {isEditing ? (
@@ -563,15 +512,17 @@ const MyDetails = () => {
                   ) : (
                     <>
                       {"•".repeat(currentPassword.length)}
-                      <FaPen
-                        onClick={handleEditClick}
-                        style={{ marginLeft: "10px", cursor: "pointer" }}
-                        title="Edit Password"
-                      />
+                      {role === "user" && (
+                        <FaPen
+                          onClick={handleEditClick}
+                          style={{ marginLeft: "10px", cursor: "pointer" }}
+                          title="Edit Password"
+                        />
+                      )}
                     </>
                   )}
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -608,18 +559,48 @@ const MyDetails = () => {
               <div className="user-section">
                 <p>
                   <span className="label">Employee Number: </span>
-                  {userDetails?.id ?? "N/A"}
+                  {userDetails?.employeeId || "N/A"}
                 </p>
               </div>
               <div className="user-section">
                 <p>
                   <span className="label">Project Code: </span>
-                  {userDetails?.projectCode ?? "N/A"}
+                  {(role === "MANAGER" || role === "ADMIN") && editMode ? (
+                    <Dropdown
+                      menu={{
+                        items: projectCodeList.map((project) => ({
+                          label: project.project_code,
+                          key: project.id,
+                        })),
+
+                        onClick: (e) => {
+                          // Set selected project code to state
+                          setEditValues((prev) => ({
+                            ...prev,
+                            projectCode: e.key, // since key is project_code
+                          }));
+                        },
+                      }}
+                      placement="bottomLeft"
+                      arrow
+                    >
+                      <Space.Compact>
+                        <Input
+                          name="projectCode"
+                          value={editValues.projectCode}
+                          onChange={handleInputChange}
+                          style={{ width: 220 }}
+                        />
+                      </Space.Compact>
+                    </Dropdown>
+                  ) : (
+                    userDetails?.projectCode ?? "N/A"
+                  )}
                 </p>
               </div>
               <div className="user-section right-align">
                 <p>
-                  <span className="label">Current Location：</span>
+                  <span className="label">Current Location: </span>
                   {editMode ? (
                     <Dropdown
                       menu={{
@@ -689,62 +670,37 @@ const MyDetails = () => {
               <div className="user-section">
                 <p>
                   <span className="label">Permanent Address: </span>
-                  {editMode ? (
-                    <Space.Compact>
-                      <Input
-                        name="permanentAddress"
-                        value={editValues.permanentAddress}
-                        onChange={handleInputChange}
-                      />
-                    </Space.Compact>
-                  ) : (
-                    userDetails?.permanentAddress ?? "N/A"
-                  )}
+                  {userDetails?.permanentAddress}
                 </p>
-
                 <p>
                   <span className="label">Local Address: </span>
-                  {editMode ? (
-                    <Space.Compact>
-                      <Input
-                        name="localAddress"
-                        value={editValues.localAddress}
-                        onChange={handleInputChange}
-                      />
-                    </Space.Compact>
-                  ) : (
-                    userDetails?.localAddress ?? "N/A"
-                  )}
+                  {userDetails?.localAddress}
                 </p>
               </div>
               <div className="user-section">
                 <p>
                   <span className="label">Passport No: </span>
-
-                  {userDetails?.passportNo ?? "N/A"}
+                  {userDetails?.passportNo}
                 </p>
                 <p>
                   <span className="label">Passport Office: </span>
-
-                  {userDetails?.passportOffice ?? "N/A"}
+                  {userDetails?.passportOffice}
                 </p>
               </div>
               <div className="user-section right-align">
                 <p>
                   <span className="label">Issue Date: </span>
-
-                  {userDetails?.passportIssueDate ?? "N/A"}
+                  {userDetails?.passportIssueDate}
                 </p>
                 <p>
                   <span className="label">Expiry Date: </span>
-
-                  {userDetails?.passportExpiryDate ?? "N/A"}
+                  {userDetails?.passportExpiryDate}
                 </p>
               </div>
             </div>
           </div>
 
-          <div
+            <div
             style={{
               backgroundColor: "white",
               padding: "20px",
@@ -818,19 +774,11 @@ const MyDetails = () => {
               }}
             >
               Previous Job Information
-              <div className="right-align">
-                <Button
-                  type="primary"
-                  className="add-employee"
-                  size="large"
-                  onClick={() => setIsModalOpen(true)}
-                >
-                  Add Previous Job
-                </Button>
-              </div>
             </div>
             <div
               style={{
+                // display: "flex",
+
                 flexWrap: "wrap", //  allows wrapping on smaller screens
                 justifyContent: "space-between",
                 alignItems: "center",
@@ -874,112 +822,7 @@ const MyDetails = () => {
         {/* Main content Ends here !!! */}
       </div>
       {/* Sidebar and Main Content Ends here !!! */}
-
-      {/* Modal - Add Employee Starts here !!! */}
-      <Modal
-        title="Add Employee"
-        closable={{ "aria-label": "Custom Close Button" }}
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <div
-          style={{
-            marginTop: "20px",
-          }}
-        >
-          <label
-            style={{
-              fontSize: "20px",
-              fontWeight: "bold",
-            }}
-          >
-            Organization
-          </label>
-          <Input
-            size="large"
-            placeholder="Organization Name"
-            prefix={<UserOutlined />}
-            value={newJob.orgName}
-            onChange={(e) =>
-              setNewJob((prev) => ({ ...prev, orgName: e.target.value }))
-            }
-          />
-        </div>
-
-        <div
-          style={{
-            marginTop: "20px",
-          }}
-        >
-          <label
-            style={{
-              fontSize: "20px",
-              fontWeight: "bold",
-            }}
-          >
-            Duration
-          </label>
-          <Input
-            size="large"
-            placeholder="Duration (e.g., 2 years)"
-            prefix={<UserOutlined />}
-            value={newJob.duration}
-            onChange={(e) =>
-              setNewJob((prev) => ({ ...prev, duration: e.target.value }))
-            }
-          />
-        </div>
-
-        <div
-          style={{
-            marginTop: "20px",
-          }}
-        >
-          <label
-            style={{
-              fontSize: "20px",
-              fontWeight: "bold",
-            }}
-          >
-            Designation
-          </label>
-          <Input
-            size="large"
-            placeholder="Designation"
-            prefix={<UserOutlined />}
-            value={newJob.designation}
-            onChange={(e) =>
-              setNewJob((prev) => ({ ...prev, designation: e.target.value }))
-            }
-          />
-        </div>
-
-        <div
-          style={{
-            marginTop: "20px",
-          }}
-        >
-          <label
-            style={{
-              fontSize: "20px",
-              fontWeight: "bold",
-            }}
-          >
-            Description
-          </label>
-          <Input
-            size="large"
-            placeholder="Description"
-            prefix={<UserOutlined />}
-            value={newJob.description}
-            onChange={(e) =>
-              setNewJob((prev) => ({ ...prev, description: e.target.value }))
-            }
-          />
-        </div>
-      </Modal>
     </div>
   );
 };
-export default MyDetails;
+export default UserDetails;
