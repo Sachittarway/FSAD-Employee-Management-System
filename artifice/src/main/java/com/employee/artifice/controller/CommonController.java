@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.employee.artifice.dto.CustomEmployeeDetails;
 import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.dto.PasswordChangeRequest;
@@ -152,5 +153,12 @@ public class CommonController {
     @GetMapping("/getCountryList")
     public List<Country> getCountryList() {
         return countryService.getAllCountries();
+    }
+
+    @GetMapping("/getEmployeeDetailsById/{employeeId}")
+    public ResponseEntity<CustomEmployeeDetails> getEmployeeDetailsById(@PathVariable Long employeeId) {
+        return employeeDetailsService.getCustomDetailsByEmployeeId(employeeId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

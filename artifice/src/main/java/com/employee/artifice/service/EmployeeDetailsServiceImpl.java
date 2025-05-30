@@ -201,4 +201,30 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
                 employeeToUpdate.getManager() != null ? employeeToUpdate.getManager().getEmail() : ""
         ));
     }
+    @Override
+    public Optional<CustomEmployeeDetails> getCustomDetailsByEmployeeId(Long employeeId) {
+        return detailsRepository.findById(employeeId)
+                .map(details -> new CustomEmployeeDetails(
+                        details.getCurrentLocation(),
+                        details.getPermanentAddress(),
+                        details.getLocalAddress(),
+                        details.getPassportNo(),
+                        details.getPhoneNumber(),
+                        details.getYearsOfExperience(),
+                        details.getPassportIssueDate(),
+                        details.getPassportExpiryDate(),
+                        details.getPassportOffice(),
+                        details.getDepartment() != null ? details.getDepartment().getId() : null,
+                        details.getProject() != null ? details.getProject().getId() : null,
+                        details.getDepartment() != null ? details.getDepartment().getDepartment_name() : "",
+                        details.getProject() != null ? details.getProject().getProject_code() : "",
+                        details.getUser().getEmail(),
+                        details.getManager() != null ? details.getManager().getId() : null,
+                        details.getManager() != null ? details.getManager().getEmployeeDetails().getEmployeeName() : "",
+                        details.getEmployeeName(),
+                        details.getUser().getId(),
+                        details.getManager() != null ? details.getManager().getEmail() : ""
+                ));
+    }
+
 }
