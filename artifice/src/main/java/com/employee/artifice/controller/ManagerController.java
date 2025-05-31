@@ -1,8 +1,10 @@
 package com.employee.artifice.controller;
 
 import com.employee.artifice.dto.CustomEmployeeDetails;
+import com.employee.artifice.dto.DashboardCountsDTO;
 import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.dto.UpdateTeam;
+import com.employee.artifice.service.DashboardService;
 import com.employee.artifice.service.EmployeeDetailsService;
 import com.employee.artifice.model.ResourceRequest;
 import com.employee.artifice.service.ResourceRequestService;
@@ -27,6 +29,9 @@ public class ManagerController {
 
     @Autowired
     ResourceRequestService resourceRequestService;
+
+    @Autowired
+    DashboardService dashboardService;
 
     @GetMapping("/myTeam")
     public List<GetEmployeeList> getMyTeamMembers(@RequestParam String name) {
@@ -63,5 +68,11 @@ public class ManagerController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/dashboardCounts")
+    public ResponseEntity<DashboardCountsDTO> getDashboardCounts(){
+        DashboardCountsDTO counts = dashboardService.getDashboardManagerCounts();
+        return ResponseEntity.ok(counts);
     }
 }

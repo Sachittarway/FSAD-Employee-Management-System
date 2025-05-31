@@ -3,4 +3,5 @@ import com.employee.artifice.dto.DashboardCountsDTO;
 
 public interface DashboardService {
     DashboardCountsDTO getDashboardCounts();
+    DashboardCountsDTO getDashboardManagerCounts();
 }

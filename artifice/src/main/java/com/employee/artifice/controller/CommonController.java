@@ -1,6 +1,7 @@
 package com.employee.artifice.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,5 +168,14 @@ public class CommonController {
         return employeeUserService.getRoleByEmployeeId(employeeId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/getEmployeeName")
+    public ResponseEntity<Map<String, String>> getEmployeeName() {
+        String name = employeeDetailsService.getEmployeeName()
+                .map(EmployeeDetails::getEmployeeName)
+                .orElse("N/A");
+        Map<String, String> response = Map.of("name", name);
+        return ResponseEntity.ok(response);
     }
 }

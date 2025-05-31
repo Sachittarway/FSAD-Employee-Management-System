@@ -413,13 +413,12 @@ const MyDetails = () => {
                   <MenuItem component={<Link to="/ManagerDashboard" />}>
                     Dashboard
                   </MenuItem>
-                  <MenuItem component={<Link to="/Departments" />}>
-                    Departments
-                  </MenuItem>
                   <MenuItem component={<Link to="/EmployeeList" />}>
                     Employee List
                   </MenuItem>
-
+                  <MenuItem component={<Link to="/TeamList" />}>
+                    Team List
+                  </MenuItem>
                   <MenuItem component={<Link to="/Resources" />}>
                     Requests
                   </MenuItem>
