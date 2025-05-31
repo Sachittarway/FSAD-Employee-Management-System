@@ -1,6 +1,6 @@
 import "./UserDetails.css";
 import React from "react";
-import { Avatar, Dropdown } from "antd";
+import { Avatar, Dropdown, Select } from "antd";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
 import { useAuth } from "../Auth/AuthContext";
@@ -21,6 +21,11 @@ const UserDetails = () => {
   const { user } = useAuth();
   const [userDetails, setUserDetails] = useState(null);
   const [editMode, setEditMode] = useState(false);
+  const [managerValues, setManagerValues] = useState({
+  managerId: userDetails?.managerId || "",
+  managerName: userDetails?.managerName || "",
+  managerEmail: userDetails?.managerEmail || ""
+});
   const [editValues, setEditValues] = useState({});
   const location = useLocation();
   const { employeeId } = location.state || {};
@@ -29,11 +34,29 @@ const UserDetails = () => {
   const [projectCodeList, setProjectCodeList] = useState([]);
   const [previousJobs, setPreviousJobs] = useState([]);
   const [role, setRole] = useState("");
-
+  const [teamValues, setTeamValues] = useState({
+    departmentId: null,
+    departmentName: "",
+    projectId: null,
+    projectCode: "",
+    // ... any other fields you already have
+  });
+ 
   console.log("User Role:", role);
   console.log("User Details:", userDetails);
   console.log("editValues:", editValues);
   // console.log("User Email:", email);
+  const myrole = user.role;
+  console.log("My Role:", myrole);
+
+
+  const handleManagerInputChange = (e) => {
+  const { name, value } = e.target;
+  setManagerValues((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
 
   useEffect(() => {
     fetchUserDetailsById(employeeId);
@@ -148,34 +171,63 @@ const UserDetails = () => {
       console.error("Error fetching department list:", err);
     }
   };
+  // Dont refer this code, it is not working properly
+  // const handleDepartmentFilter = async (e) => {
+  //   const key = e.key;
+  //   const selectedDeptName = departmentList
+  //     .filter((item) => key.includes(item.id))
+  //     .map((item) => item.department_name)[0];
 
-  const handleDepartmentFilter = async (e) => {
-    const key = e.key;
-    const selectedDeptName = departmentList
-      .filter((item) => key.includes(item.id))
-      .map((item) => item.department_name)[0];
+  //   console.log("Selected Department Key:", e.key);
+  //   console.log("Department list is :", departmentList);
 
-    console.log("Selected Department Key:", e.key);
-    console.log("Department list is :", departmentList);
+  //   console.log("Selected Department Name :", selectedDeptName);
+  //   // if (selectedDept) {
 
-    console.log("Selected Department Name :", selectedDeptName);
-    // if (selectedDept) {
+  //   handleInputChange({
+  //     target: { name: "departmentName", value: selectedDeptName },
+  //   });
+  //   //   setEditValues(prev => ({
+  //   //       ...prev,
+  //   //       departmentName: selectedDept?.department_name ,
 
-    handleInputChange({
-      target: { name: "departmentName", value: selectedDeptName },
-    });
-    //   setEditValues(prev => ({
-    //       ...prev,
-    //       departmentName: selectedDept?.department_name ,
+  //   //     }));
+  //   //   }
 
-    //     }));
-    //   }
+  //   try {
+  //     const response = await fetch(
+  //       `http://localhost:8081/common/project/department/${e.key}`,
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       }
+  //     );
 
+  //     console.log("Response:", response);
+  //     const data = await response.json();
+  //     console.log(data);
+  //     setProjectCodeList(data);
+  //   } catch (error) {
+  //     console.error("Error fetching project codes:", error);
+  //     setProjectCodeList([]);
+  //   }
+  // };
+
+  //Sachit refer this
+
+  console.log("Department List:", departmentList);
+  console.log("Project Code List:", projectCodeList);
+
+  // Fetch project codes based on selected department
+  const fetchProjectCodes = async (departmentId) => {
+    console.log("department Id:", departmentId);
     try {
       const response = await fetch(
-        `http://localhost:8081/common/project/department/${e.key}`,
+        `http://localhost:8081/common/project/department/${departmentId}`,
         {
-          method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -183,9 +235,8 @@ const UserDetails = () => {
         }
       );
 
-      console.log("Response:", response);
       const data = await response.json();
-      console.log(data);
+      console.log("Fetched Project Codes:", data);
       setProjectCodeList(data);
     } catch (error) {
       console.error("Error fetching project codes:", error);
@@ -221,6 +272,10 @@ const UserDetails = () => {
     }
   };
 
+ 
+
+ 
+
   // Initialize editValues when userDetails changes
   useEffect(() => {
     if (userDetails) {
@@ -241,6 +296,11 @@ const UserDetails = () => {
         projectId: userDetails.projectId || "",
         // add other fields as needed
       });
+       setManagerValues({
+      managerId: userDetails?.managerId || "",
+      managerName: userDetails?.managerName || "",
+      managerEmail: userDetails?.managerEmail || ""
+    });
     }
   }, [userDetails]);
 
@@ -248,28 +308,50 @@ const UserDetails = () => {
 
   const handleEditProfileClick = async () => {
     if (editMode) {
-      // Save mode - PUT updated details to backend
-      fetch("http://localhost:8081/common/updateDetails", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(editValues),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to update");
-          return res.json();
-        })
-        .then((updatedData) => {
-          setUserDetails((prev) => ({ ...prev, ...editValues }));
-          setEditMode(false);
-          console.log("Update successful:", updatedData);
-        })
-        .catch((error) => {
-          console.error("Update error:", error);
-          alert("Failed to update details.");
+     try {
+        // Save employee details
+        const employeeResponse = await fetch("http://localhost:8081/common/updateDetails", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(editValues),
         });
+
+        if (!employeeResponse.ok) {
+          throw new Error("Failed to update employee details");
+        }
+       console.log("Employee details updated successfully", employeeId);
+        // Save manager details
+        const managerResponse = await fetch(`http://localhost:8081/manager/updateManager/${employeeId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(managerValues),
+        });
+
+        if (!managerResponse.ok) {
+          throw new Error("Failed to update manager details");
+        }
+
+        // Update local state with both employee and manager data
+        setUserDetails((prev) => ({ 
+          ...prev, 
+          ...editValues,
+          ...managerValues 
+        }));
+        
+        setEditMode(false);
+        console.log("Update successful");
+        alert("Profile updated successfully!");
+
+      } catch (error) {
+        console.error("Update error:", error);
+        alert(`Failed to update details: ${error.message}`);
+      }
     } else {
       // Enter edit mode
       setEditMode(true);
@@ -280,7 +362,7 @@ const UserDetails = () => {
     const { name, value } = e.target;
     setEditValues((prev) => ({ ...prev, [name]: value }));
   };
-
+  
   return (
     <div className="mydetails">
       {/* Top Navbar Starts from here !!! */}
@@ -394,7 +476,7 @@ const UserDetails = () => {
               >
                 <h2>{userDetails?.employeeName}</h2>
                 <p>
-                  {role === "MANAGER" || role === "ADMIN"
+                  {role === "MANAGER"
                     ? "TEAM MANAGER"
                     : role === "USER"
                     ? "EMPLOYEE"
@@ -461,30 +543,45 @@ const UserDetails = () => {
                 </p>
                 <p>
                   <span className="label">Current IBU: </span>
-                  {(role === "MANAGER" || role === "ADMIN") && editMode ? (
-                    <Dropdown
-                      menu={{
-                        items: [
-                          ...departmentList.map((department) => ({
-                            label: department.department_name,
-                            key: department.id,
-                          })),
-                        ],
-                        onClick: handleDepartmentFilter,
+                  {(myrole === "MANAGER" || myrole === "ADMIN") && editMode ? (
+                    <Select
+                      showSearch
+                      style={{ width: 220 }}
+                      placeholder="Select department"
+                      optionFilterProp="children"
+                      onChange={(value) => {
+                        const selectedDept = departmentList.find(
+                          (d) => d.id === value
+                        );
+
+                        // Set the selected department name
+                        handleInputChange({
+                          target: {
+                            name: "departmentName",
+                            value: selectedDept?.department_name,
+                          },
+                        });
+
+                        // Fetch related project codes using the departmentId
+                        fetchProjectCodes(value);
                       }}
-                      placement="bottomLeft"
-                      arrow
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      value={
+                        departmentList.find(
+                          (d) => d.department_name === editValues.departmentName
+                        )?.id
+                      }
                     >
-                      <Space.Compact>
-                        <Input
-                          name="country"
-                          value={editValues.departmentName}
-                          onChange={handleInputChange}
-                          // placeholder="Select or type country"
-                          style={{ width: 220 }}
-                        />
-                      </Space.Compact>
-                    </Dropdown>
+                      {departmentList.map((dept) => (
+                        <Select.Option key={dept.id} value={dept.id}>
+                          {dept.department_name}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   ) : (
                     userDetails?.departmentName ?? "N/A"
                   )}
@@ -563,34 +660,40 @@ const UserDetails = () => {
               <div className="user-section">
                 <p>
                   <span className="label">Project Code: </span>
-                  {(role === "MANAGER" || role === "ADMIN") && editMode ? (
-                    <Dropdown
-                      menu={{
-                        items: projectCodeList.map((project) => ({
-                          label: project.project_code,
-                          key: project.id,
-                        })),
-
-                        onClick: (e) => {
-                          // Set selected project code to state
-                          setEditValues((prev) => ({
-                            ...prev,
-                            projectCode: e.key, // since key is project_code
-                          }));
-                        },
+                  {(myrole === "MANAGER" || myrole === "ADMIN") && editMode ? (
+                    <Select
+                      showSearch
+                      style={{ width: 220 }}
+                      placeholder="Select project code"
+                      optionFilterProp="children"
+                      onChange={(value) => {
+                        const selectedProject = projectCodeList.find(
+                          (p) => p.id === value
+                        );
+                        handleInputChange({
+                          target: {
+                            name: "projectCode",
+                            value: selectedProject?.project_code,
+                          },
+                        });
                       }}
-                      placement="bottomLeft"
-                      arrow
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      value={
+                        projectCodeList.find(
+                          (p) => p.project_code === editValues.projectCode
+                        )?.id
+                      }
                     >
-                      <Space.Compact>
-                        <Input
-                          name="projectCode"
-                          value={editValues.projectCode}
-                          onChange={handleInputChange}
-                          style={{ width: 220 }}
-                        />
-                      </Space.Compact>
-                    </Dropdown>
+                      {projectCodeList.map((project) => (
+                        <Select.Option key={project.id} value={project.id}>
+                          {project.project_code}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   ) : (
                     userDetails?.projectCode ?? "N/A"
                   )}
@@ -698,7 +801,7 @@ const UserDetails = () => {
             </div>
           </div>
 
-            <div
+          <div
             style={{
               backgroundColor: "white",
               padding: "20px",
@@ -731,22 +834,47 @@ const UserDetails = () => {
               <div className="user-section">
                 <p>
                   <span className="label">Manager ID: </span>
-
-                  {userDetails?.managerId ?? "N/A"}
+                  {editMode ? (
+                    <Input
+                      name="managerId"
+                      value={managerValues.managerId}
+                      onChange={handleManagerInputChange}
+                      style={{ width: 220 }}
+                    />
+                  ) : (
+                    userDetails?.managerId ?? "N/A"
+                  )}
                 </p>
               </div>
               <div className="user-section">
                 <p>
                   <span className="label">Manager Name: </span>
-                  {userDetails?.managerName ?? "N/A"}
+                  {editMode ? (
+                    <Input
+                      name="managerName"
+                      value={managerValues.managerName}
+                      onChange={handleManagerInputChange}
+                      style={{ width: 220 }}
+                    />
+                  ) : (
+                    userDetails?.managerName ?? "N/A"
+                  )}
                 </p>
               </div>
 
               <div className="user-section right-align">
                 <p>
                   <span className="label">Manager Email: </span>
-
-                  {userDetails?.managerEmail ?? "N/A"}
+                  {editMode ? (
+                    <Input
+                      name="managerEmail"
+                      value={managerValues.managerEmail}
+                      onChange={handleManagerInputChange}
+                      style={{ width: 220 }}
+                    />
+                  ) : (
+                    userDetails?.managerEmail ?? "N/A"
+                  )}
                 </p>
               </div>
             </div>
