@@ -105,7 +105,6 @@ const ManagerDashboard = () =>{
                             <MenuItem component={<Link to="/TeamList" />}>Team List</MenuItem>
                             <MenuItem component={<Link to="/Resources" />}>Requests</MenuItem>
                             <MenuItem component={<Link to="/MyDetails" />}>My Details </MenuItem>
-                            <MenuItem component={<Link to="/UserDetails" />}>User Details </MenuItem>
                         </Menu>
                     </Sidebar>
                 </div>

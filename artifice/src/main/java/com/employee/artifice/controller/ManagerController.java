@@ -54,4 +54,14 @@ public class ManagerController {
         List<ResourceRequest> requests = resourceRequestService.getRequestsByManagerEmail(email);
         return ResponseEntity.ok(requests);
     }
+
+    @PostMapping("/resourceRequest/{requestId}")
+    public ResponseEntity<ResourceRequest> updateResourceRequest(@PathVariable Long requestId) {
+        ResourceRequest updateRequest = resourceRequestService.updateRequestStatus(requestId);
+        if (updateRequest != null) {
+            return ResponseEntity.ok(updateRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

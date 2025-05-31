@@ -6,6 +6,8 @@ import { useAuth } from "../Auth/AuthContext";
 import { Button, Space, Modal, Avatar, Dropdown } from "antd";
 import {
   UserOutlined,
+  UndoOutlined,
+  SaveTwoTone
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Input } from "antd";
@@ -43,6 +45,7 @@ const MyDetails = () => {
     duration: "",
     description: "",
   });
+  console.log("Current Password:", currentPassword);
 
   const [api, contextHolder] = notification.useNotification();
 
@@ -165,6 +168,10 @@ const MyDetails = () => {
 
   
   const handleSaveClick = async () => {
+    if (!editedPassword || editedPassword.length < 6) {
+      alert("Password must be at least 6 characters long.");
+      return;
+    }
     try {
       await updatePassword(editedPassword);
       setCurrentPassword(editedPassword);
@@ -529,7 +536,9 @@ const MyDetails = () => {
                       />
                     </Space.Compact>
                   ) : (
-                    userDetails?.phoneNumber
+                    userDetails?.phoneNumber && userDetails.phoneNumber.trim() !== ""
+                      ? userDetails.phoneNumber
+                      : "N/A"
                   )}
                 </p>
               </div>
@@ -550,7 +559,9 @@ const MyDetails = () => {
                 </p>
                 <p>
                   <span className="label">Current IBU: </span>
-                  {userDetails?.departmentName ?? "N/A"}
+                  {userDetails?.departmentName && userDetails.departmentName.trim() !== ""
+                    ? userDetails.departmentName
+                    : "N/A"}
                 </p>
               </div>
               <div className="user-section right-align">
@@ -558,21 +569,28 @@ const MyDetails = () => {
                   <span className="label">Password: </span>
                   {isEditing ? (
                     <>
-                      <input
-                        type="text"
+                       <Input.Password
                         value={editedPassword}
                         onChange={(e) => setEditedPassword(e.target.value)}
-                        style={{ marginRight: "5px" }}
+                        style={{ marginRight: "5px", width: 200 }}
                       />
-                      <FaSave
+                      <SaveTwoTone 
                         onClick={handleSaveClick}
-                        style={{ cursor: "pointer", color: "green" }}
+                        style={{ cursor: "pointer", color: "green", fontSize: "22px", fontWeight: "bold" }}
                         title="Save"
+                      />
+                      <UndoOutlined 
+                        style={{ marginLeft: "10px", cursor: "pointer", color: "red", fontSize: "22px", fontWeight: "bold" }}
+                        onClick={() => {
+                          setEditedPassword(currentPassword);
+                          setIsEditing(false);
+                        }}
                       />
                     </>
                   ) : (
                     <>
-                      {"•".repeat(currentPassword.length)}
+                      
+                      ........
                       <FaPen
                         onClick={handleEditClick}
                         style={{ marginLeft: "10px", cursor: "pointer" }}
@@ -624,7 +642,7 @@ const MyDetails = () => {
               <div className="user-section">
                 <p>
                   <span className="label">Project Code: </span>
-                  {userDetails?.projectCode ?? "N/A"}
+                  {userDetails?.projectCode && userDetails.projectCode.trim() !== "" ? userDetails.projectCode : "N/A"}
                 </p>
               </div>
               <div className="user-section right-align">
@@ -708,7 +726,9 @@ const MyDetails = () => {
                       />
                     </Space.Compact>
                   ) : (
-                    userDetails?.permanentAddress ?? "N/A"
+                    userDetails?.permanentAddress && userDetails.permanentAddress.trim() !== ""
+                      ? userDetails.permanentAddress
+                      : "N/A"
                   )}
                 </p>
 
@@ -723,7 +743,9 @@ const MyDetails = () => {
                       />
                     </Space.Compact>
                   ) : (
-                    userDetails?.localAddress ?? "N/A"
+                    userDetails?.localAddress && userDetails.localAddress.trim() !== ""
+                      ? userDetails.localAddress
+                      : "N/A"
                   )}
                 </p>
               </div>
@@ -731,12 +753,16 @@ const MyDetails = () => {
                 <p>
                   <span className="label">Passport No: </span>
 
-                  {userDetails?.passportNo ?? "N/A"}
+                  {userDetails?.passportNo && userDetails.passportNo.trim() !== ""
+                    ? userDetails.passportNo
+                    : "N/A"}
                 </p>
                 <p>
                   <span className="label">Passport Office: </span>
 
-                  {userDetails?.passportOffice ?? "N/A"}
+                  {userDetails?.passportOffice && userDetails.passportOffice.trim() !== ""
+                    ? userDetails.passportOffice
+                    : "N/A"}
                 </p>
               </div>
               <div className="user-section right-align">
@@ -794,7 +820,9 @@ const MyDetails = () => {
               <div className="user-section">
                 <p>
                   <span className="label">Manager Name: </span>
-                  {userDetails?.managerName ?? "N/A"}
+                  {userDetails?.managerName && userDetails.managerName.trim() !== ""
+                    ? userDetails.managerName
+                    : "N/A"}
                 </p>
               </div>
 
@@ -802,7 +830,9 @@ const MyDetails = () => {
                 <p>
                   <span className="label">Manager Email: </span>
 
-                  {userDetails?.managerEmail ?? "N/A"}
+                  {userDetails?.managerEmail && userDetails.managerEmail.trim() !== ""
+                    ? userDetails.managerEmail
+                    : "N/A"}
                 </p>
               </div>
             </div>

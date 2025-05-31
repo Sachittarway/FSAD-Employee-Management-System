@@ -14,4 +14,6 @@ public interface ResourceRequestService {
 
     public List<ResourceRequest> getRequestsByEmployeeEmail(String managerEmail);
 
+    public ResourceRequest updateRequestStatus(Long requestId);
+
 }

@@ -32,6 +32,7 @@ const UserDetails = () => {
 
   console.log("User Role:", role);
   console.log("User Details:", userDetails);
+  console.log("editValues:", editValues);
   // console.log("User Email:", email);
 
   useEffect(() => {
@@ -346,9 +347,6 @@ const UserDetails = () => {
                 <>
                   <MenuItem component={<Link to="/ManagerDashboard" />}>
                     Dashboard
-                  </MenuItem>
-                  <MenuItem component={<Link to="/Departments" />}>
-                    Departments
                   </MenuItem>
                   <MenuItem active> Employee List</MenuItem>
                   <MenuItem component={<Link to="/TeamList" />}>
