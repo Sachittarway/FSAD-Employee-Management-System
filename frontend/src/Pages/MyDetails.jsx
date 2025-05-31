@@ -338,7 +338,7 @@ const MyDetails = () => {
       {/* Top Navbar Starts from here !!! */}
       <div className="top_navbar">
         <div className="left-div">
-          <span className="brand_name">My App</span>
+          <span className="brand_name">ArtifexOne</span>
         </div>
 
         <div className="right-div">

@@ -288,6 +288,7 @@ const EmployeeList = () => {
       }
       const data = await res.json();
       console.log(data);
+      fetchEmployeeList();
       setIsModalOpen(false);
     } catch (err) {
       console.error(err);
@@ -425,13 +426,54 @@ const EmployeeList = () => {
     }
   };
 
+  const [disabledKeys, setDisabledKeys] = useState([]);
+
+  const handleMenuClickFilter = (e) => {
+    const key = e.key;
+
+    // Prevent duplicates
+    if (!disabledKeys.includes(key)) {
+      setDisabledKeys((prev) => [key]);
+      console.log(`Disabled filter: ${key}`);
+    }
+  };
+  console.log("Disabled Keys:", disabledKeys);
+
+  const onSearchFilter =  async() =>{
+    const filter = disabledKeys[0];
+    try{
+      const response = await fetch(`http://localhost:8081/common/searchUsers?${filter}=${searchText}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (response.status === 401) {
+        console.error("Unauthorized access. Redirecting to login.");
+        return;
+      }
+      if (!response.ok) {
+        console.error("Failed to fetch filtered employee list. Status:", response.status);
+        return;
+      }
+      const data = await response.json();
+      setEmployeeList(data);
+      console.log("Filtered Employee List Data:", data);
+    }
+    catch (err) {
+      console.error("Error fetching filtered employee list:", err);
+    }
+  }
+  
+
   return (
     <div className="employee-list">
       {contextHolder}
       {/* Top Navbar Starts from here !!! */}
       <div className="top_navbar">
         <div className="left-div">
-          <span className="brand_name">My App</span>
+          <span className="brand_name">ArtifexOne</span>
         </div>
 
         <div className="right-div">
@@ -564,7 +606,7 @@ const EmployeeList = () => {
             >
               <Search
                 placeholder="Search ..."
-                // onSearch={onSearch}
+                onSearch={onSearchFilter}
                 size="large"
                 enterButton
                 style={{
@@ -579,19 +621,27 @@ const EmployeeList = () => {
                 menu={{
                   items: [
                     {
-                      label: "Filter by Department",
-                      key: "1",
+                      label: "Filter by Employee ID",
+                      key: "id",
+                      disabled: disabledKeys.includes("id"),
+                    },
+                    {
+                      label: "Filter by Email",
+                      key: "email",
+                      disabled: disabledKeys.includes("email"),
                     },
                     {
                       label: "Filter by Role",
-                      key: "2",
+                      key: "role",
+                      disabled: disabledKeys.includes("role"),
                     },
                     {
-                      label: "Filter by Location",
-                      key: "3",
+                      label: "Filter by Employee Name",
+                      key: "employeeName",
+                      disabled: disabledKeys.includes("employeeName"),
                     },
                   ],
-                  onClick: handleMenuClick,
+                  onClick: handleMenuClickFilter,
                 }}
                 style={{
                   marginLeft: "10px",
