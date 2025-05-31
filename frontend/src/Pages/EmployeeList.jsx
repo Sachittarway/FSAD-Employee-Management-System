@@ -14,7 +14,6 @@ import "./EmployeeList.css";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import {
   FilterOutlined,
-  DeleteOutlined,
   FolderViewOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -29,7 +28,6 @@ const EmployeeList = () => {
   const { user } = useAuth();
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [fullname, setFullname] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("USER");
@@ -197,11 +195,6 @@ const EmployeeList = () => {
       render: (_, record) => (
         <Space size="middle">
           <Button type="primary" onClick={() => handleViewDetails(record.employeeId)}><FolderViewOutlined /></Button>
-          {
-            user.role === "ADMIN" && (
-              <Button variant="filled" color="danger" onClick={showDeleteModal}><DeleteOutlined /></Button>
-            )
-          }
         </Space>
       ),
     },
@@ -307,15 +300,6 @@ const EmployeeList = () => {
 
   const handleCancel = () => {
     setIsModalOpen(false);
-  };
-  const showDeleteModal = () => {
-    setIsDeleteModalOpen(true);
-  };
-  const handleDeleteOk = () => {
-    setIsDeleteModalOpen(false);
-  };
-  const handleDeleteCancel = () => {
-    setIsDeleteModalOpen(false);
   };
 
   const onSearch = (value) => {
@@ -794,16 +778,6 @@ const EmployeeList = () => {
             ]}
           />
         </div>
-      </Modal>
-
-      <Modal
-        title="Delete Employee"
-        closable={{ "aria-label": "Custom Close Button" }}
-        open={isDeleteModalOpen}
-        onOk={handleDeleteOk}
-        onCancel={handleDeleteCancel}
-      >
-        <p>Are you sure you want to delete this employee?</p>
       </Modal>
     </div>
   );
