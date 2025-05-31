@@ -45,7 +45,6 @@ const TeamList = () => {
       }
       const data = await res.json();
       setEmployeeList(data);
-      console.log("Employee List Data:", data);
     }
     catch (err) {
       console.error("Error fetching employee list:", err);

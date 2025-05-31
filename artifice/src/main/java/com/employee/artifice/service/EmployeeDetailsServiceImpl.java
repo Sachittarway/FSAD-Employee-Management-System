@@ -69,8 +69,8 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
         existingDetails.setPassportIssueDate(details.getPassportIssueDate());
         existingDetails.setPassportExpiryDate(details.getPassportExpiryDate());
         existingDetails.setPassportOffice(details.getPassportOffice());
-        existingDetails.setDepartment(details.getDepartment());
-        existingDetails.setProject(details.getProject());
+        existingDetails.setDepartment(existingDetails.getDepartment());
+        existingDetails.setProject(existingDetails.getProject());
         existingDetails.setPosition(details.getPosition());
         return Optional.of(detailsRepository.save(existingDetails));
     }

@@ -4,11 +4,7 @@ import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
 import { useAuth } from "../Auth/AuthContext";
 import { Button, Space, Modal, Avatar, Dropdown } from "antd";
-import {
-  UserOutlined,
-  UndoOutlined,
-  SaveTwoTone
-} from "@ant-design/icons";
+import { UserOutlined, UndoOutlined, SaveTwoTone } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Input } from "antd";
 import { FaPen, FaSave } from "react-icons/fa";
@@ -147,26 +143,21 @@ const MyDetails = () => {
         passportOffice: userDetails.passportOffice || "",
         passportIssueDate: userDetails.passportIssueDate || "",
         passportExpiryDate: userDetails.passportExpiryDate || "",
-        employeeNumber: userDetails.employeeNumber || "",
         currentLocation: userDetails.currentLocation || "",
         departmentName: userDetails.departmentName || "",
         projectCode: userDetails.projectCode || "",
         departmentId: userDetails.departmentId || "",
         projectId: userDetails.projectId || "",
         previousJobs: userDetails.previousJobs || [],
-
-        // add other fields as needed
       });
     }
   }, [userDetails]);
-
   // Handlers
 
   const handleEditClick = () => {
     setIsEditing(true);
   };
 
-  
   const handleSaveClick = async () => {
     if (!editedPassword || editedPassword.length < 6) {
       alert("Password must be at least 6 characters long.");
@@ -180,7 +171,6 @@ const MyDetails = () => {
       alert("Failed to update password. Please try again.");
     }
   };
-
 
   const updatePassword = async (newPassword) => {
     try {
@@ -203,7 +193,7 @@ const MyDetails = () => {
       const data = await response.text();
       console.log("Password updated:", data);
       localStorage.removeItem("token");
-      window.location.href = "/login"; 
+      window.location.href = "/login";
       return data;
     } catch (error) {
       console.error("Error updating password:", error);
@@ -211,44 +201,51 @@ const MyDetails = () => {
     }
   };
 
-  // const handleEditClick = () => {
-  //   setIsEditing(true);
-  // };
-
-  // const handleSaveClick = () => {
-  //   setPassword(editedPassword);
-  //   setIsEditing(false);
-  // };
-
-  const handleEditProfileClick = () => {
+  const handleEditProfileClick = async() => {
     if (editMode) {
-      // Save mode - PUT updated details to backend
-      fetch("http://localhost:8081/common/updateDetails", {
+      const response = await fetch("http://localhost:8081/common/updateDetails", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(editValues),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to update");
-          return res.json();
-        })
-        .then((updatedData) => {
-          setUserDetails((prev) => ({ ...prev, ...editValues }));
-          setEditMode(false);
-          console.log("Update successful:", updatedData);
-        })
-        .catch((error) => {
-          console.error("Update error:", error);
-          alert("Failed to update details.");
-        });
+      });
+      if (response.status === 401) {
+        openNotification(
+          false,
+          "error",
+          "Unauthorized",
+          "You are not authorized to perform this action."
+        )();
+        return;
+      }
+      if (!response.ok) {
+        openNotification(
+          false,
+          "error",
+          "Failed to update details",
+          "Please try again later."
+        )();
+        return;
+      }
+      const data = await response.json();
+      console.log("Updated User Details:", data);
+      setEditMode(false);
+      console.log("Nilesh 1",editMode);
+      fetchUserDetails();
+      openNotification(
+        false,
+        "success",
+        "Profile Updated",
+        "Your profile has been successfully updated."
+      )();
     } else {
       // Enter edit mode
       setEditMode(true);
     }
   };
+  console.log("Nilesh 2",editMode);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -299,7 +296,6 @@ const MyDetails = () => {
           body: JSON.stringify([newJob]),
         }
       );
-  
 
       if (res.status === 401) {
         openNotification(
@@ -315,18 +311,16 @@ const MyDetails = () => {
         return;
       }
       const data = await res.json();
-      console.log(data);
-      setPreviousJobs((prevJobs) => [...prevJobs, ...data]); // update UI
-      setNewJob({
+    } catch (err) {
+      console.error(err);
+    }
+    fetchPreviousJobDetails();
+    setNewJob({
         orgName: "",
         designation: "",
         duration: "",
         description: "",
       });
-    } catch (err) {
-      console.error(err);
-    }
-
     setIsModalOpen(false);
   };
 
@@ -425,16 +419,14 @@ const MyDetails = () => {
                   <MenuItem active>My Details </MenuItem>
                 </>
               )}
-              {
-                user.role === "USER" && (
-                  <>
-                    <MenuItem active>My Details</MenuItem>
-                    <MenuItem component={<Link to="/Resources" />}>
-                      My Requests
-                    </MenuItem>
-                  </>
-                )
-              }
+              {user.role === "USER" && (
+                <>
+                  <MenuItem active>My Details</MenuItem>
+                  <MenuItem component={<Link to="/Resources" />}>
+                    My Requests
+                  </MenuItem>
+                </>
+              )}
             </Menu>
           </Sidebar>
         </div>
@@ -469,7 +461,9 @@ const MyDetails = () => {
               >
                 <h2>{userDetails?.employeeName}</h2>
                 <p>
-                  {role === "MANAGER" || role === "ADMIN"
+                  {role === "ADMIN"
+                    ? "ADMIN"
+                    : role === "MANAGER"
                     ? "TEAM MANAGER"
                     : role === "USER"
                     ? "EMPLOYEE"
@@ -534,10 +528,11 @@ const MyDetails = () => {
                         onChange={handleInputChange}
                       />
                     </Space.Compact>
+                  ) : userDetails?.phoneNumber &&
+                    userDetails.phoneNumber.trim() !== "" ? (
+                    userDetails.phoneNumber
                   ) : (
-                    userDetails?.phoneNumber && userDetails.phoneNumber.trim() !== ""
-                      ? userDetails.phoneNumber
-                      : "N/A"
+                    "N/A"
                   )}
                 </p>
               </div>
@@ -558,7 +553,8 @@ const MyDetails = () => {
                 </p>
                 <p>
                   <span className="label">Current IBU: </span>
-                  {userDetails?.departmentName && userDetails.departmentName.trim() !== ""
+                  {userDetails?.departmentName &&
+                  userDetails.departmentName.trim() !== ""
                     ? userDetails.departmentName
                     : "N/A"}
                 </p>
@@ -568,18 +564,29 @@ const MyDetails = () => {
                   <span className="label">Password: </span>
                   {isEditing ? (
                     <>
-                       <Input.Password
+                      <Input.Password
                         value={editedPassword}
                         onChange={(e) => setEditedPassword(e.target.value)}
                         style={{ marginRight: "5px", width: 200 }}
                       />
-                      <SaveTwoTone 
+                      <SaveTwoTone
                         onClick={handleSaveClick}
-                        style={{ cursor: "pointer", color: "green", fontSize: "22px", fontWeight: "bold" }}
+                        style={{
+                          cursor: "pointer",
+                          color: "green",
+                          fontSize: "22px",
+                          fontWeight: "bold",
+                        }}
                         title="Save"
                       />
-                      <UndoOutlined 
-                        style={{ marginLeft: "10px", cursor: "pointer", color: "red", fontSize: "22px", fontWeight: "bold" }}
+                      <UndoOutlined
+                        style={{
+                          marginLeft: "10px",
+                          cursor: "pointer",
+                          color: "red",
+                          fontSize: "22px",
+                          fontWeight: "bold",
+                        }}
                         onClick={() => {
                           setEditedPassword(currentPassword);
                           setIsEditing(false);
@@ -588,7 +595,6 @@ const MyDetails = () => {
                     </>
                   ) : (
                     <>
-                      
                       ........
                       <FaPen
                         onClick={handleEditClick}
@@ -635,13 +641,16 @@ const MyDetails = () => {
               <div className="user-section">
                 <p>
                   <span className="label">Employee Number: </span>
-                  {userDetails?.id ?? "N/A"}
+                  {userDetails?.employeeId ?? "N/A"}
                 </p>
               </div>
               <div className="user-section">
                 <p>
                   <span className="label">Project Code: </span>
-                  {userDetails?.projectCode && userDetails.projectCode.trim() !== "" ? userDetails.projectCode : "N/A"}
+                  {userDetails?.projectCode &&
+                  userDetails.projectCode.trim() !== ""
+                    ? userDetails.projectCode
+                    : "N/A"}
                 </p>
               </div>
               <div className="user-section right-align">
@@ -724,10 +733,11 @@ const MyDetails = () => {
                         onChange={handleInputChange}
                       />
                     </Space.Compact>
+                  ) : userDetails?.permanentAddress &&
+                    userDetails.permanentAddress.trim() !== "" ? (
+                    userDetails.permanentAddress
                   ) : (
-                    userDetails?.permanentAddress && userDetails.permanentAddress.trim() !== ""
-                      ? userDetails.permanentAddress
-                      : "N/A"
+                    "N/A"
                   )}
                 </p>
 
@@ -741,10 +751,11 @@ const MyDetails = () => {
                         onChange={handleInputChange}
                       />
                     </Space.Compact>
+                  ) : userDetails?.localAddress &&
+                    userDetails.localAddress.trim() !== "" ? (
+                    userDetails.localAddress
                   ) : (
-                    userDetails?.localAddress && userDetails.localAddress.trim() !== ""
-                      ? userDetails.localAddress
-                      : "N/A"
+                    "N/A"
                   )}
                 </p>
               </div>
@@ -752,28 +763,76 @@ const MyDetails = () => {
                 <p>
                   <span className="label">Passport No: </span>
 
-                  {userDetails?.passportNo && userDetails.passportNo.trim() !== ""
-                    ? userDetails.passportNo
-                    : "N/A"}
+                  {editMode ? (
+                    <Space.Compact>
+                      <Input
+                        name="passportNo"
+                        value={editValues.passportNo}
+                        onChange={handleInputChange}
+                      />
+                    </Space.Compact>
+                  ) : userDetails?.passportNo &&
+                    userDetails.passportNo.trim() !== "" ? (
+                    userDetails.passportNo
+                  ) : (
+                    "N/A"
+                  )}
                 </p>
                 <p>
                   <span className="label">Passport Office: </span>
 
-                  {userDetails?.passportOffice && userDetails.passportOffice.trim() !== ""
-                    ? userDetails.passportOffice
-                    : "N/A"}
+                  {editMode ? (
+                    <Space.Compact>
+                      <Input
+                        name="passportOffice"
+                        value={editValues.passportOffice}
+                        onChange={handleInputChange}
+                      />
+                    </Space.Compact>
+                  ) : userDetails?.passportOffice &&
+                    userDetails.passportOffice.trim() !== "" ? (
+                    userDetails.passportOffice
+                  ) : (
+                    "N/A"
+                  )}
                 </p>
               </div>
               <div className="user-section right-align">
                 <p>
                   <span className="label">Issue Date: </span>
 
-                  {userDetails?.passportIssueDate ?? "N/A"}
+                  {editMode ? (
+                    <Space.Compact>
+                      <Input
+                        name="passportIssueDate"
+                        value={editValues.passportIssueDate}
+                        onChange={handleInputChange}
+                      />
+                    </Space.Compact>
+                  ) : userDetails?.passportIssueDate &&
+                    userDetails.passportIssueDate.trim() !== "" ? (
+                    userDetails.passportIssueDate
+                  ) : (
+                    "N/A"
+                  )}
                 </p>
                 <p>
                   <span className="label">Expiry Date: </span>
 
-                  {userDetails?.passportExpiryDate ?? "N/A"}
+                  {editMode ? (
+                    <Space.Compact>
+                      <Input
+                        name="passportExpiryDate"
+                        value={editValues.passportExpiryDate}
+                        onChange={handleInputChange}
+                      />
+                    </Space.Compact>
+                  ) : userDetails?.passportExpiryDate &&
+                    userDetails.passportExpiryDate.trim() !== "" ? (
+                    userDetails.passportExpiryDate
+                  ) : (
+                    "N/A"
+                  )}
                 </p>
               </div>
             </div>
@@ -819,7 +878,8 @@ const MyDetails = () => {
               <div className="user-section">
                 <p>
                   <span className="label">Manager Name: </span>
-                  {userDetails?.managerName && userDetails.managerName.trim() !== ""
+                  {userDetails?.managerName &&
+                  userDetails.managerName.trim() !== ""
                     ? userDetails.managerName
                     : "N/A"}
                 </p>
@@ -829,7 +889,8 @@ const MyDetails = () => {
                 <p>
                   <span className="label">Manager Email: </span>
 
-                  {userDetails?.managerEmail && userDetails.managerEmail.trim() !== ""
+                  {userDetails?.managerEmail &&
+                  userDetails.managerEmail.trim() !== ""
                     ? userDetails.managerEmail
                     : "N/A"}
                 </p>

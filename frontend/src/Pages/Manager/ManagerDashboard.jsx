@@ -53,7 +53,6 @@ const ManagerDashboard = () =>{
             }
         };
     const fetchEmployeeName = async () => {
-        console.log("Fetching employee name...");
         try {
             const response = await fetch('http://localhost:8081/common/getEmployeeName', {
                 method: 'GET',
