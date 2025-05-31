@@ -22,4 +22,5 @@ public interface EmployeeDetailsService {
     public UpdateTeam updateEmployeeTeam(UpdateTeam updateTeam);
     public Optional<CustomEmployeeDetails> updateEmployeeManager(Long employeeId);
     Optional<CustomEmployeeDetails> getCustomDetailsByEmployeeId(Long employeeId);
+    public Optional<EmployeeDetails> getEmployeeName();
 }

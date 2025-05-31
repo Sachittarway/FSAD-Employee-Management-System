@@ -52,7 +52,7 @@ public class EmployeeDetails {
     @JsonIgnore
     private Project project;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id", referencedColumnName = "id")
     private EmployeeUser manager;
 

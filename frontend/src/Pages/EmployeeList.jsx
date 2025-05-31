@@ -14,7 +14,6 @@ import "./EmployeeList.css";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import {
   FilterOutlined,
-  DeleteOutlined,
   FolderViewOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -29,7 +28,6 @@ const EmployeeList = () => {
   const { user } = useAuth();
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [fullname, setFullname] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("USER");
@@ -197,11 +195,6 @@ const EmployeeList = () => {
       render: (_, record) => (
         <Space size="middle">
           <Button type="primary" onClick={() => handleViewDetails(record.employeeId)}><FolderViewOutlined /></Button>
-          {
-            user.role === "ADMIN" && (
-              <Button variant="filled" color="danger" onClick={showDeleteModal}><DeleteOutlined /></Button>
-            )
-          }
         </Space>
       ),
     },
@@ -295,6 +288,7 @@ const EmployeeList = () => {
       }
       const data = await res.json();
       console.log(data);
+      fetchEmployeeList();
       setIsModalOpen(false);
     } catch (err) {
       console.error(err);
@@ -307,15 +301,6 @@ const EmployeeList = () => {
 
   const handleCancel = () => {
     setIsModalOpen(false);
-  };
-  const showDeleteModal = () => {
-    setIsDeleteModalOpen(true);
-  };
-  const handleDeleteOk = () => {
-    setIsDeleteModalOpen(false);
-  };
-  const handleDeleteCancel = () => {
-    setIsDeleteModalOpen(false);
   };
 
   const onSearch = (value) => {
@@ -441,13 +426,54 @@ const EmployeeList = () => {
     }
   };
 
+  const [disabledKeys, setDisabledKeys] = useState([]);
+
+  const handleMenuClickFilter = (e) => {
+    const key = e.key;
+
+    // Prevent duplicates
+    if (!disabledKeys.includes(key)) {
+      setDisabledKeys((prev) => [key]);
+      console.log(`Disabled filter: ${key}`);
+    }
+  };
+  console.log("Disabled Keys:", disabledKeys);
+
+  const onSearchFilter =  async() =>{
+    const filter = disabledKeys[0];
+    try{
+      const response = await fetch(`http://localhost:8081/common/searchUsers?${filter}=${searchText}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (response.status === 401) {
+        console.error("Unauthorized access. Redirecting to login.");
+        return;
+      }
+      if (!response.ok) {
+        console.error("Failed to fetch filtered employee list. Status:", response.status);
+        return;
+      }
+      const data = await response.json();
+      setEmployeeList(data);
+      console.log("Filtered Employee List Data:", data);
+    }
+    catch (err) {
+      console.error("Error fetching filtered employee list:", err);
+    }
+  }
+  
+
   return (
     <div className="employee-list">
       {contextHolder}
       {/* Top Navbar Starts from here !!! */}
       <div className="top_navbar">
         <div className="left-div">
-          <span className="brand_name">My App</span>
+          <span className="brand_name">ArtifexOne</span>
         </div>
 
         <div className="right-div">
@@ -580,7 +606,7 @@ const EmployeeList = () => {
             >
               <Search
                 placeholder="Search ..."
-                // onSearch={onSearch}
+                onSearch={onSearchFilter}
                 size="large"
                 enterButton
                 style={{
@@ -595,19 +621,27 @@ const EmployeeList = () => {
                 menu={{
                   items: [
                     {
-                      label: "Filter by Department",
-                      key: "1",
+                      label: "Filter by Employee ID",
+                      key: "id",
+                      disabled: disabledKeys.includes("id"),
+                    },
+                    {
+                      label: "Filter by Email",
+                      key: "email",
+                      disabled: disabledKeys.includes("email"),
                     },
                     {
                       label: "Filter by Role",
-                      key: "2",
+                      key: "role",
+                      disabled: disabledKeys.includes("role"),
                     },
                     {
-                      label: "Filter by Location",
-                      key: "3",
+                      label: "Filter by Employee Name",
+                      key: "employeeName",
+                      disabled: disabledKeys.includes("employeeName"),
                     },
                   ],
-                  onClick: handleMenuClick,
+                  onClick: handleMenuClickFilter,
                 }}
                 style={{
                   marginLeft: "10px",
@@ -794,16 +828,6 @@ const EmployeeList = () => {
             ]}
           />
         </div>
-      </Modal>
-
-      <Modal
-        title="Delete Employee"
-        closable={{ "aria-label": "Custom Close Button" }}
-        open={isDeleteModalOpen}
-        onOk={handleDeleteOk}
-        onCancel={handleDeleteCancel}
-      >
-        <p>Are you sure you want to delete this employee?</p>
       </Modal>
     </div>
   );

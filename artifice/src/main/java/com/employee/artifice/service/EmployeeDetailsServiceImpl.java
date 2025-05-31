@@ -227,4 +227,9 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
                 ));
     }
 
+    @Override
+    public Optional<EmployeeDetails> getEmployeeName() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return detailsRepository.findByUserEmail(email);
+    }
 }

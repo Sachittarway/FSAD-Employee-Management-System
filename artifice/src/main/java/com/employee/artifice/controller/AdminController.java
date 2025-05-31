@@ -1,17 +1,9 @@
 package com.employee.artifice.controller;
 
 import com.employee.artifice.dto.CreateUser;
-import com.employee.artifice.model.Country;
-import com.employee.artifice.model.Department;
-import com.employee.artifice.model.EmployeeUser;
-import com.employee.artifice.model.Project;
-import com.employee.artifice.model.ResourceRequest;
-import com.employee.artifice.service.CountryService;
-import com.employee.artifice.service.DepartmentService;
-import com.employee.artifice.service.EmployeeUserService;
-import com.employee.artifice.service.ProjectService;
-import com.employee.artifice.service.ResourceRequestService;
-
+import com.employee.artifice.dto.DashboardCountsDTO;
+import com.employee.artifice.model.*;
+import com.employee.artifice.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +29,9 @@ public class AdminController {
 
     @Autowired
     CountryService countryService;
+
+    @Autowired
+    DashboardService dashboardService;
 
     @PostMapping("/register")
     public ResponseEntity<EmployeeUser> createUser(@RequestBody CreateUser user) {
@@ -79,5 +74,11 @@ public class AdminController {
     public ResponseEntity<List<Country>> createCountries(@RequestBody List<Country> countries) {
         List<Country> createdCountries = countryService.postAllCountries(countries);
         return ResponseEntity.ok(createdCountries);
+    }
+
+    @GetMapping("/dashboardCounts")
+    public ResponseEntity<DashboardCountsDTO> getDashboardCounts(){
+        DashboardCountsDTO counts = dashboardService.getDashboardCounts();
+        return ResponseEntity.ok(counts);
     }
 }

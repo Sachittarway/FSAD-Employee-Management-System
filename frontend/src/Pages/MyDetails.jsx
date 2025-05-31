@@ -331,7 +331,7 @@ const MyDetails = () => {
       {/* Top Navbar Starts from here !!! */}
       <div className="top_navbar">
         <div className="left-div">
-          <span className="brand_name">My App</span>
+          <span className="brand_name">ArtifexOne</span>
         </div>
 
         <div className="right-div">
@@ -406,13 +406,12 @@ const MyDetails = () => {
                   <MenuItem component={<Link to="/ManagerDashboard" />}>
                     Dashboard
                   </MenuItem>
-                  <MenuItem component={<Link to="/Departments" />}>
-                    Departments
-                  </MenuItem>
                   <MenuItem component={<Link to="/EmployeeList" />}>
                     Employee List
                   </MenuItem>
-
+                  <MenuItem component={<Link to="/TeamList" />}>
+                    Team List
+                  </MenuItem>
                   <MenuItem component={<Link to="/Resources" />}>
                     Requests
                   </MenuItem>
