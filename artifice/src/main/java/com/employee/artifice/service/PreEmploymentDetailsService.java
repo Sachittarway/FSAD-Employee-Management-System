@@ -28,9 +28,18 @@ public class PreEmploymentDetailsService {
     }
 
     preEmploymentDetailsRepository.saveAll(preEmploymentDetailsList);
-}
+    }
 
-   public List<PreEmploymentDetails> getPreEmploymentDetailsForUser(Long userId) {
+    public List<PreEmploymentDetails> getPreEmploymentDetailsForUser(Long userId) {
         return preEmploymentDetailsRepository.findByEmployee_User_Id(userId);
     }
+    public List<PreEmploymentDetails> getPreEmploymentDetailsByEmployeeId(Long employeeId) {
+        // Fetch the EmployeeDetails entity using the employeeId
+        EmployeeDetails employee = employeeDetailsRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found with ID: " + employeeId));
+
+        // Return the associated pre-employment details
+        return employee.getPreEmploymentDetails();
+    }
+
 }

@@ -45,7 +45,6 @@ const TeamList = () => {
       }
       const data = await res.json();
       setEmployeeList(data);
-      console.log("Employee List Data:", data);
     }
     catch (err) {
       console.error("Error fetching employee list:", err);
@@ -119,7 +118,7 @@ const TeamList = () => {
       {/* Top Navbar Starts from here !!! */}
       <div className="top_navbar">
         <div className="left-div">
-          <span className="brand_name">My App</span>
+          <span className="brand_name">ArtifexOne</span>
         </div>
 
         <div className="right-div">

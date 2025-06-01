@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +37,7 @@ public class PreEmploymentDetailsController {
                 }
             preEmploymentDetailsService.savePreEmploymentDetails(userId, preEmploymentDetailsList);
             return ResponseEntity.ok("Pre-employment details saved successfully.");
-            
+
     }
 
     @GetMapping("/pre-employment-details")
@@ -53,6 +54,13 @@ public class PreEmploymentDetailsController {
 
         // Fetch pre-employment details using userId
         List<PreEmploymentDetails> preEmploymentDetails = preEmploymentDetailsService.getPreEmploymentDetailsForUser(userId);
+        return ResponseEntity.ok(preEmploymentDetails);
+    }
+
+    @GetMapping("/pre-employment-details/{employeeId}")
+    public ResponseEntity<List<PreEmploymentDetails>> getPreEmploymentDetailsByEmployeeId(@PathVariable Long employeeId) {
+        // Fetch pre-employment details using employeeId
+        List<PreEmploymentDetails> preEmploymentDetails = preEmploymentDetailsService.getPreEmploymentDetailsByEmployeeId(employeeId);
         return ResponseEntity.ok(preEmploymentDetails);
     }
 }

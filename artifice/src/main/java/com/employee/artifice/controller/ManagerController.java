@@ -1,8 +1,10 @@
 package com.employee.artifice.controller;
 
 import com.employee.artifice.dto.CustomEmployeeDetails;
+import com.employee.artifice.dto.DashboardCountsDTO;
 import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.dto.UpdateTeam;
+import com.employee.artifice.service.DashboardService;
 import com.employee.artifice.service.EmployeeDetailsService;
 import com.employee.artifice.model.ResourceRequest;
 import com.employee.artifice.service.ResourceRequestService;
@@ -27,6 +29,9 @@ public class ManagerController {
 
     @Autowired
     ResourceRequestService resourceRequestService;
+
+    @Autowired
+    DashboardService dashboardService;
 
     @GetMapping("/myTeam")
     public List<GetEmployeeList> getMyTeamMembers(@RequestParam String name) {
@@ -53,5 +58,21 @@ public class ManagerController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         List<ResourceRequest> requests = resourceRequestService.getRequestsByManagerEmail(email);
         return ResponseEntity.ok(requests);
+    }
+
+    @PostMapping("/resourceRequest/{requestId}")
+    public ResponseEntity<ResourceRequest> updateResourceRequest(@PathVariable Long requestId) {
+        ResourceRequest updateRequest = resourceRequestService.updateRequestStatus(requestId);
+        if (updateRequest != null) {
+            return ResponseEntity.ok(updateRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/dashboardCounts")
+    public ResponseEntity<DashboardCountsDTO> getDashboardCounts(){
+        DashboardCountsDTO counts = dashboardService.getDashboardManagerCounts();
+        return ResponseEntity.ok(counts);
     }
 }

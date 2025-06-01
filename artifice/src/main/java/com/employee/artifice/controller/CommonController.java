@@ -1,6 +1,7 @@
 package com.employee.artifice.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.employee.artifice.dto.CustomEmployeeDetails;
 import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.dto.PasswordChangeRequest;
@@ -152,5 +154,28 @@ public class CommonController {
     @GetMapping("/getCountryList")
     public List<Country> getCountryList() {
         return countryService.getAllCountries();
+    }
+
+    @GetMapping("/getEmployeeDetailsById/{employeeId}")
+    public ResponseEntity<CustomEmployeeDetails> getEmployeeDetailsById(@PathVariable Long employeeId) {
+        return employeeDetailsService.getCustomDetailsByEmployeeId(employeeId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/getEmployeeRoleById/{employeeId}")
+    public ResponseEntity<String> getEmployeeRoleById(@PathVariable Long employeeId) {
+        return employeeUserService.getRoleByEmployeeId(employeeId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/getEmployeeName")
+    public ResponseEntity<Map<String, String>> getEmployeeName() {
+        String name = employeeDetailsService.getEmployeeName()
+                .map(EmployeeDetails::getEmployeeName)
+                .orElse("N/A");
+        Map<String, String> response = Map.of("name", name);
+        return ResponseEntity.ok(response);
     }
 }

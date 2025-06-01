@@ -3,13 +3,8 @@ import React from "react";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
 import { useAuth } from "../Auth/AuthContext";
-import { Button, Space, Modal, Select, Avatar, Dropdown } from "antd";
-import {
-  FilterOutlined,
-  DeleteOutlined,
-  FolderViewOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+import { Button, Space, Modal, Avatar, Dropdown } from "antd";
+import { UserOutlined, UndoOutlined, SaveTwoTone } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Input } from "antd";
 import { FaPen, FaSave } from "react-icons/fa";
@@ -30,20 +25,30 @@ const MyDetails = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [editValues, setEditValues] = useState({});
-  const [isEditing, setIsEditing] = useState(false); // For password editing
-  const [password, setPassword] = useState("India");
-  const [editedPassword, setEditedPassword] = useState(password);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedPassword, setEditedPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState(editedPassword);
   const [countryList, setCountryList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [orgname, setOrgName] = useState("");
+  const [previousJobs, setPreviousJobs] = useState([]);
+  const [orgName, setOrgName] = useState("");
   const [duration, setJobDuration] = useState("");
   const [designation, setDesignation] = useState("");
+  const [description, setDescription] = useState("");
+  const [newJob, setNewJob] = useState({
+    orgName: "",
+    designation: "",
+    duration: "",
+    description: "",
+  });
+  console.log("Current Password:", currentPassword);
 
   const [api, contextHolder] = notification.useNotification();
 
   useEffect(() => {
     fetchUserDetails();
     fetchCountryList();
+    fetchPreviousJobDetails();
   }, []);
 
   // Fetch user details once on mount
@@ -103,6 +108,29 @@ const MyDetails = () => {
     }
   };
 
+  const fetchPreviousJobDetails = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:8081/employees/pre-employment-details",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log("Fetching previous job details...", response);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      console.log("Previous Job Details:", data);
+      setPreviousJobs(data);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
   // Initialize editValues when userDetails changes
   useEffect(() => {
     if (userDetails) {
@@ -115,57 +143,109 @@ const MyDetails = () => {
         passportOffice: userDetails.passportOffice || "",
         passportIssueDate: userDetails.passportIssueDate || "",
         passportExpiryDate: userDetails.passportExpiryDate || "",
-        employeeNumber: userDetails.employeeNumber || "",
         currentLocation: userDetails.currentLocation || "",
         departmentName: userDetails.departmentName || "",
         projectCode: userDetails.projectCode || "",
         departmentId: userDetails.departmentId || "",
         projectId: userDetails.projectId || "",
-        // add other fields as needed
+        previousJobs: userDetails.previousJobs || [],
       });
     }
   }, [userDetails]);
-
   // Handlers
 
   const handleEditClick = () => {
     setIsEditing(true);
   };
 
-  const handleSaveClick = () => {
-    setPassword(editedPassword);
-    setIsEditing(false);
+  const handleSaveClick = async () => {
+    if (!editedPassword || editedPassword.length < 6) {
+      alert("Password must be at least 6 characters long.");
+      return;
+    }
+    try {
+      await updatePassword(editedPassword);
+      setCurrentPassword(editedPassword);
+      setIsEditing(false);
+    } catch (error) {
+      alert("Failed to update password. Please try again.");
+    }
   };
 
-  const handleEditProfileClick = () => {
+  const updatePassword = async (newPassword) => {
+    try {
+      const response = await fetch(
+        "http://localhost:8081/common/updatePassword",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ newPassword }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update password");
+      }
+
+      const data = await response.text();
+      console.log("Password updated:", data);
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+      return data;
+    } catch (error) {
+      console.error("Error updating password:", error);
+      throw error;
+    }
+  };
+
+  const handleEditProfileClick = async() => {
     if (editMode) {
-      // Save mode - PUT updated details to backend
-      fetch("http://localhost:8081/common/updateDetails", {
+      const response = await fetch("http://localhost:8081/common/updateDetails", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(editValues),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to update");
-          return res.json();
-        })
-        .then((updatedData) => {
-          setUserDetails((prev) => ({ ...prev, ...editValues }));
-          setEditMode(false);
-          console.log("Update successful:", updatedData);
-        })
-        .catch((error) => {
-          console.error("Update error:", error);
-          alert("Failed to update details.");
-        });
+      });
+      if (response.status === 401) {
+        openNotification(
+          false,
+          "error",
+          "Unauthorized",
+          "You are not authorized to perform this action."
+        )();
+        return;
+      }
+      if (!response.ok) {
+        openNotification(
+          false,
+          "error",
+          "Failed to update details",
+          "Please try again later."
+        )();
+        return;
+      }
+      const data = await response.json();
+      console.log("Updated User Details:", data);
+      setEditMode(false);
+      console.log("Nilesh 1",editMode);
+      fetchUserDetails();
+      openNotification(
+        false,
+        "success",
+        "Profile Updated",
+        "Your profile has been successfully updated."
+      )();
     } else {
       // Enter edit mode
       setEditMode(true);
     }
   };
+  console.log("Nilesh 2",editMode);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -183,7 +263,8 @@ const MyDetails = () => {
     });
   };
   const handleOk = async () => {
-    if (!orgname || !duration || !designation) {
+    const { orgName, duration, designation } = newJob;
+    if (!orgName || !duration || !designation) {
       openNotification(
         false,
         "error",
@@ -193,16 +274,53 @@ const MyDetails = () => {
       return;
     }
 
-    if (orgname.length < 3) {
+    if (orgName.length < 3) {
       openNotification(
         false,
         "error",
-        "Invalid full name",
-        "Full name should be at least 3 characters long."
+        "Invalid Organization name",
+        "Organization Name should be at least 3 characters long."
       )();
       return;
     }
+    try {
+      // Make API call to add new job
+      const res = await fetch(
+        "http://localhost:8081/employees/pre-employment-details",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify([newJob]),
+        }
+      );
 
+      if (res.status === 401) {
+        openNotification(
+          false,
+          "error",
+          "Unauthorized",
+          "You are not authorized to perform this action."
+        )();
+        return;
+      }
+      if (!res.ok) {
+        alert("Failed to add employee. Please try again.");
+        return;
+      }
+      const data = await res.json();
+    } catch (err) {
+      console.error(err);
+    }
+    fetchPreviousJobDetails();
+    setNewJob({
+        orgName: "",
+        designation: "",
+        duration: "",
+        description: "",
+      });
     setIsModalOpen(false);
   };
 
@@ -214,7 +332,7 @@ const MyDetails = () => {
       {/* Top Navbar Starts from here !!! */}
       <div className="top_navbar">
         <div className="left-div">
-          <span className="brand_name">My App</span>
+          <span className="brand_name">ArtifexOne</span>
         </div>
 
         <div className="right-div">
@@ -289,17 +407,24 @@ const MyDetails = () => {
                   <MenuItem component={<Link to="/ManagerDashboard" />}>
                     Dashboard
                   </MenuItem>
-                  <MenuItem component={<Link to="/Departments" />}>
-                    Departments
-                  </MenuItem>
                   <MenuItem component={<Link to="/EmployeeList" />}>
                     Employee List
                   </MenuItem>
-
+                  <MenuItem component={<Link to="/TeamList" />}>
+                    Team List
+                  </MenuItem>
                   <MenuItem component={<Link to="/Resources" />}>
                     Requests
                   </MenuItem>
                   <MenuItem active>My Details </MenuItem>
+                </>
+              )}
+              {user.role === "USER" && (
+                <>
+                  <MenuItem active>My Details</MenuItem>
+                  <MenuItem component={<Link to="/Resources" />}>
+                    My Requests
+                  </MenuItem>
                 </>
               )}
             </Menu>
@@ -336,7 +461,9 @@ const MyDetails = () => {
               >
                 <h2>{userDetails?.employeeName}</h2>
                 <p>
-                  {role === "MANAGER" && role === "ADMIN"
+                  {role === "ADMIN"
+                    ? "ADMIN"
+                    : role === "MANAGER"
                     ? "TEAM MANAGER"
                     : role === "USER"
                     ? "EMPLOYEE"
@@ -401,8 +528,11 @@ const MyDetails = () => {
                         onChange={handleInputChange}
                       />
                     </Space.Compact>
+                  ) : userDetails?.phoneNumber &&
+                    userDetails.phoneNumber.trim() !== "" ? (
+                    userDetails.phoneNumber
                   ) : (
-                    userDetails?.phoneNumber
+                    "N/A"
                   )}
                 </p>
               </div>
@@ -423,7 +553,10 @@ const MyDetails = () => {
                 </p>
                 <p>
                   <span className="label">Current IBU: </span>
-                  {userDetails?.departmentName ?? "N/A"}
+                  {userDetails?.departmentName &&
+                  userDetails.departmentName.trim() !== ""
+                    ? userDetails.departmentName
+                    : "N/A"}
                 </p>
               </div>
               <div className="user-section right-align">
@@ -431,21 +564,38 @@ const MyDetails = () => {
                   <span className="label">Password: </span>
                   {isEditing ? (
                     <>
-                      <input
-                        type="text"
+                      <Input.Password
                         value={editedPassword}
                         onChange={(e) => setEditedPassword(e.target.value)}
-                        style={{ marginRight: "5px" }}
+                        style={{ marginRight: "5px", width: 200 }}
                       />
-                      <FaSave
+                      <SaveTwoTone
                         onClick={handleSaveClick}
-                        style={{ cursor: "pointer", color: "green" }}
+                        style={{
+                          cursor: "pointer",
+                          color: "green",
+                          fontSize: "22px",
+                          fontWeight: "bold",
+                        }}
                         title="Save"
+                      />
+                      <UndoOutlined
+                        style={{
+                          marginLeft: "10px",
+                          cursor: "pointer",
+                          color: "red",
+                          fontSize: "22px",
+                          fontWeight: "bold",
+                        }}
+                        onClick={() => {
+                          setEditedPassword(currentPassword);
+                          setIsEditing(false);
+                        }}
                       />
                     </>
                   ) : (
                     <>
-                      {"•".repeat(password.length)}
+                      ........
                       <FaPen
                         onClick={handleEditClick}
                         style={{ marginLeft: "10px", cursor: "pointer" }}
@@ -491,13 +641,16 @@ const MyDetails = () => {
               <div className="user-section">
                 <p>
                   <span className="label">Employee Number: </span>
-                  {userDetails?.id ?? "N/A"}
+                  {userDetails?.employeeId ?? "N/A"}
                 </p>
               </div>
               <div className="user-section">
                 <p>
                   <span className="label">Project Code: </span>
-                  {userDetails?.projectCode ?? "N/A"}
+                  {userDetails?.projectCode &&
+                  userDetails.projectCode.trim() !== ""
+                    ? userDetails.projectCode
+                    : "N/A"}
                 </p>
               </div>
               <div className="user-section right-align">
@@ -580,8 +733,11 @@ const MyDetails = () => {
                         onChange={handleInputChange}
                       />
                     </Space.Compact>
+                  ) : userDetails?.permanentAddress &&
+                    userDetails.permanentAddress.trim() !== "" ? (
+                    userDetails.permanentAddress
                   ) : (
-                    userDetails?.permanentAddress ?? "N/A"
+                    "N/A"
                   )}
                 </p>
 
@@ -595,8 +751,11 @@ const MyDetails = () => {
                         onChange={handleInputChange}
                       />
                     </Space.Compact>
+                  ) : userDetails?.localAddress &&
+                    userDetails.localAddress.trim() !== "" ? (
+                    userDetails.localAddress
                   ) : (
-                    userDetails?.localAddress ?? "N/A"
+                    "N/A"
                   )}
                 </p>
               </div>
@@ -604,24 +763,76 @@ const MyDetails = () => {
                 <p>
                   <span className="label">Passport No: </span>
 
-                  {userDetails?.passportNo ?? "N/A"}
+                  {editMode ? (
+                    <Space.Compact>
+                      <Input
+                        name="passportNo"
+                        value={editValues.passportNo}
+                        onChange={handleInputChange}
+                      />
+                    </Space.Compact>
+                  ) : userDetails?.passportNo &&
+                    userDetails.passportNo.trim() !== "" ? (
+                    userDetails.passportNo
+                  ) : (
+                    "N/A"
+                  )}
                 </p>
                 <p>
                   <span className="label">Passport Office: </span>
 
-                  {userDetails?.passportOffice ?? "N/A"}
+                  {editMode ? (
+                    <Space.Compact>
+                      <Input
+                        name="passportOffice"
+                        value={editValues.passportOffice}
+                        onChange={handleInputChange}
+                      />
+                    </Space.Compact>
+                  ) : userDetails?.passportOffice &&
+                    userDetails.passportOffice.trim() !== "" ? (
+                    userDetails.passportOffice
+                  ) : (
+                    "N/A"
+                  )}
                 </p>
               </div>
               <div className="user-section right-align">
                 <p>
                   <span className="label">Issue Date: </span>
 
-                  {userDetails?.passportIssueDate ?? "N/A"}
+                  {editMode ? (
+                    <Space.Compact>
+                      <Input
+                        name="passportIssueDate"
+                        value={editValues.passportIssueDate}
+                        onChange={handleInputChange}
+                      />
+                    </Space.Compact>
+                  ) : userDetails?.passportIssueDate &&
+                    userDetails.passportIssueDate.trim() !== "" ? (
+                    userDetails.passportIssueDate
+                  ) : (
+                    "N/A"
+                  )}
                 </p>
                 <p>
                   <span className="label">Expiry Date: </span>
 
-                  {userDetails?.passportExpiryDate ?? "N/A"}
+                  {editMode ? (
+                    <Space.Compact>
+                      <Input
+                        name="passportExpiryDate"
+                        value={editValues.passportExpiryDate}
+                        onChange={handleInputChange}
+                      />
+                    </Space.Compact>
+                  ) : userDetails?.passportExpiryDate &&
+                    userDetails.passportExpiryDate.trim() !== "" ? (
+                    userDetails.passportExpiryDate
+                  ) : (
+                    "N/A"
+                  )}
                 </p>
               </div>
             </div>
@@ -667,7 +878,10 @@ const MyDetails = () => {
               <div className="user-section">
                 <p>
                   <span className="label">Manager Name: </span>
-                  {userDetails?.managerName ?? "N/A"}
+                  {userDetails?.managerName &&
+                  userDetails.managerName.trim() !== ""
+                    ? userDetails.managerName
+                    : "N/A"}
                 </p>
               </div>
 
@@ -675,7 +889,10 @@ const MyDetails = () => {
                 <p>
                   <span className="label">Manager Email: </span>
 
-                  {userDetails?.managerEmail ?? "N/A"}
+                  {userDetails?.managerEmail &&
+                  userDetails.managerEmail.trim() !== ""
+                    ? userDetails.managerEmail
+                    : "N/A"}
                 </p>
               </div>
             </div>
@@ -714,14 +931,13 @@ const MyDetails = () => {
             </div>
             <div
               style={{
-                display: "flex",
                 flexWrap: "wrap", //  allows wrapping on smaller screens
                 justifyContent: "space-between",
                 alignItems: "center",
                 gap: "10px",
               }}
             >
-              {userDetails?.previousJobs?.map((job, index) => (
+              {previousJobs?.map((job, index) => (
                 <div
                   key={index}
                   style={{
@@ -729,16 +945,24 @@ const MyDetails = () => {
                     borderRadius: "8px",
                     padding: "15px",
                     backgroundColor: "#fafafa",
+                    marginBottom: "30px",
                   }}
                 >
                   <p>
-                    <strong>Organization:</strong>{" "}
+                    <strong>Organization:</strong>
+                    {" " + job?.orgName || "N/A"}
                   </p>
                   <p>
-                    <strong>Duration:</strong>{" "}
+                    <strong>Duration:</strong>
+                    {" " + job?.duration || "N/A"}
                   </p>
                   <p>
-                    <strong>Designation:</strong>{" "}
+                    <strong>Designation:</strong>
+                    {" " + job?.designation || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Description:</strong>
+                    {" " + job?.description || "N/A"}
                   </p>
                 </div>
               ))}
@@ -776,8 +1000,10 @@ const MyDetails = () => {
             size="large"
             placeholder="Organization Name"
             prefix={<UserOutlined />}
-            value={orgname}
-            onChange={(e) => setOrgName(e.target.value)}
+            value={newJob.orgName}
+            onChange={(e) =>
+              setNewJob((prev) => ({ ...prev, orgName: e.target.value }))
+            }
           />
         </div>
 
@@ -798,8 +1024,10 @@ const MyDetails = () => {
             size="large"
             placeholder="Duration (e.g., 2 years)"
             prefix={<UserOutlined />}
-            value={duration}
-            onChange={(e) => setJobDuration(e.target.value)}
+            value={newJob.duration}
+            onChange={(e) =>
+              setNewJob((prev) => ({ ...prev, duration: e.target.value }))
+            }
           />
         </div>
 
@@ -820,8 +1048,34 @@ const MyDetails = () => {
             size="large"
             placeholder="Designation"
             prefix={<UserOutlined />}
-            value={designation}
-            onChange={(e) => setDesignation(e.target.value)}
+            value={newJob.designation}
+            onChange={(e) =>
+              setNewJob((prev) => ({ ...prev, designation: e.target.value }))
+            }
+          />
+        </div>
+
+        <div
+          style={{
+            marginTop: "20px",
+          }}
+        >
+          <label
+            style={{
+              fontSize: "20px",
+              fontWeight: "bold",
+            }}
+          >
+            Description
+          </label>
+          <Input
+            size="large"
+            placeholder="Description"
+            prefix={<UserOutlined />}
+            value={newJob.description}
+            onChange={(e) =>
+              setNewJob((prev) => ({ ...prev, description: e.target.value }))
+            }
           />
         </div>
       </Modal>

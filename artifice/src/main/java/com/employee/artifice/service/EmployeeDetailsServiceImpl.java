@@ -69,8 +69,8 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
         existingDetails.setPassportIssueDate(details.getPassportIssueDate());
         existingDetails.setPassportExpiryDate(details.getPassportExpiryDate());
         existingDetails.setPassportOffice(details.getPassportOffice());
-        existingDetails.setDepartment(details.getDepartment());
-        existingDetails.setProject(details.getProject());
+        existingDetails.setDepartment(existingDetails.getDepartment());
+        existingDetails.setProject(existingDetails.getProject());
         existingDetails.setPosition(details.getPosition());
         return Optional.of(detailsRepository.save(existingDetails));
     }
@@ -200,5 +200,36 @@ public class EmployeeDetailsServiceImpl implements EmployeeDetailsService{
                 employeeToUpdate.getUser().getId(),
                 employeeToUpdate.getManager() != null ? employeeToUpdate.getManager().getEmail() : ""
         ));
+    }
+    @Override
+    public Optional<CustomEmployeeDetails> getCustomDetailsByEmployeeId(Long employeeId) {
+        return detailsRepository.findById(employeeId)
+                .map(details -> new CustomEmployeeDetails(
+                        details.getCurrentLocation(),
+                        details.getPermanentAddress(),
+                        details.getLocalAddress(),
+                        details.getPassportNo(),
+                        details.getPhoneNumber(),
+                        details.getYearsOfExperience(),
+                        details.getPassportIssueDate(),
+                        details.getPassportExpiryDate(),
+                        details.getPassportOffice(),
+                        details.getDepartment() != null ? details.getDepartment().getId() : null,
+                        details.getProject() != null ? details.getProject().getId() : null,
+                        details.getDepartment() != null ? details.getDepartment().getDepartment_name() : "",
+                        details.getProject() != null ? details.getProject().getProject_code() : "",
+                        details.getUser().getEmail(),
+                        details.getManager() != null ? details.getManager().getId() : null,
+                        details.getManager() != null ? details.getManager().getEmployeeDetails().getEmployeeName() : "",
+                        details.getEmployeeName(),
+                        details.getUser().getId(),
+                        details.getManager() != null ? details.getManager().getEmail() : ""
+                ));
+    }
+
+    @Override
+    public Optional<EmployeeDetails> getEmployeeName() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return detailsRepository.findByUserEmail(email);
     }
 }

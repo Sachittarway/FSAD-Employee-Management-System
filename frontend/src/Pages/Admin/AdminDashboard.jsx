@@ -3,6 +3,7 @@ import { Avatar,Dropdown } from "antd";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import {UserOutlined,BarChartOutlined,CheckCircleOutlined,ClockCircleOutlined} from "@ant-design/icons";
 import { Link } from 'react-router-dom' ;
+import React, { useEffect, useState } from 'react';
 
 const CardItem = ({ title, value, icon, trend, onClick }) => (
     <div className="card" onClick={onClick}>
@@ -16,7 +17,62 @@ const CardItem = ({ title, value, icon, trend, onClick }) => (
 
 
 const AdminDashboard = () =>{
+
+    const [dashboardDetails, setDashboardDetails] = useState({
+        employeeCount: 0,
+        managerCount: 0,
+        departmentCount: 0,
+        totalRequestCount: 0,
+        approvedRequestCount: 0,
+        pendingRequestCount: 0
+    });
+    const [employeeName, setEmployeeName] = useState("");
     
+    useEffect(() => {
+        fetchDashboardDetails();
+        fetchEmployeeName();
+    }, []);
+
+    const fetchDashboardDetails = async () => {
+        try {
+            const response = await fetch('http://localhost:8081/admin/dashboardCounts', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch dashboard details');
+            }
+            const data = await response.json();
+            setDashboardDetails(data);
+        } catch (error) {
+            console.error('Error fetching dashboard details:', error);
+        }
+    };
+
+    const fetchEmployeeName = async () => {
+        console.log("Fetching employee name...");
+        try {
+            const response = await fetch('http://localhost:8081/common/getEmployeeName', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch employee name');
+            }
+            const data = await response.json();
+            setEmployeeName(data.name);
+        } catch (error) {
+            console.error('Error fetching employee name:', error);
+        }
+    }
 
     const items = [
         {
@@ -29,32 +85,32 @@ const AdminDashboard = () =>{
     const cards = [
         {
           title: 'All Employees',
-          value: 15,
+          value: dashboardDetails.employeeCount || 0,
           icon: <UserOutlined style={{ color: '#888' }} />,
         },
         {
             title: 'All Managers',
-            value: 15,
+            value: dashboardDetails.managerCount || 0,
             icon: <UserOutlined style={{ color: '#888' }} />,
         },
         {
             title: 'All Departments',
-            value: 15,
+            value: dashboardDetails.departmentCount || 0,
             icon: <BarChartOutlined style={{ color: '#888' }} />,
         },
         {
           title: 'All Requests',
-          value: 3,
+          value: dashboardDetails.totalRequestCount || 0,
           icon: <BarChartOutlined style={{ color: '#888' }} />,
         },
         {
           title: 'Approved Requests',
-          value: 10,
+          value: dashboardDetails.approvedRequestCount || 0,
           icon: <CheckCircleOutlined style={{ color: '#888' }} />,
         },
         {
           title: 'Pending Requests',
-          value: 25,
+          value: dashboardDetails.pendingRequestCount || 0,
           icon: <ClockCircleOutlined style={{ color: '#888' }} />,
         }
     ];
@@ -65,7 +121,7 @@ const AdminDashboard = () =>{
             {/* Top Navbar Starts from here !!! */}
             <div className="top_navbar">
                 <div className="left-div">
-                    <span className="brand_name">My App</span>
+                    <span className="brand_name">ArtifexOne</span>
                 </div>
 
                 <div className="right-div">
@@ -119,7 +175,7 @@ const AdminDashboard = () =>{
         
                 {/* Main content Starts here !!! */}
                 <div className="employee-content">
-                    <div className="hello">Hi, Sachit Tarway 👋</div>
+                    <div className="hello">Hi, {employeeName} 👋</div>
 
                     <div style={{
                         width:"100%"

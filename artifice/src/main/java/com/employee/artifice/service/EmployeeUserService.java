@@ -3,10 +3,10 @@ package com.employee.artifice.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.employee.artifice.dto.GetEmployeeList;
 import org.springframework.stereotype.Service;
 
 import com.employee.artifice.dto.CreateUser;
+import com.employee.artifice.dto.GetEmployeeList;
 import com.employee.artifice.model.EmployeeUser;
 
 @Service
@@ -30,5 +30,6 @@ public interface EmployeeUserService {
 
 
     public List<GetEmployeeList> getEmployeeListByRole (String role);
+    public Optional<String> getRoleByEmployeeId(Long employeeId);
 
 }

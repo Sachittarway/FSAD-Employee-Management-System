@@ -33,4 +33,13 @@ public class ResourceRequestServiceImpl implements ResourceRequestService{
     public List<ResourceRequest> getRequestsByEmployeeEmail(String employeeEmail) {
         return resourceRequestRepository.findByEmployeeEmail(employeeEmail);
     }
+
+    @Override
+    public ResourceRequest updateRequestStatus(Long requestId) {
+        ResourceRequest request = resourceRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Resource request not found with id: " + requestId));
+
+        request.setAccept(!request.getAccept());
+        return resourceRequestRepository.save(request);
+    }
 }
