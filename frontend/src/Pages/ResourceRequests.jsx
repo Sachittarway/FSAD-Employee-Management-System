@@ -36,7 +36,7 @@ const ResourceRequests = () => {
   const fetchResourceRequests = async () => {
     if(user.role === "USER") {
         try {
-            const response = await fetch("http://localhost:8081/user/resourceRequests", {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user/resourceRequests`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -55,7 +55,7 @@ const ResourceRequests = () => {
     }
     else if(user.role === "MANAGER"){
         try {
-            const response = await fetch("http://localhost:8081/manager/resourceRequests", {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}manager/resourceRequests`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -74,7 +74,7 @@ const ResourceRequests = () => {
     }
     else{
         try {
-            const response = await fetch("http://localhost:8081/admin/resourceRequests", {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}admin/resourceRequests`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -169,7 +169,7 @@ console.log("Resource Requests:", confirmStatusRecord);
         return;
     }
     try{
-        const response = await fetch("http://localhost:8081/user/createResourceRequest", {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}user/createResourceRequest`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -201,7 +201,7 @@ console.log("Resource Requests:", confirmStatusRecord);
 
     const handleConfirmOk = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/manager/resourceRequest/${confirmStatusRecord.id}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}manager/resourceRequest/${confirmStatusRecord.id}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

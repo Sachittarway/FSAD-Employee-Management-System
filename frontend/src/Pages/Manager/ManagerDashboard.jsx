@@ -35,7 +35,7 @@ const ManagerDashboard = () =>{
     
         const fetchDashboardDetails = async () => {
             try {
-                const response = await fetch('http://localhost:8081/manager/dashboardCounts', {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}manager/dashboardCounts`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ const ManagerDashboard = () =>{
         };
     const fetchEmployeeName = async () => {
         try {
-            const response = await fetch('http://localhost:8081/common/getEmployeeName', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/getEmployeeName`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

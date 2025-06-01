@@ -76,7 +76,7 @@ const Departments = () => {
   }, []);
   const fetchDepartmentData = async () => {
     try {
-      const res = await fetch('http://localhost:8081/common/departments', {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/departments`, {
       method: 'GET',
       headers: { 
         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -94,7 +94,7 @@ const Departments = () => {
 
   const fetchProjectData = async (departmentId) => {
     try {
-      const res = await fetch(`http://localhost:8081/common/project/department/${departmentId}`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/project/department/${departmentId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -121,7 +121,7 @@ const Departments = () => {
       return;
     }
     try {
-      const res = await fetch('http://localhost:8081/admin/createDepartment', {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}admin/createDepartment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ const Departments = () => {
       return;
     }
     try {
-      const response = await fetch('http://localhost:8081/admin/createProject', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}admin/createProject`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -204,7 +204,7 @@ const Departments = () => {
 
   const onSearchDepartments = async () => {
     try{
-      const response = await fetch(`http://localhost:8081/common/searchDepartments?name=${searchText}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/searchDepartments?name=${searchText}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

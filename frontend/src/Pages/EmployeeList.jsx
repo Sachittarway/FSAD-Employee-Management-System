@@ -50,7 +50,7 @@ const EmployeeList = () => {
 
   const fetchEmployeeList = async () => {
     try {
-      const res = await fetch("http://localhost:8081/common/employeeList", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/employeeList`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +76,7 @@ const EmployeeList = () => {
 
   const fetchDepartmentList = async () => {
     try {
-      const res = await fetch("http://localhost:8081/common/departments", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/departments`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -101,7 +101,7 @@ const EmployeeList = () => {
 
   const fetchCountryList = async () => {
     try {
-      const res = await fetch("http://localhost:8081/common/getCountryList", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/getCountryList`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -259,7 +259,7 @@ const EmployeeList = () => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:8081/admin/register", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}admin/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -336,7 +336,7 @@ const EmployeeList = () => {
   const fetchEmployeeListByDepartment = async (departmentId) => {
     try {
       const response = await fetch(
-        `http://localhost:8081/common/searchEmployeesByDepartmentId?departmentId=${departmentId}`,
+        `${process.env.REACT_APP_BACKEND_URL}common/searchEmployeesByDepartmentId?departmentId=${departmentId}`,
         {
           method: "GET",
           headers: {
@@ -367,7 +367,7 @@ const EmployeeList = () => {
   const fetchEmployeeListByRole = async (role) => {
     try {
       const response = await fetch(
-        `http://localhost:8081/common/getEmployeeByRole?role=${role}`,
+        `${process.env.REACT_APP_BACKEND_URL}common/getEmployeeByRole?role=${role}`,
         {
           method: "GET",
           headers: {
@@ -398,7 +398,7 @@ const EmployeeList = () => {
   const fetchEmployeeListByLocation = async (countryName) => {
     try {
       const response = await fetch(
-        `http://localhost:8081/common/getEmployeeDetailsByCurrentLocation?currentLocation=${countryName}`,
+        `${process.env.REACT_APP_BACKEND_URL}common/getEmployeeDetailsByCurrentLocation?currentLocation=${countryName}`,
         {
           method: "GET",
           headers: {
@@ -442,7 +442,7 @@ const EmployeeList = () => {
   const onSearchFilter =  async() =>{
     const filter = disabledKeys[0];
     try{
-      const response = await fetch(`http://localhost:8081/common/searchUsers?${filter}=${searchText}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/searchUsers?${filter}=${searchText}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

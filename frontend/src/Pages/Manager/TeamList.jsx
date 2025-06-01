@@ -28,7 +28,7 @@ const TeamList = () => {
 
   const fetchTeamEmployeeList = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/manager/myTeam?name=${searchInput}`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}manager/myTeam?name=${searchInput}`, {
         method: 'GET',
         headers: { 
           'Content-Type': 'application/json',

@@ -56,7 +56,7 @@ const MyDetails = () => {
   const fetchUserDetails = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8081/common/getEmployeeDetailsByEmail",
+        `${process.env.REACT_APP_BACKEND_URL}common/getEmployeeDetailsByEmail`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -78,7 +78,7 @@ const MyDetails = () => {
 
   const fetchCountryList = async () => {
     try {
-      const res = await fetch("http://localhost:8081/common/getCountryList", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/getCountryList`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -111,7 +111,7 @@ const MyDetails = () => {
   const fetchPreviousJobDetails = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8081/employees/pre-employment-details",
+        `${process.env.REACT_APP_BACKEND_URL}employees/pre-employment-details`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -175,7 +175,7 @@ const MyDetails = () => {
   const updatePassword = async (newPassword) => {
     try {
       const response = await fetch(
-        "http://localhost:8081/common/updatePassword",
+        `${process.env.REACT_APP_BACKEND_URL}common/updatePassword`,
         {
           method: "POST",
           headers: {
@@ -203,7 +203,7 @@ const MyDetails = () => {
 
   const handleEditProfileClick = async() => {
     if (editMode) {
-      const response = await fetch("http://localhost:8081/common/updateDetails", {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/updateDetails`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -286,7 +286,7 @@ const MyDetails = () => {
     try {
       // Make API call to add new job
       const res = await fetch(
-        "http://localhost:8081/employees/pre-employment-details",
+        `${process.env.REACT_APP_BACKEND_URL}employees/pre-employment-details`,
         {
           method: "POST",
           headers: {

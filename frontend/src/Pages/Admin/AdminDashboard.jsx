@@ -35,7 +35,7 @@ const AdminDashboard = () =>{
 
     const fetchDashboardDetails = async () => {
         try {
-            const response = await fetch('http://localhost:8081/admin/dashboardCounts', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}admin/dashboardCounts`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ const AdminDashboard = () =>{
     const fetchEmployeeName = async () => {
         console.log("Fetching employee name...");
         try {
-            const response = await fetch('http://localhost:8081/common/getEmployeeName', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/getEmployeeName`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

@@ -60,7 +60,7 @@ const UserDetails = () => {
   const fetchRoleById = async (employeeId) => {
     try {
       const response = await fetch(
-        `http://localhost:8081/common/getEmployeeRoleById/${employeeId}`,
+        `${process.env.REACT_APP_BACKEND_URL}common/getEmployeeRoleById/${employeeId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -85,7 +85,7 @@ const UserDetails = () => {
   const fetchUserDetailsById = async (employeeiId) => {
     try {
       const response = await fetch(
-        `http://localhost:8081/common/getEmployeeDetailsById/${employeeId}`,
+        `${process.env.REACT_APP_BACKEND_URL}common/getEmployeeDetailsById/${employeeId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -106,7 +106,7 @@ const UserDetails = () => {
 
   const fetchCountryList = async () => {
     try {
-      const res = await fetch("http://localhost:8081/common/getCountryList", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/getCountryList`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -131,7 +131,7 @@ const UserDetails = () => {
 
   const fetchDepartmentList = async () => {
     try {
-      const res = await fetch("http://localhost:8081/common/departments", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/departments`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -160,7 +160,7 @@ const UserDetails = () => {
     
     try {
       const response = await fetch(
-        `http://localhost:8081/common/project/department/${departmentId}`,
+        `${process.env.REACT_APP_BACKEND_URL}common/project/department/${departmentId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -189,7 +189,7 @@ const UserDetails = () => {
     }
     try {
       const response = await fetch(
-        `http://localhost:8081/employees/pre-employment-details/${employeeId}`,
+        `${process.env.REACT_APP_BACKEND_URL}employees/pre-employment-details/${employeeId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -217,7 +217,7 @@ const UserDetails = () => {
   const handleEditProfileClick = async () => {
     if (editMode) {
       try {
-        const response = await fetch("http://localhost:8081/manager/updateTeam",
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}manager/updateTeam`,
           {
             method: "PATCH",
             headers: {
@@ -257,7 +257,7 @@ const UserDetails = () => {
   */
   const handleAssignManager = async () => {
     try{
-      const response = await fetch(`http://localhost:8081/manager/updateManager/${employeeId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}manager/updateManager/${employeeId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
