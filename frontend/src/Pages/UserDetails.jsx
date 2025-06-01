@@ -446,17 +446,22 @@ const UserDetails = () => {
                     : "N/A"}
                 </p>
               </div>
-              <div>
-                <Button
-                  type="primary"
-                  className="add-employee"
-                  size="large"
-                  onClick={handleEditProfileClick}
-                  loading={saveLoading}
-                >
-                  {editMode ? "Save" : "Edit Profile"}
-                </Button>
-              </div>
+              {
+                myrole === "MANAGER" && (
+                   <div>
+                    <Button
+                      type="primary"
+                      className="add-employee"
+                      size="large"
+                      onClick={handleEditProfileClick}
+                      loading={saveLoading}
+                    >
+                      {editMode ? "Save" : "Edit Profile"}
+                    </Button>
+                  </div>
+                )
+              }
+             
             </div>
           </div>
 
@@ -790,11 +795,6 @@ const UserDetails = () => {
               </div>
             </div>
           </div>
-                </>
-              )
-          }
-          
-
           <div
             style={{
               backgroundColor: "white",
@@ -857,6 +857,12 @@ const UserDetails = () => {
               ))}
             </div>
           </div>
+                </>
+              )
+          }
+          
+
+          
 
           {/* Start your from here !!!!!!! */}
         </div>

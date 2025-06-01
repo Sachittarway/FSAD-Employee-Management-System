@@ -293,17 +293,6 @@ const Departments = () => {
         
         {/* Main content Starts here !!! */}
         <div className="employee-content">
-          {
-            isLoading ? 
-              <Spin size="large" style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)'
-              }}/>
-            :
-            (
-              <>
                 <div
                   style={{
                     width: "100%",
@@ -353,19 +342,28 @@ const Departments = () => {
                 </div>
 
                 {/* Table Content Starts from here!!!!! */}
-                <div style={{
-                  width:"100%",
-                  marginTop:"20px",
-                }}>
-                  <Table 
-                    columns={columns} 
-                    dataSource={departmentData} 
-                    className="custom-ant-table"
-                  />
-                </div>
-              </>
-            )
-          }
+                {
+                  isLoading ?
+                    <Spin size="large" style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)'
+                    }}/>
+                    :(
+                      <div style={{
+                        width:"100%",
+                        marginTop:"20px",
+                      }}>
+                        <Table 
+                          columns={columns} 
+                          dataSource={departmentData} 
+                          className="custom-ant-table"
+                        />
+                      </div>
+                    )
+                }
+                
         </div>
         {/* Main content Ends here !!! */}
 
