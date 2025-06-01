@@ -4,9 +4,10 @@ import { Avatar, Dropdown, Select } from "antd";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
 import { useAuth } from "../Auth/AuthContext";
-import { Button, Input, Space } from "antd";
+import { Button, Spin} from "antd";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { notification } from "antd";
 
 const UserDetails = () => {
   const items = [
@@ -31,12 +32,26 @@ const UserDetails = () => {
   const [projectCodeList, setProjectCodeList] = useState([]);
   const [previousJobs, setPreviousJobs] = useState([]);
   const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const[assignManagerLoading,setAssignManagerLoading] = useState(false);
   const [teamValues, setTeamValues] = useState({
     departmentId: null,
     projectId: null
   });
 
   const myrole = user.role;
+
+  const [api, contextHolder] = notification.useNotification();
+  const openNotification = (pauseOnHover, type, message, description) => () => {
+    api.open({
+      message,
+      description,
+      showProgress: true,
+      pauseOnHover,
+      type,
+    });
+  };
 
 
   const handleManagerInputChange = (e) => {
@@ -83,6 +98,7 @@ const UserDetails = () => {
   };
 
   const fetchUserDetailsById = async (employeeiId) => {
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}common/getEmployeeDetailsById/${employeeId}`,
@@ -101,6 +117,9 @@ const UserDetails = () => {
       setUserDetails(data);
     } catch (error) {
       console.error("Error fetching user details:", error);
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -156,8 +175,6 @@ const UserDetails = () => {
  
 
   const fetchProjectCodes = async (departmentId) => {
-    console.log("department Id:", departmentId);
-    
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}common/project/department/${departmentId}`,
@@ -216,6 +233,7 @@ const UserDetails = () => {
   */
   const handleEditProfileClick = async () => {
     if (editMode) {
+      setSaveLoading(true);
       try {
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}manager/updateTeam`,
           {
@@ -239,14 +257,24 @@ const UserDetails = () => {
           return;
         }
         const data = await response.json();
-        console.log("Team details updated successfully", data);
         setEditMode(false);
         fetchUserDetailsById(employeeId);
-        alert("Profile updated successfully!");
+        openNotification(
+          false,
+          "success",
+          "Profile updated successfully",
+          "Your profile has been updated."
+        )();
       } catch (error) {
         console.error("Error updating team details:", error);
-        alert("Failed to update profile. Please try again.");
+        openNotification(
+          false,
+          "error",
+          "Failed to update profile",
+          "Please try again later."
+        )();
       }
+      setSaveLoading(false);
     } else {
       setEditMode(true);
     }
@@ -256,6 +284,7 @@ const UserDetails = () => {
     Assign manager to the employee
   */
   const handleAssignManager = async () => {
+    setAssignManagerLoading(true);
     try{
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}manager/updateManager/${employeeId}`, {
         method: "PATCH",
@@ -268,17 +297,27 @@ const UserDetails = () => {
         throw new Error("Failed to assign manager");
       }
       const data = await response.json();
-      console.log("Manager assigned successfully", data);
       fetchUserDetailsById(employeeId); 
-      alert("Manager assigned successfully!");
+      openNotification(
+        false,
+        "success",
+        "Manager assigned successfully",
+        "The manager has been assigned to the employee."
+      )();
     } catch (error) {
-      console.error("Error assigning manager:", error);
-      alert("Failed to assign manager. Please try again.");
+      openNotification(
+        false,
+        "error",
+        "Failed to assign manager",
+        "Please try again later."
+      )();
     }
+    setAssignManagerLoading(false);
   }
-  
+
   return (
     <div className="mydetails">
+      {contextHolder}
       {/* Top Navbar Starts from here !!! */}
       <div className="top_navbar">
         <div className="left-div">
@@ -363,7 +402,17 @@ const UserDetails = () => {
 
         {/* Main content Starts here !!! */}
         <div className="employee-content">
-          <div
+          {
+            loading ? 
+              <Spin size="large" style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)'
+              }}/>:
+              (
+                <>
+                  <div
             style={{
               // backgroundColor: "white",
               padding: "20px",
@@ -403,6 +452,7 @@ const UserDetails = () => {
                   className="add-employee"
                   size="large"
                   onClick={handleEditProfileClick}
+                  loading={saveLoading}
                 >
                   {editMode ? "Save" : "Edit Profile"}
                 </Button>
@@ -702,7 +752,7 @@ const UserDetails = () => {
             {
               user.role === "MANAGER" && (
                 <div>
-                  <Button type="primary" onClick={handleAssignManager}>Assign Me</Button>
+                  <Button type="primary" onClick={handleAssignManager} loading={assignManagerLoading}>Assign Me</Button>
                 </div>
               )
             }
@@ -740,6 +790,10 @@ const UserDetails = () => {
               </div>
             </div>
           </div>
+                </>
+              )
+          }
+          
 
           <div
             style={{

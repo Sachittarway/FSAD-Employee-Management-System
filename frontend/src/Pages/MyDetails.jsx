@@ -8,7 +8,7 @@ import { UserOutlined, UndoOutlined, SaveTwoTone } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Input } from "antd";
 import { FaPen, FaSave } from "react-icons/fa";
-import { notification } from "antd";
+import { notification,Spin } from "antd";
 
 const MyDetails = () => {
   const { user } = useAuth();
@@ -35,6 +35,8 @@ const MyDetails = () => {
   const [duration, setJobDuration] = useState("");
   const [designation, setDesignation] = useState("");
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saveLoading, setSaveLoading] = useState(false);
   const [newJob, setNewJob] = useState({
     orgName: "",
     designation: "",
@@ -54,6 +56,7 @@ const MyDetails = () => {
   // Fetch user details once on mount
 
   const fetchUserDetails = async () => {
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}common/getEmployeeDetailsByEmail`,
@@ -73,6 +76,8 @@ const MyDetails = () => {
       setUserDetails(data);
     } catch (error) {
       console.error("Error fetching user details:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -191,9 +196,9 @@ const MyDetails = () => {
       }
 
       const data = await response.text();
-      console.log("Password updated:", data);
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      localStorage.removeItem("role");
+      window.location.href = "/";
       return data;
     } catch (error) {
       console.error("Error updating password:", error);
@@ -203,6 +208,7 @@ const MyDetails = () => {
 
   const handleEditProfileClick = async() => {
     if (editMode) {
+      setSaveLoading(true);
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/updateDetails`, {
         method: "PUT",
         headers: {
@@ -240,6 +246,7 @@ const MyDetails = () => {
         "Profile Updated",
         "Your profile has been successfully updated."
       )();
+      setSaveLoading(false);
     } else {
       // Enter edit mode
       setEditMode(true);
@@ -330,6 +337,7 @@ const MyDetails = () => {
   return (
     <div className="mydetails">
       {/* Top Navbar Starts from here !!! */}
+      {contextHolder}
       <div className="top_navbar">
         <div className="left-div">
           <span className="brand_name">ArtifexOne</span>
@@ -342,8 +350,8 @@ const MyDetails = () => {
               onClick: ({ key }) => {
                 if (key === "1") {
                   localStorage.removeItem("token");
-                  localStorage.removeItem("user");
-                  window.location.reload();
+                  localStorage.removeItem("role");
+                  window.location.href = "/";
                 }
               },
             }}
@@ -434,7 +442,16 @@ const MyDetails = () => {
 
         {/* Main content Starts here !!! */}
         <div className="employee-content">
-          <div
+          {
+            loading ? <Spin size="large" style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)'
+                        }}/>:
+                        (
+                          <>
+                            <div
             style={{
               // backgroundColor: "white",
               padding: "20px",
@@ -476,6 +493,7 @@ const MyDetails = () => {
                   className="add-employee"
                   size="large"
                   onClick={handleEditProfileClick}
+                  loading={saveLoading}
                 >
                   {editMode ? "Save" : "Edit Profile"}
                 </Button>
@@ -969,7 +987,10 @@ const MyDetails = () => {
             </div>
           </div>
 
-          {/* Start your from here !!!!!!! */}
+                          </>
+                        )
+          }
+          
         </div>
         {/* Main content Ends here !!! */}
       </div>

@@ -1,7 +1,7 @@
 import "./ResourceRequests.css";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import { Link } from 'react-router-dom';
-import { Table,Space, Button, Avatar,Dropdown,Tag,Input,Modal} from "antd";
+import { Table,Space, Button, Avatar,Dropdown,Tag,Input,Modal,Spin} from "antd";
 import {CheckOutlined} from "@ant-design/icons";
 import { useAuth } from "../Auth/AuthContext";
 import { useEffect, useState } from "react";
@@ -14,6 +14,9 @@ const ResourceRequests = () => {
     const [resourceRequests, setResourceRequests] = useState([]);
     const [isModalConfirmOpen, setIsModalConfirmOpen] = useState(false);
     const [confirmStatusRecord, setConfirmStatusRecord] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [acceptLoading, setAcceptLoading] = useState(false);
+    const [addLoading,setAddLoading] = useState(false);
     const [resourceItem, setResourceItem] = useState({
         item: "",
         message: "",
@@ -35,8 +38,9 @@ const ResourceRequests = () => {
     
   const fetchResourceRequests = async () => {
     if(user.role === "USER") {
+        setIsLoading(true);
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user/resourceRequests`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}user/resourceRequests`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -52,8 +56,13 @@ const ResourceRequests = () => {
         } catch (error) {
             openNotification(true, "error", "Error", "An error occurred while fetching resource requests. Please try again later.");
         }
+        finally {
+            setIsLoading(false);
+        }
+        
     }
     else if(user.role === "MANAGER"){
+        setIsLoading(true);
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}manager/resourceRequests`, {
                 method: "GET",
@@ -70,9 +79,12 @@ const ResourceRequests = () => {
             }
         } catch (error) {
             openNotification(true, "error", "Error", "An error occurred while fetching resource requests. Please try again later.");
+        } finally {
+            setIsLoading(false);
         }
     }
     else{
+        setIsLoading(true);
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}admin/resourceRequests`, {
                 method: "GET",
@@ -89,6 +101,8 @@ const ResourceRequests = () => {
             }
         } catch (error) {
             openNotification(true, "error", "Error", "An error occurred while fetching resource requests. Please try again later.");
+        } finally {
+            setIsLoading(false);
         }
     }
   };
@@ -101,64 +115,64 @@ const ResourceRequests = () => {
     },
   ];
       /* Table Columns!!! */ 
-const columns = [
-    {
-        title: "Resource ID",
-        dataIndex: "id",
-        key: "id",
-        render: (text) => <a>{text}</a>,
-    },
-    {
-        title: "Email",
-        dataIndex: "employeeEmail",
-        key: "employeeEmail",
-    },
-    {
-            title: "Approver",
-            dataIndex: "managerEmail",
-            key: "managerEmail",
+    const columns = [
+        {
+            title: "Resource ID",
+            dataIndex: "id",
+            key: "id",
             render: (text) => <a>{text}</a>,
-    },
-    {
-            title: "Resource",
-            dataIndex: "item",
-            key: "item",
-            render: (resource) => {
-                    return <Tag color="volcano">{resource?.toUpperCase()}</Tag>;
-            }
-    },
-    {
-        title: "Status",
-        dataIndex: "accept",
-        render: (boolean) => <a>{boolean ? "Accepted" : "Awaiting"}</a>,
-    },
-    {
-            title: "Message",
-            dataIndex: "message",
-            key: "message",
-            render: (text) => <span>{text}</span>,
-    },
-    ...(user.role === "MANAGER"
-        ? [
-                {
-                    title: "Action",
-                    key: "action",
-                    render: (_, record) => (
-                        <Space size="middle">
-                            <Button type="primary" onClick={() => {
-                                setConfirmStatusRecord(record);
-                                setIsModalConfirmOpen(true);
-                            }}
-                            disabled={
-                                record.accept === true
-                            }><CheckOutlined /></Button>
-                        </Space>
-                    ),
-                },
-            ]
-        : []),
-];
-console.log("Resource Requests:", confirmStatusRecord);
+        },
+        {
+            title: "Email",
+            dataIndex: "employeeEmail",
+            key: "employeeEmail",
+        },
+        {
+                title: "Approver",
+                dataIndex: "managerEmail",
+                key: "managerEmail",
+                render: (text) => <a>{text}</a>,
+        },
+        {
+                title: "Resource",
+                dataIndex: "item",
+                key: "item",
+                render: (resource) => {
+                        return <Tag color="volcano">{resource?.toUpperCase()}</Tag>;
+                }
+        },
+        {
+            title: "Status",
+            dataIndex: "accept",
+            render: (boolean) => <a>{boolean ? "Accepted" : "Awaiting"}</a>,
+        },
+        {
+                title: "Message",
+                dataIndex: "message",
+                key: "message",
+                render: (text) => <span>{text}</span>,
+        },
+        ...(user.role === "MANAGER"
+            ? [
+                    {
+                        title: "Action",
+                        key: "action",
+                        render: (_, record) => (
+                            <Space size="middle">
+                                <Button type="primary"
+                                    onClick={() => {
+                                        setConfirmStatusRecord(record);
+                                        setIsModalConfirmOpen(true);
+                                    }}
+                                disabled={
+                                    record.accept === true
+                                }><CheckOutlined /></Button>
+                            </Space>
+                        ),
+                    },
+                ]
+            : []),
+    ];
   
   const showModal = () => {
     setIsModalOpen(true);
@@ -168,6 +182,7 @@ console.log("Resource Requests:", confirmStatusRecord);
         alert("Please fill all the fields");
         return;
     }
+    setAddLoading(true);
     try{
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}user/createResourceRequest`, {
             method: "POST",
@@ -182,6 +197,7 @@ console.log("Resource Requests:", confirmStatusRecord);
         });
         if (response.ok) {
             const data = await response.json();
+            setAddLoading(false);
             setIsModalOpen(false);
             fetchResourceRequests();
             openNotification(true, "success", "Resource request added successfully", "Your resource request has been submitted successfully.");
@@ -200,6 +216,7 @@ console.log("Resource Requests:", confirmStatusRecord);
   };
 
     const handleConfirmOk = async () => {
+        setAcceptLoading(true);
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}manager/resourceRequest/${confirmStatusRecord.id}`, {
                 method: "POST",
@@ -218,6 +235,8 @@ console.log("Resource Requests:", confirmStatusRecord);
             }
         } catch (error) {
             openNotification(true, "error", "Error", "An error occurred while fetching resource requests. Please try again later.");
+        } finally {
+            setAcceptLoading(false);
         }
     }
     
@@ -243,8 +262,8 @@ console.log("Resource Requests:", confirmStatusRecord);
                                   onClick: ({ key }) => {
                                     if (key === "1") {
                                       localStorage.removeItem("token");
-                                      localStorage.removeItem("user");
-                                      window.location.reload();
+                                      localStorage.removeItem("role");
+                                      window.location.href = "/";
                                     }
                                   },
                                 }}
@@ -347,17 +366,26 @@ console.log("Resource Requests:", confirmStatusRecord);
                         }
                     </div>
                     </div>
-
-                    <div style={{
-                        width:"100%",
-                        marginTop:"20px",
-                    }}>
-                        <Table 
-                            columns={columns} 
-                            dataSource={resourceRequests} 
-                            className="custom-ant-table"
-                        />
-                    </div>
+                    {
+                        isLoading ? <Spin size="large" style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)'
+                        }}/>:(
+                            <div style={{
+                                width:"100%",
+                                marginTop:"20px",
+                            }}>
+                                <Table 
+                                    columns={columns} 
+                                    dataSource={resourceRequests} 
+                                    className="custom-ant-table"
+                                />
+                            </div>
+                        )
+                    }
+                    
 
                 </div>
                 {/* Main content Ends here !!! */}
@@ -370,6 +398,14 @@ console.log("Resource Requests:", confirmStatusRecord);
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}
+                footer={[
+                    <Button key="back" onClick={handleCancel}>
+                        Cancel
+                    </Button>,
+                    <Button key="submit" type="primary" loading={addLoading} onClick={handleOk}>
+                        Add Request
+                    </Button>,
+                ]}
             >
                <div 
                 style={{
@@ -412,6 +448,14 @@ console.log("Resource Requests:", confirmStatusRecord);
                 open={isModalConfirmOpen}
                 onOk={handleConfirmOk}
                 onCancel={handleConfirmCancel}
+                footer={[
+                    <Button key="back" onClick={handleConfirmCancel}>
+                        Cancel
+                    </Button>,
+                    <Button key="submit" type="primary" loading={acceptLoading} onClick={handleConfirmOk}>
+                        Accept
+                    </Button>,
+                ]}
             >
                 <p>Are you sure you want to accept this resource request?</p>
             </Modal>

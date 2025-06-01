@@ -1,5 +1,5 @@
 import "./ManagerDashboard.css"
-import { Avatar,Dropdown } from "antd";
+import { Avatar,Dropdown,Spin } from "antd";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import {UserOutlined,BarChartOutlined,CheckCircleOutlined,ClockCircleOutlined} from "@ant-design/icons";
 import { Link } from 'react-router-dom';
@@ -19,21 +19,23 @@ const CardItem = ({ title, value, icon, trend, onClick }) => (
 const ManagerDashboard = () =>{
 
     const [dashboardDetails, setDashboardDetails] = useState({
-            employeeCount: 0,
-            managerCount: 0,
-            departmentCount: 0,
-            totalRequestCount: 0,
-            approvedRequestCount: 0,
-            pendingRequestCount: 0
-        });
+        employeeCount: 0,
+        managerCount: 0,
+        departmentCount: 0,
+        totalRequestCount: 0,
+        approvedRequestCount: 0,
+        pendingRequestCount: 0
+    });
     const [employeeName, setEmployeeName] = useState("");
+    const [Loading, setLoading] = useState(true);
         
-        useEffect(() => {
-            fetchDashboardDetails();
-            fetchEmployeeName();
-        }, []);
+    useEffect(() => {
+        fetchDashboardDetails();
+        fetchEmployeeName();
+    }, []);
     
         const fetchDashboardDetails = async () => {
+            setLoading(true);
             try {
                 const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}manager/dashboardCounts`, {
                     method: 'GET',
@@ -50,6 +52,8 @@ const ManagerDashboard = () =>{
                 setDashboardDetails(data);
             } catch (error) {
                 console.error('Error fetching dashboard details:', error);
+            } finally {
+                setLoading(false);
             }
         };
     const fetchEmployeeName = async () => {
@@ -123,8 +127,8 @@ const ManagerDashboard = () =>{
                         onClick: ({ key }) => {
                             if (key === "1") {
                                 localStorage.removeItem("token");
-                                localStorage.removeItem("user");
-                                window.location.reload();
+                                localStorage.removeItem("role");
+                                window.location.href = "/";
                             }
                         }
                     }} placement="bottomLeft">
@@ -167,25 +171,39 @@ const ManagerDashboard = () =>{
         
                 {/* Main content Starts here !!! */}
                 <div className="employee-content">
-                    <div className="hello">Hi, {employeeName} 👋</div>
+                    {
+                        Loading ? 
+                            <Spin size="large" style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)'
+                            }}/>
+                            :(
+                                <>
+                                    <div className="hello">Hi, {employeeName} 👋</div>
 
-                    <div style={{
-                        width:"100%"
-                    }}>
-                        <div style={{ padding: '24px',minHeight: '100vh' }}>
-                            <div
-                                style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-                                    gap: '16px',
-                                }}
-                            >
-                                {cards.map((card, idx) => (
-                                <CardItem key={idx} {...card} onClick={() => alert(`Clicked on ${card.title}`)} />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                                    <div style={{
+                                        width:"100%"
+                                    }}>
+                                        <div style={{ padding: '24px',minHeight: '100vh' }}>
+                                            <div
+                                                style={{
+                                                    display: 'grid',
+                                                    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+                                                    gap: '16px',
+                                                }}
+                                            >
+                                                {cards.map((card, idx) => (
+                                                    <CardItem key={idx} {...card} onClick={() => alert(`Clicked on ${card.title}`)} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            )
+                    }
+                    
           
                 </div>
                 {/* Main content Ends here !!! */}

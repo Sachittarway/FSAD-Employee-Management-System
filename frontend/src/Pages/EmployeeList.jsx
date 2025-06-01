@@ -9,6 +9,7 @@ import {
   Dropdown,
   Modal,
   Select,
+  Spin,
 } from "antd";
 import "./EmployeeList.css";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
@@ -21,7 +22,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../Auth/AuthContext";
 import { notification } from "antd";
-import UserDetails from "./UserDetails";
 
 const EmployeeList = () => {
   const { Search } = Input;
@@ -35,6 +35,8 @@ const EmployeeList = () => {
   const [employeeList, setEmployeeList] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
   const [countryList, setCountryList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAddEmployeeLoading, setIsAddEmployeeLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -49,6 +51,7 @@ const EmployeeList = () => {
   }, []);
 
   const fetchEmployeeList = async () => {
+    setIsLoading(true);
     try {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/employeeList`, {
         method: "GET",
@@ -67,10 +70,10 @@ const EmployeeList = () => {
       }
       const data = await res.json();
       setEmployeeList(data);
-      console.log("Employee List Data:", data);
-      // You can set the data to state if needed
     } catch (err) {
       console.error("Error fetching employee list:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -200,31 +203,6 @@ const EmployeeList = () => {
     },
   ];
 
-  /* Table Data!!!*/
-  const data = [
-    {
-      empid: "1",
-      name: "John Brown",
-      position: "Software Developer",
-      role: "Admin",
-      email: "sachit.tarway@gmail.com",
-    },
-    {
-      empid: "2",
-      name: "Jim Green",
-      position: "Software Developer",
-      role: "Manager",
-      email: "sachit.tarway@gmail.com",
-    },
-    {
-      empid: "3",
-      name: "Joe Black",
-      position: "Software Developer",
-      role: "User",
-      email: "sachit.tarway@gmail.com",
-    },
-  ];
-
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -258,6 +236,7 @@ const EmployeeList = () => {
       )();
       return;
     }
+    setIsAddEmployeeLoading(true);
     try {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}admin/register`, {
         method: "POST",
@@ -287,7 +266,12 @@ const EmployeeList = () => {
         return;
       }
       const data = await res.json();
-      console.log(data);
+      openNotification(
+        false,
+        "success",
+        "Employee Added",
+        "Employee has been successfully added."
+      )();
       fetchEmployeeList();
       setIsModalOpen(false);
     } catch (err) {
@@ -297,6 +281,7 @@ const EmployeeList = () => {
     setFullname("");
     setEmail("");
     setRole("USER");
+    setIsAddEmployeeLoading(false);
   };
 
   const handleCancel = () => {
@@ -334,6 +319,7 @@ const EmployeeList = () => {
   };
 
   const fetchEmployeeListByDepartment = async (departmentId) => {
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}common/searchEmployeesByDepartmentId?departmentId=${departmentId}`,
@@ -361,10 +347,13 @@ const EmployeeList = () => {
       console.log("Filtered Employee List Data:", data);
     } catch (err) {
       console.error("Error fetching employee list by department:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const fetchEmployeeListByRole = async (role) => {
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}common/getEmployeeByRole?role=${role}`,
@@ -392,10 +381,13 @@ const EmployeeList = () => {
       console.log("Filtered Employee List Data:", data);
     } catch (err) {
       console.error("Error fetching employee list by role:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const fetchEmployeeListByLocation = async (countryName) => {
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}common/getEmployeeDetailsByCurrentLocation?currentLocation=${countryName}`,
@@ -423,6 +415,8 @@ const EmployeeList = () => {
       console.log("Filtered Employee List Data:", data);
     } catch (err) {
       console.error("Error fetching employee list by location:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -437,10 +431,10 @@ const EmployeeList = () => {
       console.log(`Disabled filter: ${key}`);
     }
   };
-  console.log("Disabled Keys:", disabledKeys);
 
   const onSearchFilter =  async() =>{
     const filter = disabledKeys[0];
+    setIsLoading(true);
     try{
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/searchUsers?${filter}=${searchText}`, {
         method: "GET",
@@ -463,9 +457,11 @@ const EmployeeList = () => {
     }
     catch (err) {
       console.error("Error fetching filtered employee list:", err);
+    } finally {
+      setIsLoading(false);
     }
   }
-  
+
 
   return (
     <div className="employee-list">
@@ -483,8 +479,8 @@ const EmployeeList = () => {
               onClick: ({ key }) => {
                 if (key === "1") {
                   localStorage.removeItem("token");
-                  localStorage.removeItem("user");
-                  window.location.reload();
+                  localStorage.removeItem("role");
+                  window.location.href = "/";
                 }
               },
             }}
@@ -734,7 +730,14 @@ const EmployeeList = () => {
           </div>
 
           {/* Table Content Starts from here!!!!! */}
-          <div
+          {
+            isLoading ? <Spin size="large" style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)'
+                        }}/> :(
+                          <div
             style={{
               width: "100%",
               marginTop: "20px",
@@ -746,6 +749,9 @@ const EmployeeList = () => {
               className="custom-ant-table"
             />
           </div>
+                        )
+          }
+          
         </div>
         {/* Main content Ends here !!! */}
       </div>
@@ -756,8 +762,20 @@ const EmployeeList = () => {
         title="Add Employee"
         closable={{ "aria-label": "Custom Close Button" }}
         open={isModalOpen}
-        onOk={handleOk}
         onCancel={handleCancel}
+        footer={[
+          <Button
+            key="submit"
+            type="primary"
+            loading={isAddEmployeeLoading}
+            onClick={handleOk}
+          >
+            Register
+          </Button>,
+          <Button key="cancel" onClick={handleCancel}>
+            Cancel
+          </Button>,
+        ]}
       >
         <div
           style={{

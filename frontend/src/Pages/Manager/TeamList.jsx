@@ -1,4 +1,4 @@
-import { Table, Tag,Avatar, Input, Dropdown,Modal } from "antd";
+import { Table, Tag,Avatar, Input, Dropdown,Modal,Spin } from "antd";
 import "./TeamList.css";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import {UserOutlined} from "@ant-design/icons";
@@ -12,6 +12,7 @@ const TeamList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const[employeeList, setEmployeeList] = useState([]);
   const [searchInput, setSearchInput] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const items = [
     {
@@ -27,6 +28,7 @@ const TeamList = () => {
   }, []);
 
   const fetchTeamEmployeeList = async () => {
+    setLoading(true);
     try {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}manager/myTeam?name=${searchInput}`, {
         method: 'GET',
@@ -48,6 +50,8 @@ const TeamList = () => {
     }
     catch (err) {
       console.error("Error fetching employee list:", err);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -127,8 +131,8 @@ const TeamList = () => {
             onClick: ({ key }) => {
               if (key === "1") {
                 localStorage.removeItem("token");
-                localStorage.removeItem("user");
-                window.location.reload();
+                localStorage.removeItem("role");
+                window.location.href = "/";
               }
             }
           }} placement="bottomLeft">
@@ -229,49 +233,30 @@ const TeamList = () => {
               />
             </div>
 
-            {/* <div style={{
-              display:"flex",
-              justifyContent:"space-between",
-              gap: "20px"
-            }}>
-              <div>
-                <Dropdown menu={{ items }} placement="bottomLeft" arrow>
-                  <Button size="large">
-                  <FilterOutlined /> All Departments
-                  </Button>
-                </Dropdown>
-              </div>
-
-              <div>
-                <Dropdown menu={{ items }} placement="bottomLeft" arrow>
-                  <Button size="large">
-                  <FilterOutlined /> Roles
-                  </Button>
-                </Dropdown>
-              </div>
-
-              <div>
-                <Dropdown menu={{ items }} placement="bottomLeft" arrow>
-                  <Button size="large">
-                  <FilterOutlined /> Location
-                  </Button>
-                </Dropdown>
-              </div>
-
-            </div> */}
           </div>
 
           {/* Table Content Starts from here!!!!! */}
-          <div style={{
-            width:"100%",
-            marginTop:"20px",
-          }}>
-          <Table 
-            columns={columns} 
-            dataSource={employeeList} 
-            className="custom-ant-table"
-          />
-          </div>
+          {
+            loading ? 
+              <Spin size="large" style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)'
+              }}/>:(
+                <div style={{
+                  width:"100%",
+                  marginTop:"20px",
+                }}>
+                  <Table 
+                    columns={columns} 
+                    dataSource={employeeList} 
+                    className="custom-ant-table"
+                  />
+                </div>
+            )
+          }
+          
           
         </div>
         {/* Main content Ends here !!! */}

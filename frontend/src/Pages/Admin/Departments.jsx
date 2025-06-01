@@ -1,4 +1,4 @@
-import { Table, Button, Avatar,Dropdown,Input,Space,Modal} from "antd";
+import { Table, Button, Avatar,Dropdown,Input,Space,Modal,Spin} from "antd";
 import "./Departments.css";
 import { Sidebar, Menu, MenuItem} from "react-pro-sidebar";
 import {FolderViewOutlined,EditOutlined} from "@ant-design/icons";
@@ -70,11 +70,18 @@ const Departments = () => {
   const[departmentname, setDepartmentName] = useState("");
   const [isProjectNewOpen, setIsProjectNewOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAddDepartmentLoading, setIsAddDepartmentLoading] = useState(false);
+  const [isAddProjectLoading, setIsAddProjectLoading] = useState(false);
+  const [loadingProjectData, setLoadingProjectData] = useState(false);
   const { Search } = Input;
+  
   useEffect(() => {
     fetchDepartmentData();
   }, []);
+  
   const fetchDepartmentData = async () => {
+    setIsLoading(true);
     try {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/departments`, {
       method: 'GET',
@@ -89,10 +96,13 @@ const Departments = () => {
       setDepartmentData(data);
     } catch (error) {
       console.error("Error fetching department data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const fetchProjectData = async (departmentId) => {
+    setLoadingProjectData(true);
     try {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/project/department/${departmentId}`, {
         method: 'GET',
@@ -105,6 +115,7 @@ const Departments = () => {
       }
       const data = await res.json();
       setProjectData(data);
+      setLoadingProjectData(false);
     } catch (error) {
       console.error("Error fetching project data:", error);
     }
@@ -120,6 +131,7 @@ const Departments = () => {
       alert("Please enter a department name");
       return;
     }
+    setIsAddDepartmentLoading(true);
     try {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}admin/createDepartment`, {
         method: 'POST',
@@ -133,7 +145,7 @@ const Departments = () => {
         throw new Error("Network response was not ok");
       }
       const data = await res.json();
-      console.log("Department added successfully:", data);
+      setIsAddDepartmentLoading(false);
       fetchDepartmentData(); 
       setIsModalOpen(false);
       setDepartmentName(""); 
@@ -169,6 +181,7 @@ const Departments = () => {
       alert("Please select a department");
       return;
     }
+    setIsAddProjectLoading(true);
     try {
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}admin/createProject`, {
         method: 'POST',
@@ -187,7 +200,7 @@ const Departments = () => {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      console.log("Project added successfully:", data);
+      setIsAddProjectLoading(false);
       fetchProjectData(departmentId);
       setIsProjectNewOpen(false);
       setProjectName("");
@@ -203,6 +216,7 @@ const Departments = () => {
   };
 
   const onSearchDepartments = async () => {
+    setIsLoading(true);
     try{
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}common/searchDepartments?name=${searchText}`, {
         method: 'GET',
@@ -215,7 +229,7 @@ const Departments = () => {
       }
       const data = await response.json();
       setDepartmentData(data);
-      console.log("Search results:", data);
+      setIsLoading(false);
     }
     catch (error) {
       console.error("Error searching departments:", error);
@@ -235,8 +249,8 @@ const Departments = () => {
                         onClick: ({ key }) => {
                             if (key === "1") {
                                 localStorage.removeItem("token");
-                                localStorage.removeItem("user");
-                                window.location.reload();
+                                localStorage.removeItem("role");
+                                window.location.href = "/";
                             }
                         }
                     }} placement="bottomLeft">
@@ -279,68 +293,79 @@ const Departments = () => {
         
         {/* Main content Starts here !!! */}
         <div className="employee-content">
+          {
+            isLoading ? 
+              <Spin size="large" style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)'
+              }}/>
+            :
+            (
+              <>
+                <div
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                > 
+                  <div className="hello">Departments 🏬</div>
+                  <div>
+                    {
+                      user.role === "ADMIN" && (
+                        <Button type="primary" className="add-employee" size="large" onClick={showModal}>
+                          Add Department
+                        </Button>
+                      )
+                    }
+                  </div>
+                </div>
 
 
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div className="hello">Departments 🏬</div>
-            <div>
-              {
-                user.role === "ADMIN" && (
-                  <Button type="primary" className="add-employee" size="large" onClick={showModal}>
-                    Add Department
-                  </Button>
-                )
-              }
-            </div>
-          </div>
+                <div style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop:"20px",
+                  width: "100%",
+                }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Search
+                      placeholder="Search by Department Name"
+                      allowClear
+                      size="large"
+                      enterButton
+                      style={{
+                        width: 600,
+                      }}
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                      onSearch={onSearchDepartments}
+                    />
+                  </div>
+                </div>
 
-
-          <div style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop:"20px",
-                width: "100%",
-              }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <Search
-                placeholder="Search by Department Name"
-                allowClear
-                size="large"
-                enterButton
-                style={{
-                  width: 600,
-                }}
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                onSearch={onSearchDepartments}
-              />
-            </div>
-          </div>
-
-          {/* Table Content Starts from here!!!!! */}
-          <div style={{
-            width:"100%",
-            marginTop:"20px",
-          }}>
-          <Table 
-            columns={columns} 
-            dataSource={departmentData} 
-            className="custom-ant-table"
-          />
-          </div>
-          
+                {/* Table Content Starts from here!!!!! */}
+                <div style={{
+                  width:"100%",
+                  marginTop:"20px",
+                }}>
+                  <Table 
+                    columns={columns} 
+                    dataSource={departmentData} 
+                    className="custom-ant-table"
+                  />
+                </div>
+              </>
+            )
+          }
         </div>
         {/* Main content Ends here !!! */}
 
@@ -352,8 +377,23 @@ const Departments = () => {
         title="Add Department"
         closable={{ 'aria-label': 'Custom Close Button' }}
         open={isModalOpen}
-        onOk={handleOk}
         onCancel={handleCancel}
+        footer={[
+          <Button 
+            key="cancel" 
+            onClick={handleCancel}
+          > 
+            Cancel
+          </Button>,
+          <Button 
+            key="submit" 
+            type="primary" 
+            loading={isAddDepartmentLoading} 
+            onClick={handleOk}
+          >
+            Submit
+          </Button>,
+        ]}
       >
         <div style={{
           marginTop:"20px",
@@ -375,6 +415,7 @@ const Departments = () => {
         open={isProjectOpen}
         onOk={handleProjectOk}
         onCancel={handleProjectCancel}
+        loading={loadingProjectData}
       >
         <div style={{
             width:"100%",
@@ -392,8 +433,23 @@ const Departments = () => {
         title="Add Projects"
         closable={{ 'aria-label': 'Custom Close Button' }}
         open={isProjectNewOpen}
-        onOk={handleProjectNewOk}
         onCancel={handleProjectNewCancel}
+        footer={[
+          <Button 
+            key="cancel" 
+            onClick={handleProjectNewCancel}
+          > 
+            Cancel
+          </Button>,
+          <Button 
+            key="submit" 
+            type="primary" 
+            loading={isAddProjectLoading} 
+            onClick={handleProjectNewOk}
+          >
+            Submit
+          </Button>,
+        ]}
       >
         <div style={{
           marginTop:"20px",
