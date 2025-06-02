@@ -15,7 +15,7 @@ AMS aims to simplify HR processes by providing a centralized platform where empl
 - **Employee** can:
   - Login to the system
   - Change the password
-  - View profile with detailed personal info
+  - View and edit profile with detailed personal info
   - Raise resource request to the manager
 
 ### Manager Module:
@@ -27,7 +27,7 @@ AMS aims to simplify HR processes by providing a centralized platform where empl
 - Review and approve resource requests from team members
 
 ### Admin Module:
-- Manage employee profiles with full CRUD (Create, Read, Update, Delete) capabilities
+- Manage employee profiles with full Create and Read capabilities
 - Assign roles to employees
 - Manage departments and associate projects with departments
 
