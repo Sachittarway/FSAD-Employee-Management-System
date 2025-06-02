@@ -1,6 +1,6 @@
 # FSAD-Artifice-Management-System
 
-The **Artifice Management System** is an Intranet-based employee management tool. It provides control access to employee records.
+The **Artifice Management System** is an Intranet-based employee management tool. It provides control access to employee records and allows resource allocation.
 
 ---
 
@@ -19,6 +19,12 @@ The **Artifice Management System** is an Intranet-based employee management tool
 - View all employee records
 - Search employees using any field
 - Edit the following:
+
+### Admin Module:
+- Add, Edit or Delete employee profiles.
+
+### Search or find:
+- Comprehensive search across employee records based on:
 
 ## Tech Stack
 
