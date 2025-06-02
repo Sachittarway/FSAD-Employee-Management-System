@@ -3,6 +3,7 @@ import { useState,useEffect } from "react";
 import { useAuth } from "../Auth/AuthContext";
 import { useNavigate } from 'react-router-dom';
 import { notification} from 'antd';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Login = () => {
   const [isActive, setIsActive] = useState(false);
@@ -12,6 +13,7 @@ const Login = () => {
   const [name, setName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [captchaSuccess, setCaptchaSuccess] = useState(false);
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
 
@@ -67,16 +69,19 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (!email || !password) {
+      openNotification(false, 'error', 'Login failed', 'Please enter both email and password.')();
+      return;
+    }
+    if (!captchaSuccess) {
+      openNotification(false, 'error', 'Captcha required', 'Please complete the captcha before logging in.')();
+      return;
+    }
     try {
       const { token, role } = await loginUser(email, password);
       setUser({ isAuthenticated: true, role, token });
-
-      console.log('User role:', role);
-      console.log('User token:', token);
-
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
-
       switch (role) {
         case 'ADMIN':
           navigate('/AdminDashboard');
@@ -113,6 +118,10 @@ const Login = () => {
       console.error(err);
       openNotification(false, 'error')();
     }
+  }
+
+  function onChange(value) {
+    setCaptchaSuccess(true);
   }
 
   return (
@@ -155,8 +164,14 @@ const Login = () => {
             <input type="password" placeholder="Password"  value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <ReCAPTCHA
+              sitekey="6Lc3a1IrAAAAAMDYZWcI0Hay2e3U1FigIKlKMjmO"
+              onChange={onChange}
+            />
             <button>Sign in</button>
+            
           </form>
+           
         </div>
         <div class="toggle-container">
           <div class="toggle">
@@ -170,15 +185,15 @@ const Login = () => {
             <div class="toggle-panel toggle-right">
               <h1>Hello, User!</h1>
               <p>
-                Send a request to the admin for approval
+                Send a request to the admin to create an account
               </p>
-              <button
+              {/* <button
                 onClick={handleRegisterClick}
                 class="hidden"
                 id="register"
               >
                 Sign Up
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
