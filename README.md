@@ -32,7 +32,11 @@ AMS aims to simplify HR processes by providing a centralized platform where empl
 - Manage departments and associate projects with departments
 
 ### Search or find:
-- Comprehensive search across employee records based on multiple criteria for quick and efficient data retrieval
+- Provides comprehensive and efficient search functionality across employee records based on multiple criteria, including:
+  - Employee ID
+  - Employee name
+  - Employee role
+  - Department
 
 ### Resource Module:
 - **Employee** can:
